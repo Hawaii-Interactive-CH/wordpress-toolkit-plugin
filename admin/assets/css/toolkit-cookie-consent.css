@@ -1,0 +1,120 @@
+.cookie-banner {
+    z-index: 30;
+    border-radius: 10px;
+    position: fixed;
+    right: 2em;
+    bottom: 2em;
+    width: 360px;
+    background-color: #fff;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
+    padding: 2em;
+    transform: translateY(120%);
+    transition: transform 0.4s ease-in-out;
+    font-size: 0.8em;
+  }
+  
+  .cookie-banner.active {
+    transform: translateY(0);
+  }
+  
+  .cookie-banner.hidden {
+    display: none;
+  }
+  
+  .cookie-banner .cookie-banner-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .cookie-banner .cookie-banner-wrapper .cookie-banner-wrapper-text p {
+    margin: 0;
+  }
+  
+  .cookie-banner .cookie-banner-wrapper .cookie-banner-wrapper-text p a {
+    color: #383838;
+    text-decoration: underline;
+  }
+  
+  .cookie-banner .cookie-banner-wrapper .btn-wrapper {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .cookie-banner .cookie-banner-wrapper .btn-wrapper a {
+    width: auto;
+    margin-top: 0 !important;
+  }
+  
+  .cookie-banner .cross {
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .cookie-banner .cross > span {
+    position: absolute;
+    left: 0;
+    top: calc(50% - 1px);
+    width: 24px;
+    height: 2px;
+    background-color: #383838;
+  }
+  
+  .cookie-banner .cross > span:nth-child(1) {
+    transform: rotate(-45deg);
+  }
+  
+  .cookie-banner .cross > span:nth-child(2) {
+    transform: rotate(45deg);
+  }
+  
+  .btn {
+    cursor: pointer;
+  }
+  
+  @media screen and (max-width: 1124px) {
+    .cookie-banner .cookie-banner-wrapper {
+      display: block;
+      padding-right: 2rem;
+    }
+    .cookie-banner .cookie-banner-wrapper .btn-wrapper {
+      margin-top: 0.5rem;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .cookie-banner {
+      width: 100%;
+      transform: translate(0);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 0;
+      padding: 1.5rem;
+    }
+    .cookie-banner .cookie-banner-wrapper {
+      display: block;
+      padding-right: 0;
+    }
+    .cookie-banner .cookie-banner-wrapper .cookie-banner-wrapper-text {
+      padding-right: 1rem;
+    }
+    .cookie-banner .cookie-banner-wrapper .cookie-banner-wrapper-text p {
+      line-height: 16px;
+    }
+    .cookie-banner .cookie-banner-wrapper .btn-wrapper {
+      width: 100%;
+      margin-top: 1rem;
+    }
+  }
+  
+  /*# sourceMappingURL=styles.css.map */
+  

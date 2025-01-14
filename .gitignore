@@ -1,0 +1,25 @@
+# Node.js dependencies
+/node_modules/
+
+# Toolkit generated assets
+/toolkit/public/
+
+# Pattern to match any directories starting with 'twenty'
+/twenty*/
+
+# Ignore .DS_Store everywhere
+.DS_Store
+
+# Documentation build directory
+/phpdoc
+
+# Build directory
+/build
+
+# Environment files
+/.env
+/.dev
+
+# Editor settings
+/.vscode/settings.json
+.DS_Store
