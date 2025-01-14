@@ -48,7 +48,7 @@ require 'utils/plugin-update-checker/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $updateChecker = PucFactory::buildUpdateChecker(
-	'https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin.git',
+	'https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin',
 	__FILE__,
 	'wordpress-toolkit-plugin'
 );
