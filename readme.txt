@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.6.6 =
+- Remove default custom CPT to keep only the one defined in the theme
+
 = 1.6.5 =
 - Fix typo
 
