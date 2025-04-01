@@ -7,7 +7,6 @@ defined( 'ABSPATH' ) or exit;
 
 use Toolkit\utils\GravityForm;
 
-
 function render_partial($view, $data = [])
 {
     extract($data);
