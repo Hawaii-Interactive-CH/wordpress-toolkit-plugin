@@ -31,6 +31,15 @@ class AssetService
                 WP_TOOLKIT_URL . '/admin/assets/css/toolkit-md.css',
                 [],
             );
+
+            // Enqueue blocks.css in wp-admin only
+            if (file_exists(WP_TOOLKIT_THEME_PATH . "/public/css/blocks/blocks.css")) {
+                wp_enqueue_style(
+                    "vite-wordpress-toolkit-plugin-css-blocks",
+                    WP_TOOLKIT_THEME_URL . "/public/css/blocks/blocks.css",
+                    [],
+                );
+            }
         });
     }
 

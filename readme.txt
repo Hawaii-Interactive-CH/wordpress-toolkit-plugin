@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.7.1 =
+- Add blocks.css to see custom block style in admin
+
 = 1.7.0 =
 - Add category to media files
 
