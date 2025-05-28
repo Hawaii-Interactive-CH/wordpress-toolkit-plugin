@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.7.3 =
+- Fix cpt creation
+
 = 1.7.2 =
 - Fix url assets path for block.css
 

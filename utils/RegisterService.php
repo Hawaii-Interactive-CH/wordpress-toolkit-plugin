@@ -194,7 +194,40 @@ class RegisterService
         $phpContent .= '    const SLUG = \'' . strtolower(sanitize_text_field($formData['model_slug'])) . '\';' . PHP_EOL . PHP_EOL;
         $phpContent .= '    public static function type_settings()' . PHP_EOL;
         $phpContent .= '    {' . PHP_EOL;
-        $phpContent .= '        return ' . var_export(self::prepare_settings($formData), true) . ';' . PHP_EOL;
+        $phpContent .= '        return [' . PHP_EOL;
+        $phpContent .= '            "menu_position" => 2,' . PHP_EOL;
+        $phpContent .= '            "label" => __("' . $formData['model_label'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '            "labels" => [' . PHP_EOL;
+        $phpContent .= '                "name" => __("' . $formData['model_label'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "singular_name" => __("' . $formData['model_singular_name'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "menu_name" => __("' . $formData['model_menu_name'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "all_items" => __("' . $formData['model_all_items'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "add_new" => __("' . $formData['model_add_new'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "add_new_item" => __("' . $formData['model_add_new_item'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "edit_item" => __("' . $formData['model_edit_item'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "new_item" => __("' . $formData['model_new_item'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "view_item" => __("' . $formData['model_view_item'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "view_items" => __("' . $formData['model_view_items'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "search_items" => __("' . $formData['model_search_items'] . '", "toolkit")' . PHP_EOL;
+        $phpContent .= '            ],' . PHP_EOL;
+        $phpContent .= '            "description" => "",' . PHP_EOL;
+        $phpContent .= '            "public" => true,' . PHP_EOL;
+        $phpContent .= '            "publicly_queryable" => true,' . PHP_EOL;
+        $phpContent .= '            "show_ui" => true,' . PHP_EOL;
+        $phpContent .= '            "show_in_rest" => true,' . PHP_EOL;
+        $phpContent .= '            "show_in_nav_menus" => true,' . PHP_EOL;
+        $phpContent .= '            "rest_base" => "",' . PHP_EOL;
+        $phpContent .= '            "has_archive" => true,' . PHP_EOL;
+        $phpContent .= '            "show_in_menu" => true,' . PHP_EOL;
+        $phpContent .= '            "exclude_from_search" => false,' . PHP_EOL;
+        $phpContent .= '            "capability_type" => "post",' . PHP_EOL;
+        $phpContent .= '            "map_meta_cap" => true,' . PHP_EOL;
+        $phpContent .= '            "hierarchical" => false,' . PHP_EOL;
+        $phpContent .= '            "rewrite" => ["slug" => self::SLUG, "with_front" => false],' . PHP_EOL;
+        $phpContent .= '            "query_var" => true,' . PHP_EOL;
+        $phpContent .= '            "menu_icon" => "dashicons-icon-' . $formData['model_icon'] . '",' . PHP_EOL;
+        $phpContent .= '            "supports" => ' . var_export(explode(", ", $formData['model_supports']), true) . ',' . PHP_EOL;
+        $phpContent .= '        ];' . PHP_EOL;
         $phpContent .= '    }' . PHP_EOL . PHP_EOL;
         // Add the jsonSerialize method
         $phpContent .= '    public function jsonSerialize(): mixed' . PHP_EOL;
@@ -309,44 +342,6 @@ class RegisterService
         echo __('Block created successfully.', 'toolkit');
 
         die();
-    }
-
-    public static function prepare_settings(array $formData)
-    {
-        return [
-            "menu_position" => 2,
-            "label" => __($formData['model_label'], "toolkit"),
-            "labels" => [
-                "name" => __($formData['model_label'], "toolkit"),
-                "singular_name" => __($formData['model_singular_name'], "toolkit"),
-                "menu_name" => __($formData['model_menu_name'], "toolkit"),
-                "all_items" => __($formData['model_all_items'], "toolkit"),
-                "add_new" => __($formData['model_add_new'], "toolkit"),
-                "add_new_item" => __($formData['model_add_new_item'], "toolkit"),
-                "edit_item" => __($formData['model_edit_item'], "toolkit"),
-                "new_item" => __($formData['model_new_item'], "toolkit"),
-                "view_item" => __($formData['model_view_item'], "toolkit"),
-                "view_items" => __($formData['model_view_items'], "toolkit"),
-                "search_items" => __($formData['model_search_items'], "toolkit")
-            ],
-            "description" => "",
-            "public" => true,
-            "publicly_queryable" => true,
-            "show_ui" => true,
-            "show_in_rest" => true,
-            "show_in_nav_menus" => true,
-            "rest_base" => "",
-            "has_archive" => true,
-            "show_in_menu" => true,
-            "exclude_from_search" => false,
-            "capability_type" => "post",
-            "map_meta_cap" => true,
-            "hierarchical" => false,
-            "rewrite" => ["slug" => sanitize_text_field($formData['model_slug']), "with_front" => false],
-            "query_var" => true,
-            "menu_icon" => "dashicons-icon-" . $formData['model_icon'],
-            "supports" => explode(", ", $formData['model_supports']),
-        ];
     }
 
     public static function prepare_category()
