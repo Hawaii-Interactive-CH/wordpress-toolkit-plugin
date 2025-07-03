@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.8.0 =
+- Add support of wp-i18n in js script
+
 = 1.7.3 =
 - Fix cpt creation
 

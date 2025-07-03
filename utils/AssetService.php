@@ -157,7 +157,7 @@ class AssetService
                 wp_enqueue_script(
                     "vite-wordpress-toolkit-plugin-js-" . basename($file, ".js"),
                     WP_TOOLKIT_THEME_URL . "/public/js/" . $file,
-                    [],
+                    ['wp-i18n'],
                     null,
                     true
                 );
