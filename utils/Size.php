@@ -325,7 +325,7 @@ class Size
         }
 
         // Check if image extension is supported
-        $non_supported_extensions = ["svg"];
+        $non_supported_extensions = ["svg", "avif", "heic", "heif"];
         $image_extension = $this->get_image_extension(
             get_attached_file($attachment_id)
         );

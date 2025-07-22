@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.8.1 =
+- Exclude "svg", "avif", "heic", "heif" from image resize
+
 = 1.8.0 =
 - Add support of wp-i18n in js script
 
