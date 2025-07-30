@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.8.3 =
+- Fix: Typo in import
+
 = 1.8.2 =
 - Fix: Corretly load block themes in editor
 
