@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.8.2 =
+- Fix: Corretly load block themes in editor
+
 = 1.8.1 =
 - Exclude "svg", "avif", "heic", "heif" from image resize
 

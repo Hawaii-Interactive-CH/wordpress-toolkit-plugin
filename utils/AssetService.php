@@ -39,6 +39,9 @@ class AssetService
                     WP_TOOLKIT_THEME_URL . "/public/css/blocks/blocks.css",
                     [],
                 );
+
+                add_theme_support( 'editor-styles' );
+                add_editor_style(WP_TOOLKIT_THEME_URL . "/public/css/blocks/blocks.css");
             }
         });
     }
