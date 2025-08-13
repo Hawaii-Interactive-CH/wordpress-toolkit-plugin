@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.8.4 =
+- Fix: Block css @elenagoto
+
 = 1.8.3 =
 - Fix: Typo in import
 
