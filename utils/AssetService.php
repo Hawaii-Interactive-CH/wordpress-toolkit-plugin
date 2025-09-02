@@ -373,6 +373,15 @@ class AssetService
             }
         }
         
+        // Preload font assets if they exist
+        if (isset($entry['assets'])) {
+            foreach ($entry['assets'] as $assetFile) {
+                if (preg_match('/\.(woff|woff2|ttf|otf|eot)$/', $assetFile)) {
+                    echo '<link rel="preload" href="' . esc_url($baseUrl . $assetFile) . '" as="font" type="font/' . pathinfo($assetFile, PATHINFO_EXTENSION) . '" crossorigin>' . "\n";
+                }
+            }
+        }
+        
         // Add configuration for JavaScript
         echo '<script>window.toolkitConfig = ' . json_encode([
             'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -391,7 +400,7 @@ class AssetService
      */
     private static function is_dev_mode() {
         // Never use dev mode if we're in WP-CLI context
-        if (defined('WP_CLI') && WP_CLI) {
+        if (defined('WP_CLI') && \WP_CLI) {
             return false;
         }
         

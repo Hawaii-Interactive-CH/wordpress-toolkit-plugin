@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.9.1 =
+- Fix: Correct asset paths for fonts
+
 = 1.9.0 =
 - Feat: Rewrite assets loading to use vite
 
