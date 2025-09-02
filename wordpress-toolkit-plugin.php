@@ -4,7 +4,7 @@
  * Plugin Name: Toolkit
  * Description: Hawaii Interactive Toolkit Theme Plugin
  * Plugin URI: https://git.hawai.li/hawai-li/wordpress-toolkit-plugin
- * Version: 1.8.4
+ * Version: 1.9.0
  * Requires at least: 5.2
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
@@ -19,12 +19,14 @@ namespace Toolkit;
 defined("ABSPATH") or exit();
 
 // Define plugin constants.
+define("WP_TOOLKIT_VERSION", "1.9.0");
 define("WP_TOOLKIT_DIR", plugin_dir_path(__FILE__));
 define("WP_TOOLKIT_URL", plugin_dir_url(__FILE__));
 define("WP_TOOLKIT_THEME_PATH", get_template_directory());
 define("WP_TOOLKIT_THEME_URL", get_template_directory_uri());
 define("WP_TOOLKIT_THEME_VIEWS_PATH", get_template_directory() . "/templates");
 define("JB_FLY_PLUGIN_PATH", WP_TOOLKIT_DIR . "vendor/jb-fly");
+
 
 // Autoload classes.
 spl_autoload_register(function ($class) {
@@ -59,16 +61,18 @@ $updateChecker->setBranch("main");
 include WP_TOOLKIT_DIR . "/main.php";
 include WP_TOOLKIT_DIR . "/routes/api.php";
 
-// Register classes.
+
+// Register other classes on init
 $to_register = [
     // Utils
-    "\\Toolkit\\utils\\AssetService",
     "\\Toolkit\\utils\\MainService",
     "\\Toolkit\\utils\\ModelService",
     "\\Toolkit\\utils\\RegisterService",
     "\\Toolkit\\utils\\DocService",
     "\\Toolkit\\utils\\ApiAuthService",
     "\\Toolkit\\utils\\MenuService",
+    "\\Toolkit\\utils\\AssetService",
+    "\\Toolkit\\utils\\CookieService",
     // Models
     "\\Toolkit\\models\\MediaTaxonomy",
 ];

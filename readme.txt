@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.9.0 =
+- Feat: Rewrite assets loading to use vite
+
 = 1.8.4 =
 - Fix: Block css @elenagoto
 

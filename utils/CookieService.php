@@ -30,8 +30,8 @@ class CookieService
             register_setting('cookie_consent_plugin_settings', 'cookie_consent_additional_data');
         });
         add_action('wp_enqueue_scripts', function () {
-            wp_enqueue_script('aloha-cookie-consent-script', WP_TOOLKIT_URL . '/admin/assets/js/toolkit-cookie-consent.js', array('jquery'), false, true);
-            wp_enqueue_style('aloha-cookie-consent-style', WP_TOOLKIT_URL . '/admin/assets/css/toolkit-cookie-consent.css');
+            wp_enqueue_script('aloha-cookie-consent-script', WP_TOOLKIT_URL . 'admin/assets/js/toolkit-cookie-consent.js', array('jquery'), false, true);
+            wp_enqueue_style('aloha-cookie-consent-style', WP_TOOLKIT_URL . 'admin/assets/css/toolkit-cookie-consent.css');
         });
 
         add_action('wp_footer', function () {
