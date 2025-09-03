@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 1.9.2 =
+- Fix: Remove duplicate cookie register by default
+
 = 1.9.1 =
 - Fix: Correct asset paths for fonts
 

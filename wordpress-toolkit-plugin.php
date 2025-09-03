@@ -4,7 +4,7 @@
  * Plugin Name: Toolkit
  * Description: Hawaii Interactive Toolkit Theme Plugin
  * Plugin URI: https://git.hawai.li/hawai-li/wordpress-toolkit-plugin
- * Version: 1.9.1
+ * Version: 1.9.2
  * Requires at least: 5.2
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
@@ -72,7 +72,6 @@ $to_register = [
     "\\Toolkit\\utils\\ApiAuthService",
     "\\Toolkit\\utils\\MenuService",
     "\\Toolkit\\utils\\AssetService",
-    "\\Toolkit\\utils\\CookieService",
     // Models
     "\\Toolkit\\models\\MediaTaxonomy",
 ];
