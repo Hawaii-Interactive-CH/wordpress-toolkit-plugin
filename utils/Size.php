@@ -35,18 +35,15 @@ class Size
     public function init()
     {
         $this->_fly_dir = apply_filters("fly_dir_path", $this->get_fly_dir());
-        $this->_capability = apply_filters(
-            "fly_images_user_capability",
-            $this->_capability
-        );
+        $this->_capability = apply_filters("fly_images_user_capability", $this->_capability);
 
         $this->check_fly_dir();
 
         add_action('admin_menu', array($this, 'admin_menu_item'));
         add_filter('media_row_actions', array($this, 'media_row_action'), 10, 2);
         add_action('delete_attachment', array($this, 'delete_attachment_fly_images'));
-
         add_action('switch_blog', array($this, 'blog_switched'));
+        add_action('wp_generate_attachment_metadata', array($this, 'generate_all_fly_images_batch'), 10, 2);
     }
 
     public static function add(
@@ -303,6 +300,81 @@ class Size
     }
 
     /**
+     * Generate all fly image sizes at once when image is uploaded
+     */
+    public function generate_all_fly_images_batch($metadata, $attachment_id)
+    {
+        if (empty($this->_image_sizes) || empty($metadata)) {
+            return $metadata;
+        }
+
+        $image_path = get_attached_file($attachment_id);
+        $image_extension = $this->get_image_extension($image_path);
+
+        if (in_array($image_extension, ["svg", "avif", "heic", "heif"])) {
+            return $metadata;
+        }
+
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(120);
+        }
+
+        $fly_dir = $this->get_fly_dir($attachment_id);
+        if (!is_dir($fly_dir)) {
+            wp_mkdir_p($fly_dir);
+        }
+
+        try {
+            // Group sizes by dimensions to avoid redundant processing
+            $sizes_to_process = [];
+            foreach ($this->_image_sizes as $size_name => $size_data) {
+                $width = $size_data['size'][0];
+                $height = $size_data['size'][1];
+                $crop = $size_data['crop'];
+
+                if ($width > 2560) {
+                    $width = 2560;
+                    $height = intval($height * (2560 / $size_data['size'][0]));
+                }
+
+                $fly_file_path = $fly_dir . DIRECTORY_SEPARATOR . $this->get_fly_file_name(basename($metadata["file"]), $width, $height, $crop);
+                $fly_webp_path = $fly_dir . DIRECTORY_SEPARATOR . $this->get_fly_file_name(basename($metadata["file"]), $width, $height, $crop, true);
+
+                if (!file_exists($fly_file_path) || !file_exists($fly_webp_path)) {
+                    $sizes_to_process[] = compact('width', 'height', 'crop', 'fly_file_path', 'fly_webp_path', 'size_name');
+                }
+            }
+
+            if (empty($sizes_to_process)) {
+                return $metadata;
+            }
+
+            // Process all sizes
+            foreach ($sizes_to_process as $size_info) {
+                $sized_editor = wp_get_image_editor($image_path);
+                if (is_wp_error($sized_editor)) continue;
+
+                $sized_editor->set_quality(70);
+                if (!is_wp_error($sized_editor->resize($size_info['width'], $size_info['height'], $size_info['crop']))) {
+                    if (!is_wp_error($sized_editor->save($size_info['fly_file_path']))) {
+                        if (function_exists('imagewebp') && file_exists($size_info['fly_file_path'])) {
+                            $webp_editor = wp_get_image_editor($size_info['fly_file_path']);
+                            if (!is_wp_error($webp_editor) && $webp_editor->supports_mime_type('image/webp')) {
+                                $webp_editor->save($size_info['fly_webp_path'], 'image/webp', ['quality' => 75, 'strip_metadata' => true]);
+                            }
+                        }
+                        do_action("fly_image_created", $attachment_id, $size_info['fly_file_path']);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Silent fail
+        }
+
+        return $metadata;
+    }
+
+    /**
      * Gets a dynamically generated image URL from the Fly_Images class.
      *
      * @param  integer  $attachment_id
@@ -376,74 +448,67 @@ class Size
                 true // Check for .webp
             );
     
-            // Check if WebP file exists
             if (file_exists($fly_webp_path)) {
-                $image_size = getimagesize($fly_webp_path);
-                if (!empty($image_size)) {
-                    return [
-                        "src" => $this->get_fly_path($fly_webp_path),
-                        "width" => $image_size[0],
-                        "height" => $image_size[1],
-                    ];
-                }
+                return [
+                    "src" => $this->get_fly_path($fly_webp_path),
+                    "width" => $width,
+                    "height" => $height,
+                ];
             }
     
-            // Check if original file exists
             if (file_exists($fly_file_path)) {
-                $image_size = getimagesize($fly_file_path);
-                if (!empty($image_size)) {
-                    return [
-                        "src" => $this->get_fly_path($fly_file_path),
-                        "width" => $image_size[0],
-                        "height" => $image_size[1],
-                    ];
-                }
+                return [
+                    "src" => $this->get_fly_path($fly_file_path),
+                    "width" => $width,
+                    "height" => $height,
+                ];
             }
     
-            // Check if images directory is writable
             if (!$this->fly_dir_writable()) {
                 return [];
             }
     
-            // File does not exist, let's check if directory exists
             $this->check_fly_dir();
     
-            // Get WP Image Editor Instance
+            if (function_exists('set_time_limit')) {
+                @set_time_limit(45);
+            }
+    
             $image_path = get_attached_file($attachment_id);
             $image_editor = wp_get_image_editor($image_path);
+            
             if (!is_wp_error($image_editor)) {
-                // Create new image
-                $image_editor->resize($width, $height, $crop);
-                $image_editor->save($fly_file_path);
-    
-                // Check if WebP format is supported
-                if (function_exists('imagewebp') && $image_editor->supports_mime_type('image/webp')) {
-                    $image_editor->save($fly_webp_path, 'image/webp', ['quality' => 75, 'strip_metadata' => true]);
-                }
-    
-                // Trigger action
-                do_action("fly_image_created", $attachment_id, $fly_file_path);
-    
-                // Return WebP if it exists, otherwise return original
-                if (file_exists($fly_webp_path)) {
+                try {
+                    if ($width > 2560) {
+                        $ratio = 2560 / $width;
+                        $width = 2560;
+                        $height = intval($height * $ratio);
+                    }
+                    
+                    $image_editor->set_quality(70);
+                    $image_editor->resize($width, $height, $crop);
                     $image_dimensions = $image_editor->get_size();
+                    $image_editor->save($fly_file_path);
+        
+                    $webp_created = false;
+                    if (function_exists('imagewebp') && $image_editor->supports_mime_type('image/webp')) {
+                        $result = $image_editor->save($fly_webp_path, 'image/webp', ['quality' => 75, 'strip_metadata' => true]);
+                        $webp_created = !is_wp_error($result);
+                    }
+        
+                    do_action("fly_image_created", $attachment_id, $fly_file_path);
+        
                     return [
-                        "src" => $this->get_fly_path($fly_webp_path),
+                        "src" => $this->get_fly_path($webp_created ? $fly_webp_path : $fly_file_path),
                         "width" => $image_dimensions["width"],
                         "height" => $image_dimensions["height"],
                     ];
-                } else {
-                    $image_dimensions = $image_editor->get_size();
-                    return [
-                        "src" => $this->get_fly_path($fly_file_path),
-                        "width" => $image_dimensions["width"],
-                        "height" => $image_dimensions["height"],
-                    ];
+                } catch (\Exception $e) {
+                    return [];
                 }
             }
         }
     
-        // Something went wrong
         return [];
     }
 
