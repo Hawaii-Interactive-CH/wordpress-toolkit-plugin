@@ -220,6 +220,7 @@ class MainService
                 'upload.php' => 'Media',
                 'edit.php?post_type=page' => 'Pages',
                 'edit.php' => 'Posts',
+                'toolkit-calendar' => 'Calendrier',
             ];
 
             foreach ($menu_items as $menu_slug => $menu_label) {
@@ -227,7 +228,7 @@ class MainService
                     remove_menu_page($menu_slug);
                 }
             }
-        });
+        }, 999);
 
         add_action("admin_init", function () {
             // Redirect any user trying to access comments page
@@ -418,6 +419,7 @@ class MainService
             'upload.php' => 'Media',
             'edit.php?post_type=page' => 'Pages',
             'edit.php' => 'Posts',
+            'toolkit-calendar' => 'Calendrier',
         ];
 
         // Check if the form was submitted
