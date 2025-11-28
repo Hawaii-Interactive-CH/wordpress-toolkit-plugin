@@ -81,3 +81,6 @@ add_action("init", function () use ($to_register) {
         $class::register();
     }
 });
+
+// Register deactivation hook for cron cleanup
+register_deactivation_hook(__FILE__, ['\\Toolkit\\utils\\Size', 'deactivate']);
