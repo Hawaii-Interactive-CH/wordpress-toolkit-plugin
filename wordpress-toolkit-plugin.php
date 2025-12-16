@@ -4,7 +4,7 @@
  * Plugin Name: Toolkit
  * Description: Hawaii Interactive Toolkit Theme Plugin
  * Plugin URI: https://git.hawai.li/hawai-li/wordpress-toolkit-plugin
- * Version: 1.9.2
+ * Version: 2.0.0
  * Requires at least: 5.2
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
