@@ -174,9 +174,9 @@ class GoogleCalendarSource
         ], true));
         
         // Parse dates
-        $start_date = self::parse_google_date($google_event['start'] ?? []);
-        $end_date = self::parse_google_date($google_event['end'] ?? []);
         $is_all_day = !empty($google_event['start']['date']); // All-day events use 'date' instead of 'dateTime'
+        $start_date = self::parse_google_date($google_event['start'] ?? [], false, $is_all_day);
+        $end_date = self::parse_google_date($google_event['end'] ?? [], true, $is_all_day);
         
         // Prepare post data
         $post_data = [
@@ -210,9 +210,11 @@ class GoogleCalendarSource
      * Parse Google Calendar date format to MySQL datetime
      * 
      * @param array $date_data Date data from Google Calendar (dateTime or date)
+     * @param bool $is_end_date Whether this is an end date
+     * @param bool $is_all_day Whether this is an all-day event
      * @return string MySQL datetime format (Y-m-d H:i:s)
      */
-    private static function parse_google_date($date_data)
+    private static function parse_google_date($date_data, $is_end_date = false, $is_all_day = false)
     {
         if (empty($date_data)) {
             return '';
@@ -220,7 +222,15 @@ class GoogleCalendarSource
         
         // All-day events use 'date' field (YYYY-MM-DD)
         if (!empty($date_data['date'])) {
-            return date('Y-m-d 00:00:00', strtotime($date_data['date']));
+            // Google Calendar uses exclusive end dates for all-day events
+            // e.g., an event on Nov 20-21 has end date = Nov 22
+            // So we need to subtract 1 day from the end date
+            if ($is_end_date && $is_all_day) {
+                $datetime = new \DateTime($date_data['date']);
+                $datetime->modify('-1 day');
+                return $datetime->format('Y-m-d') . ' 23:59:59';
+            }
+            return $date_data['date'] . ' 00:00:00';
         }
         
         // Timed events use 'dateTime' field (RFC3339)
