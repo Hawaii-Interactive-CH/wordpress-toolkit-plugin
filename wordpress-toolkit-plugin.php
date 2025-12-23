@@ -19,7 +19,7 @@ namespace Toolkit;
 defined("ABSPATH") or exit();
 
 // Define plugin constants.
-define("WP_TOOLKIT_VERSION", "1.9.1");
+define("WP_TOOLKIT_VERSION", "2.0.0");
 define("WP_TOOLKIT_DIR", plugin_dir_path(__FILE__));
 define("WP_TOOLKIT_URL", plugin_dir_url(__FILE__));
 define("WP_TOOLKIT_THEME_PATH", get_template_directory());
