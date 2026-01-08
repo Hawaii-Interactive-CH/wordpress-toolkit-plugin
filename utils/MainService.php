@@ -22,6 +22,7 @@ class MainService
         self::templates_directory();
         self::maintenance_mode();
         self::enable_cookie_consent();
+        self::enable_calendar();
     }
 
     public static function maintenance_mode()
@@ -41,6 +42,15 @@ class MainService
     {
         if (get_option('cookie_consent', 0) == 1) {
             CookieService::register();
+        }
+    }
+
+    public static function enable_calendar()
+    {
+        if (get_option('calendar', 0) == 1) {
+            \Toolkit\models\CalendarEvent::register();
+            \Toolkit\utils\CalendarService::register();
+            CalendarAdminService::register();
         }
     }
 
@@ -150,7 +160,7 @@ class MainService
             }
         }
     }
-    
+
 
 
     public static function admin_menu()
@@ -161,7 +171,7 @@ class MainService
             register_setting('wordpress-toolkit-plugin', 'cookie_consent');
             register_setting('wordpress-toolkit-plugin', 'file_size');
         });
-        
+
         add_action('admin_menu', function () {
             add_menu_page(
                 'Toolkit',
@@ -502,13 +512,22 @@ class MainService
             update_option('cookie_consent', $options['cookie_consent']);
         }
 
+        if (isset($_POST['submit']) && isset($_POST['calendar_nonce']) && wp_verify_nonce($_POST['calendar_nonce'], 'calendar_action')) {
+            // Save the user's choices to options
+            $options = [];
+
+            $options['calendar'] = isset($_POST['calendar']) ? 1 : 0;
+
+            update_option('calendar', $options['calendar']);
+        }
+
         if (isset($_POST['submit']) && isset($_POST['file_size_nonce']) && wp_verify_nonce($_POST['file_size_nonce'], 'file_size_action')) {
             // Save the user's choices to options
             $options = [];
 
             $file_size_mo = isset($_POST['file_size']) ? floatval($_POST['file_size']) : 0;
             $file_size_bytes = $file_size_mo * 1024 * 1024;
-    
+
             $max_size_bytes = 100 * 1024 * 1024; // 100 Mo en octets
             $min_size_bytes = 1 * 1024 * 1024; // 1 Mo en octets
             if ($file_size_bytes >= $min_size_bytes && $file_size_bytes <= $max_size_bytes) {
@@ -589,8 +608,24 @@ class MainService
                 </form>
             </div>
 
+            <div class="cookie-consent">
+                <h2>Calendar</h2>
+                <form method="post">
+                    <?php wp_nonce_field('calendar_action', 'calendar_nonce'); ?>
+                    <p>
+                        <label for="calendar_action">
+                            <input type="checkbox" name="calendar" id="calendar" value="1" <?php checked(get_option('calendar', 0), 1); ?>>
+                            <?= __('Enable calendar', 'toolkit') ?>
+                        </label>
+                    </p>
+                    <p class="submit">
+                        <input type="submit" name="submit" class="button-primary" value="Save Changes">
+                    </p>
+                </form>
+            </div>
+
             <hr />
-            
+
             <div class="file_size">
                 <h2>File size</h2>
                 <form method="post" action="">

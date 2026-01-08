@@ -15,7 +15,7 @@ class CalendarEvent extends CustomPostType
     public static function register()
     {
         parent::register();
-        
+
         // Add custom columns to admin list
         add_filter('manage_' . self::TYPE . '_posts_columns', [self::class, 'set_custom_columns']);
         add_action('manage_' . self::TYPE . '_posts_custom_column', [self::class, 'custom_column_content'], 10, 2);
@@ -47,7 +47,7 @@ class CalendarEvent extends CustomPostType
             'publicly_queryable' => true,
             'show_ui' => true,
             'show_in_menu' => false, // Hidden by default, visible in Toolkit Calendar menu
-            'show_in_nav_menus' => true,
+            'show_in_nav_menus' => false,
             'show_in_rest' => true,
             'rest_base' => 'events',
             'rest_controller_class' => 'WP_REST_Posts_Controller',
@@ -76,26 +76,26 @@ class CalendarEvent extends CustomPostType
     public static function set_custom_columns($columns)
     {
         $new_columns = [];
-        
+
         // Checkbox
         if (isset($columns['cb'])) {
             $new_columns['cb'] = $columns['cb'];
         }
-        
+
         // Title
         $new_columns['title'] = __('Événement', 'toolkit');
-        
+
         // Custom columns
         $new_columns['event_date'] = __('Date', 'toolkit');
         $new_columns['event_location'] = __('Lieu', 'toolkit');
         $new_columns['event_source'] = __('Source', 'toolkit');
         $new_columns['event_sync'] = __('Dernière synchro', 'toolkit');
-        
+
         // Date (published date)
         if (isset($columns['date'])) {
             $new_columns['date'] = $columns['date'];
         }
-        
+
         return $new_columns;
     }
 
@@ -109,11 +109,11 @@ class CalendarEvent extends CustomPostType
                 $start_date = get_post_meta($post_id, '_event_start_date', true);
                 $end_date = get_post_meta($post_id, '_event_end_date', true);
                 $is_all_day = get_post_meta($post_id, '_event_is_all_day', true);
-                
+
                 if ($start_date) {
                     $start = strtotime($start_date);
                     $end = $end_date ? strtotime($end_date) : null;
-                    
+
                     if ($is_all_day) {
                         echo '<strong>' . date_i18n('j M Y', $start) . '</strong>';
                         if ($end && date('Y-m-d', $start) !== date('Y-m-d', $end)) {
@@ -132,7 +132,7 @@ class CalendarEvent extends CustomPostType
                     echo '—';
                 }
                 break;
-                
+
             case 'event_location':
                 $location = get_post_meta($post_id, '_event_location', true);
                 if ($location) {
@@ -142,11 +142,11 @@ class CalendarEvent extends CustomPostType
                     echo '—';
                 }
                 break;
-                
+
             case 'event_source':
                 $google_id = get_post_meta($post_id, '_google_event_id', true);
                 $google_link = get_post_meta($post_id, '_google_calendar_link', true);
-                
+
                 if ($google_id) {
                     if ($google_link) {
                         echo '<a href="' . esc_url($google_link) . '" target="_blank" title="' . __('Voir sur Google Calendar', 'toolkit') . '">';
@@ -159,13 +159,13 @@ class CalendarEvent extends CustomPostType
                     echo '<span class="dashicons dashicons-admin-post" style="color: #999;"></span> ' . __('Manuel', 'toolkit');
                 }
                 break;
-                
+
             case 'event_sync':
                 $last_synced = get_post_meta($post_id, '_last_synced', true);
                 if ($last_synced) {
                     $synced_time = strtotime($last_synced);
                     $diff = time() - $synced_time;
-                    
+
                     if ($diff < 3600) { // Less than 1 hour
                         echo '<span style="color: #46b450;">●</span> ';
                         echo sprintf(__('Il y a %d min', 'toolkit'), round($diff / 60));
@@ -195,7 +195,7 @@ class CalendarEvent extends CustomPostType
 
     /**
      * Get event start date
-     * 
+     *
      * @param int|null $post_id Post ID (defaults to current post)
      * @return string|false Event start date in MySQL format, or false if not found
      */
@@ -204,13 +204,13 @@ class CalendarEvent extends CustomPostType
         if (!$post_id) {
             $post_id = get_the_ID();
         }
-        
+
         return get_post_meta($post_id, '_event_start_date', true);
     }
 
     /**
      * Get event end date
-     * 
+     *
      * @param int|null $post_id Post ID (defaults to current post)
      * @return string|false Event end date in MySQL format, or false if not found
      */
@@ -219,13 +219,13 @@ class CalendarEvent extends CustomPostType
         if (!$post_id) {
             $post_id = get_the_ID();
         }
-        
+
         return get_post_meta($post_id, '_event_end_date', true);
     }
 
     /**
      * Get event location
-     * 
+     *
      * @param int|null $post_id Post ID (defaults to current post)
      * @return string Event location
      */
@@ -234,13 +234,13 @@ class CalendarEvent extends CustomPostType
         if (!$post_id) {
             $post_id = get_the_ID();
         }
-        
+
         return get_post_meta($post_id, '_event_location', true);
     }
 
     /**
      * Check if event is all-day
-     * 
+     *
      * @param int|null $post_id Post ID (defaults to current post)
      * @return bool True if all-day event
      */
@@ -249,13 +249,13 @@ class CalendarEvent extends CustomPostType
         if (!$post_id) {
             $post_id = get_the_ID();
         }
-        
+
         return get_post_meta($post_id, '_event_is_all_day', true) === '1';
     }
 
     /**
      * Get Google event ID
-     * 
+     *
      * @param int|null $post_id Post ID (defaults to current post)
      * @return string|false Google event ID, or false if not synced from Google
      */
@@ -264,13 +264,13 @@ class CalendarEvent extends CustomPostType
         if (!$post_id) {
             $post_id = get_the_ID();
         }
-        
+
         return get_post_meta($post_id, '_google_event_id', true);
     }
 
     /**
      * Get Google Calendar link
-     * 
+     *
      * @param int|null $post_id Post ID (defaults to current post)
      * @return string|false Google Calendar link, or false if not available
      */
@@ -279,13 +279,13 @@ class CalendarEvent extends CustomPostType
         if (!$post_id) {
             $post_id = get_the_ID();
         }
-        
+
         return get_post_meta($post_id, '_google_calendar_link', true);
     }
 
     /**
      * Get last sync time
-     * 
+     *
      * @param int|null $post_id Post ID (defaults to current post)
      * @return string|false Last sync time in MySQL format, or false if never synced
      */
@@ -294,7 +294,7 @@ class CalendarEvent extends CustomPostType
         if (!$post_id) {
             $post_id = get_the_ID();
         }
-        
+
         return get_post_meta($post_id, '_last_synced', true);
     }
 }

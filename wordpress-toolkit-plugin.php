@@ -72,11 +72,8 @@ $to_register = [
     "\\Toolkit\\utils\\ApiAuthService",
     "\\Toolkit\\utils\\MenuService",
     "\\Toolkit\\utils\\AssetService",
-    "\\Toolkit\\utils\\CalendarAdminService",
-    "\\Toolkit\\utils\\CalendarService",
     // Models
     "\\Toolkit\\models\\MediaTaxonomy",
-    "\\Toolkit\\models\\CalendarEvent",
 ];
 
 add_action("init", function () use ($to_register) {
