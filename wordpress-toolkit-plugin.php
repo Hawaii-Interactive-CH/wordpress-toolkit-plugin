@@ -4,7 +4,7 @@
  * Plugin Name: Toolkit
  * Description: Hawaii Interactive Toolkit Theme Plugin
  * Plugin URI: https://git.hawai.li/hawai-li/wordpress-toolkit-plugin
- * Version: 2.0.0
+ * Version: 2.1.0
  * Requires at least: 5.2
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
@@ -19,7 +19,7 @@ namespace Toolkit;
 defined("ABSPATH") or exit();
 
 // Define plugin constants.
-define("WP_TOOLKIT_VERSION", "2.0.0");
+define("WP_TOOLKIT_VERSION", "2.1.0");
 define("WP_TOOLKIT_DIR", plugin_dir_path(__FILE__));
 define("WP_TOOLKIT_URL", plugin_dir_url(__FILE__));
 define("WP_TOOLKIT_THEME_PATH", get_template_directory());
@@ -75,6 +75,11 @@ $to_register = [
     // Models
     "\\Toolkit\\models\\MediaTaxonomy",
 ];
+
+// Load WebP test admin page (for development/testing)
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    require_once WP_TOOLKIT_DIR . 'utils/admin-webp-test-page.php';
+}
 
 add_action("init", function () use ($to_register) {
     foreach ($to_register as $class) {

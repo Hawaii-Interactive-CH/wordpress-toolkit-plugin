@@ -163,6 +163,78 @@ class Size
         update_option('fly_images_queue', array_values($queue), false);
     }
 
+    /**
+     * Queue all image attachments for WebP regeneration
+     * 
+     * @param bool $force_rebuild If true, deletes existing fly images before queuing
+     * @return int Number of images queued
+     */
+    public function rebuild_all_webp_images($force_rebuild = false)
+    {
+        $args = [
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'posts_per_page' => -1,
+            'fields' => 'ids'
+        ];
+        
+        $attachment_ids = get_posts($args);
+        
+        if (empty($attachment_ids)) {
+            return 0;
+        }
+        
+        $queued_count = 0;
+        $queue = get_option('fly_images_queue', []);
+        
+        foreach ($attachment_ids as $attachment_id) {
+            $metadata = wp_get_attachment_metadata($attachment_id);
+            if (empty($metadata)) continue;
+            
+            $extension = strtolower(pathinfo($metadata['file'], PATHINFO_EXTENSION));
+            if (in_array($extension, ["svg", "avif", "heic", "heif"])) continue;
+            
+            // Delete existing fly images if force rebuild
+            if ($force_rebuild) {
+                $this->delete_attachment_fly_images($attachment_id);
+            }
+            
+            // Add to queue if not already present
+            if (!in_array($attachment_id, $queue)) {
+                $queue[] = $attachment_id;
+                $queued_count++;
+            }
+        }
+        
+        update_option('fly_images_queue', $queue, false);
+        
+        return $queued_count;
+    }
+
+    /**
+     * Get the current queue status
+     * 
+     * @return array
+     */
+    public function get_queue_status()
+    {
+        $queue = get_option('fly_images_queue', []);
+        return [
+            'count' => count($queue),
+            'queue' => $queue
+        ];
+    }
+
+    /**
+     * Clear the entire queue
+     * 
+     * @return bool
+     */
+    public function clear_queue()
+    {
+        return update_option('fly_images_queue', [], false);
+    }
+
     private function generate_fly_images_for_attachment($attachment_id)
     {
         $metadata = wp_get_attachment_metadata($attachment_id);
@@ -198,17 +270,20 @@ class Size
             $editor->set_quality(70);
             if (is_wp_error($editor->resize($width, $height, $crop))) continue;
 
+            // Qualité adaptative : plus l'image est grande, moins on a besoin de qualité élevée
+            $webp_quality = 75;
+            if ($width >= 1920) {
+                $webp_quality = 60;
+            } elseif ($width >= 1280) {
+                $webp_quality = 65;
+            } elseif ($width >= 640) {
+                $webp_quality = 70;
+            }
+
             // Essai WebP d'abord
             if (function_exists('imagewebp') && $editor->supports_mime_type('image/webp')) {
-                // Créer PNG temporaire pour fallback
-                $editor->save($fly_file_path);
-                // Créer WebP
-                if (!is_wp_error($editor->save($fly_webp_path, 'image/webp', ['quality' => 75]))) {
-                    // Supprimer le PNG une fois le WebP créé
-                    if (file_exists($fly_file_path)) {
-                        @unlink($fly_file_path);
-                    }
-                }
+                // Créer directement le WebP sans PNG temporaire
+                $editor->save($fly_webp_path, 'image/webp', ['quality' => $webp_quality]);
             } else {
                 // Fallback PNG si WebP non supporté
                 $editor->save($fly_file_path);
