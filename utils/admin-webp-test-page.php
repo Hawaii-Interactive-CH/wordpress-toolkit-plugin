@@ -1,7 +1,7 @@
 <?php
 /**
  * WordPress Admin Test Page for WebP Optimization
- * 
+ *
  * Add this to your plugin's main file to create an admin page for testing
  */
 
@@ -35,23 +35,23 @@ class WebPTestPage
         if (isset($_POST['rebuild_webp']) && check_admin_referer('rebuild_webp_action', 'rebuild_webp_nonce')) {
             $size_instance = Size::get_instance();
             $force_rebuild = isset($_POST['force_rebuild']) && $_POST['force_rebuild'] === '1';
-            
+
             $queued_count = $size_instance->rebuild_all_webp_images($force_rebuild);
-            
+
             if ($queued_count > 0) {
                 $rebuild_message = '<div class="notice notice-success is-dismissible"><p><strong>Success!</strong> ' . $queued_count . ' images queued for WebP regeneration. Processing will happen in the background.</p></div>';
             } else {
                 $rebuild_message = '<div class="notice notice-warning"><p><strong>Notice:</strong> No images found to queue.</p></div>';
             }
         }
-        
+
         // Handle clear queue action
         if (isset($_POST['clear_queue']) && check_admin_referer('clear_queue_action', 'clear_queue_nonce')) {
             $size_instance = Size::get_instance();
             $size_instance->clear_queue();
             $rebuild_message = '<div class="notice notice-info is-dismissible"><p><strong>Queue cleared.</strong> All pending WebP generation tasks have been removed.</p></div>';
         }
-        
+
         ?>
         <!DOCTYPE html>
         <html>
@@ -168,9 +168,9 @@ class WebPTestPage
             <div class="wrap webp-test-wrap">
                 <h1>🎨 WebP Optimization Test Results</h1>
 
-                <?php 
+                <?php
                 echo $rebuild_message;
-                
+
                 // Get queue status
                 $size_instance = Size::get_instance();
                 $queue_status = $size_instance->get_queue_status();
@@ -179,13 +179,13 @@ class WebPTestPage
                 <div class="rebuild-controls">
                     <h3>🔄 Rebuild WebP Images</h3>
                     <p>Use this tool to regenerate all WebP images in the background. The process will queue all image attachments and process them via cron.</p>
-                    
+
                     <?php if ($queue_status['count'] > 0): ?>
                         <div class="notice notice-info inline" style="margin: 10px 0; padding: 10px;">
                             <p><strong>⏳ Queue Status:</strong> <?php echo $queue_status['count']; ?> images waiting to be processed.</p>
                         </div>
                     <?php endif; ?>
-                    
+
                     <form method="post" style="display: inline-block;">
                         <?php wp_nonce_field('rebuild_webp_action', 'rebuild_webp_nonce'); ?>
                         <div class="checkbox-wrapper">
@@ -200,7 +200,7 @@ class WebPTestPage
                             </button>
                         </div>
                     </form>
-                    
+
                     <?php if ($queue_status['count'] > 0): ?>
                         <form method="post" style="display: inline-block; margin-left: 10px;">
                             <?php wp_nonce_field('clear_queue_action', 'clear_queue_nonce'); ?>
@@ -209,7 +209,7 @@ class WebPTestPage
                             </button>
                         </form>
                     <?php endif; ?>
-                    
+
                     <p style="margin-top: 15px; font-size: 12px; color: #646970;">
                         <strong>Note:</strong> Images are processed in batches every minute via WordPress cron. Large libraries may take some time to complete.
                     </p>
@@ -233,10 +233,10 @@ class WebPTestPage
 
                 // Initialize Size class
                 $size_instance = Size::get_instance();
-                
+
                 // Get fly directory
                 $fly_base_dir = $size_instance->get_fly_dir();
-                
+
                 $total_original_size = 0;
                 $total_webp_size = 0;
                 $total_png_size = 0;
@@ -247,28 +247,28 @@ class WebPTestPage
                 foreach ($images as $image) {
                     $attachment_id = $image->ID;
                     $original_path = get_attached_file($attachment_id);
-                    
+
                     if (!file_exists($original_path)) continue;
-                    
+
                     $extension = strtolower(pathinfo($original_path, PATHINFO_EXTENSION));
                     if (in_array($extension, ['svg', 'avif', 'heic', 'heif'])) continue;
-                    
+
                     $original_size = filesize($original_path);
                     $total_original_size += $original_size;
-                    
+
                     // Check fly directory for this attachment
                     $fly_dir = $fly_base_dir . DIRECTORY_SEPARATOR . $attachment_id;
-                    
+
                     if (!is_dir($fly_dir)) continue;
-                    
+
                     $files = glob($fly_dir . DIRECTORY_SEPARATOR . '*');
-                    
+
                     foreach ($files as $file) {
                         $file_size = filesize($file);
                         $file_name = basename($file);
                         $file_ext = pathinfo($file, PATHINFO_EXTENSION);
                         $is_webp = $file_ext === 'webp';
-                        
+
                         if ($is_webp) {
                             $total_webp_size += $file_size;
                             $webp_count++;
@@ -276,12 +276,12 @@ class WebPTestPage
                             $total_png_size += $file_size;
                             $png_count++;
                         }
-                        
+
                         // Extract dimensions from filename (format: name-WIDTHxHEIGHT.ext)
                         preg_match('/(\d+)x(\d+)/', $file_name, $matches);
                         $width = isset($matches[1]) ? intval($matches[1]) : 0;
                         $height = isset($matches[2]) ? intval($matches[2]) : 0;
-                        
+
                         // Determine quality based on width (same logic as code)
                         $expected_quality = 75;
                         if ($width >= 1920) {
@@ -291,10 +291,10 @@ class WebPTestPage
                         } elseif ($width >= 640) {
                             $expected_quality = 70;
                         }
-                        
+
                         $savings = $original_size - $file_size;
                         $savings_percent = $original_size > 0 ? ($savings / $original_size) * 100 : 0;
-                        
+
                         $results[] = [
                             'attachment_id' => $attachment_id,
                             'filename' => $file_name,
@@ -313,7 +313,7 @@ class WebPTestPage
                 // Calculate overall stats
                 $total_savings = $total_original_size - $total_webp_size;
                 $savings_percent = $total_original_size > 0 ? ($total_savings / $total_original_size) * 100 : 0;
-                
+
                 $avg_webp_size = $webp_count > 0 ? $total_webp_size / $webp_count : 0;
                 $avg_png_size = $png_count > 0 ? $total_png_size / $png_count : 0;
                 ?>
@@ -346,7 +346,7 @@ class WebPTestPage
                     <?php if ($avg_webp_size > 0 && $avg_png_size > 0): ?>
                     <p>
                         <strong>Average file size:</strong><br>
-                        WebP: <?php echo size_format($avg_webp_size); ?> | 
+                        WebP: <?php echo size_format($avg_webp_size); ?> |
                         PNG/JPG: <?php echo size_format($avg_png_size); ?> |
                         <span style="color: #00a32a; font-weight: 600;">
                             Difference: <?php echo number_format((1 - $avg_webp_size / $avg_png_size) * 100, 1); ?>% smaller
@@ -363,7 +363,7 @@ class WebPTestPage
                                 <td><strong>imagewebp function</strong></td>
                                 <td><?php echo function_exists('imagewebp') ? '✅ Available' : '❌ Not available'; ?></td>
                             </tr>
-                            <?php if (function_exists('gd_info')): 
+                            <?php if (function_exists('gd_info')):
                                 $gd_info = gd_info();
                             ?>
                             <tr>
@@ -402,7 +402,7 @@ class WebPTestPage
                                 70 => 0,
                                 75 => 0
                             ];
-                            
+
                             foreach ($results as $result) {
                                 if ($result['is_webp'] && isset($quality_counts[$result['expected_quality']])) {
                                     $quality_counts[$result['expected_quality']]++;
@@ -437,48 +437,9 @@ class WebPTestPage
                     </table>
                 </div>
 
-                <div class="test-section">
-                    <h2>📁 Generated Files Detail</h2>
-                    <?php if (empty($results)): ?>
-                        <div class="notice notice-info">
-                            <p><strong>No fly images found.</strong> Try uploading a new image or wait for the queue to process.</p>
-                        </div>
-                        <p><a href="<?php echo admin_url('upload.php'); ?>" class="button button-primary">Upload New Image</a></p>
-                    <?php else: ?>
-                        <p>Showing <?php echo count($results); ?> generated files from <?php echo count($images); ?> recent uploads.</p>
-                        <table class="widefat">
-                            <thead>
-                                <tr>
-                                    <th>File Name</th>
-                                    <th>Type</th>
-                                    <th>Dimensions</th>
-                                    <th>Quality</th>
-                                    <th>File Size</th>
-                                    <th>Savings vs Original</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($results as $result): ?>
-                                    <tr>
-                                        <td><code><?php echo esc_html($result['filename']); ?></code></td>
-                                        <td>
-                                            <span class="badge <?php echo $result['is_webp'] ? 'badge-webp' : 'badge-png'; ?>">
-                                                <?php echo $result['type']; ?>
-                                            </span>
-                                        </td>
-                                        <td><?php echo $result['dimensions']; ?></td>
-                                        <td><span class="quality-indicator"><?php echo $result['expected_quality']; ?>%</span></td>
-                                        <td><?php echo size_format($result['size']); ?></td>
-                                        <td class="size-comparison">
-                                            ↓ <?php echo number_format($result['savings_percent'], 1); ?>% 
-                                            (<?php echo size_format($result['savings']); ?>)
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
+
+
+
 
                 <div class="test-section">
                     <h2>🚀 Next Steps</h2>

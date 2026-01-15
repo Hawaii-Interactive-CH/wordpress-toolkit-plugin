@@ -31,14 +31,22 @@ class Upscale
 
     public static function resize_keep_ratio($orig_w, $orig_h, $new_w, $new_h)
     {
-        $size_ratio = min($new_w / $orig_w, $new_h / $orig_h);
+        // Allow upscaling for retina displays
+        // Calculate ratio - if requested size is larger than original, ratio will be > 1
+        $width_ratio = $new_w / $orig_w;
+        $height_ratio = $new_h / $orig_h;
+        
+        // Use the smaller ratio to maintain aspect ratio
+        // This may result in upscaling if both ratios are > 1
+        $size_ratio = min($width_ratio, $height_ratio);
 
         if ($size_ratio === 0) {
             return null;
         }
 
-        $new_w = $orig_w * $size_ratio;
-        $new_h = $orig_h * $size_ratio;
+        // Calculate new dimensions (may be larger than original for retina)
+        $new_w = round($orig_w * $size_ratio);
+        $new_h = round($orig_h * $size_ratio);
 
         return [
             0,

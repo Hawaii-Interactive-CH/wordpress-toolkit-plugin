@@ -238,37 +238,66 @@ class Size
     private function generate_fly_images_for_attachment($attachment_id)
     {
         $metadata = wp_get_attachment_metadata($attachment_id);
-        if (empty($metadata)) return;
+        if (empty($metadata)) {
+            error_log("Fly Images: No metadata for attachment $attachment_id");
+            return;
+        }
 
         $image_path = get_attached_file($attachment_id);
-        if (!file_exists($image_path)) return;
+        if (!file_exists($image_path)) {
+            error_log("Fly Images: File not found for attachment $attachment_id: $image_path");
+            return;
+        }
 
         $extension = pathinfo($image_path, PATHINFO_EXTENSION);
-        if (in_array($extension, ["svg", "avif", "heic", "heif"])) return;
+        if (in_array($extension, ["svg", "avif", "heic", "heif"])) {
+            error_log("Fly Images: Skipping unsupported format for attachment $attachment_id: $extension");
+            return;
+        }
 
         $fly_dir = $this->get_fly_dir($attachment_id);
-        if (!is_dir($fly_dir)) wp_mkdir_p($fly_dir);
+        if (!is_dir($fly_dir)) {
+            wp_mkdir_p($fly_dir);
+            error_log("Fly Images: Created directory for attachment $attachment_id: $fly_dir");
+        }
 
-        foreach ($this->_image_sizes as $size_data) {
+        if (empty($this->_image_sizes)) {
+            error_log("Fly Images: No image sizes registered for attachment $attachment_id");
+            return;
+        }
+
+        foreach ($this->_image_sizes as $size_name => $size_data) {
             $width = $size_data['size'][0];
             $height = $size_data['size'][1];
             $crop = $size_data['crop'];
 
-            if ($width > 2560) {
-                $width = 2560;
-                $height = intval($height * (2560 / $size_data['size'][0]));
+            // Limit maximum width to 4096px (supports retina 2x up to 2048px screens)
+            // This allows image-xl-2x (3840px) to be generated properly
+            if ($width > 4096) {
+                $width = 4096;
+                $height = intval($height * (4096 / $size_data['size'][0]));
             }
 
             $fly_file_path = $fly_dir . DIRECTORY_SEPARATOR . $this->get_fly_file_name(basename($metadata["file"]), $width, $height, $crop);
             $fly_webp_path = $fly_dir . DIRECTORY_SEPARATOR . $this->get_fly_file_name(basename($metadata["file"]), $width, $height, $crop, true);
 
-            if (file_exists($fly_webp_path)) continue;
+            if (file_exists($fly_webp_path)) {
+                error_log("Fly Images: WebP already exists for attachment $attachment_id size $size_name: " . basename($fly_webp_path));
+                continue;
+            }
 
             $editor = wp_get_image_editor($image_path);
-            if (is_wp_error($editor)) continue;
+            if (is_wp_error($editor)) {
+                error_log("Fly Images: Error getting image editor for attachment $attachment_id: " . $editor->get_error_message());
+                continue;
+            }
 
             $editor->set_quality(70);
-            if (is_wp_error($editor->resize($width, $height, $crop))) continue;
+            $resize_result = $editor->resize($width, $height, $crop);
+            if (is_wp_error($resize_result)) {
+                error_log("Fly Images: Error resizing attachment $attachment_id to {$width}x{$height}: " . $resize_result->get_error_message());
+                continue;
+            }
 
             // Qualité adaptative : plus l'image est grande, moins on a besoin de qualité élevée
             $webp_quality = 75;
@@ -303,12 +332,18 @@ class Size
         }
 
         $image = wp_get_attachment_metadata($attachment_id);
-        if (empty($image)) return [];
+        if (empty($image)) {
+            error_log("Fly Images: No metadata for attachment $attachment_id in get_attachment_image_src");
+            return wp_get_attachment_image_src($attachment_id, "full");
+        }
 
         // Determine width and height
         if (is_string($size)) {
             $image_size = $this->get_image_size($size);
-            if (empty($image_size)) return [];
+            if (empty($image_size)) {
+                error_log("Fly Images: Size '$size' not registered for attachment $attachment_id");
+                return wp_get_attachment_image_src($attachment_id, "full");
+            }
             $width = $image_size["size"][0];
             $height = $image_size["size"][1];
             $crop = isset($crop) ? $crop : $image_size["crop"];
@@ -325,21 +360,23 @@ class Size
 
         // Priority: WebP
         if (file_exists($fly_webp_path)) {
-            return ["src" => $this->get_fly_path($fly_webp_path), "width" => $width, "height" => $height];
+            $url = $this->get_fly_path($fly_webp_path);
+            return [$url, $width, $height, true];
         }
 
         // Fallback: PNG/JPG
         if (file_exists($fly_file_path)) {
-            return ["src" => $this->get_fly_path($fly_file_path), "width" => $width, "height" => $height];
+            $url = $this->get_fly_path($fly_file_path);
+            return [$url, $width, $height, true];
         }
 
         // Not generated yet: return original
         $original_src = wp_get_attachment_image_src($attachment_id, "full");
         if ($original_src) {
-            return ["src" => $original_src[0], "width" => $original_src[1], "height" => $original_src[2]];
+            return $original_src;
         }
 
-        return [];
+        return false;
     }
 
     public function get_fly_file_name($file_name, $width, $height, $crop, $webp = false)

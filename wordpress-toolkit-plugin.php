@@ -76,10 +76,8 @@ $to_register = [
     "\\Toolkit\\models\\MediaTaxonomy",
 ];
 
-// Load WebP test admin page (for development/testing)
-if (defined('WP_DEBUG') && WP_DEBUG) {
-    require_once WP_TOOLKIT_DIR . 'utils/admin-webp-test-page.php';
-}
+// Load WebP test admin page
+require_once WP_TOOLKIT_DIR . 'utils/admin-webp-test-page.php';
 
 add_action("init", function () use ($to_register) {
     foreach ($to_register as $class) {
