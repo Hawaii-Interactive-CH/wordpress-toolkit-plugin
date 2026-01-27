@@ -122,6 +122,10 @@ class Size
 
     public function get_image_size($size_name = "")
     {
+        if (!isset($this->_image_sizes[$size_name]) && $size_name === "thumbnail") {
+            $this->add_image_size("thumbnail", 150, 150, true);
+        }
+
         return isset($this->_image_sizes[$size_name]) ? $this->_image_sizes[$size_name] : [];
     }
 
