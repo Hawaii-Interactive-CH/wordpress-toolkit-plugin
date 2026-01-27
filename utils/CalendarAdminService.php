@@ -36,11 +36,21 @@ class CalendarAdminService
         // Submenu: Paramètres (settings)
         add_submenu_page(
             self::MENU_SLUG,
-            __('Paramètres du Calendrier', 'toolkit'),
-            __('Paramètres', 'toolkit'),
+            __('Paramètres de Google Calendar', 'toolkit'),
+            __('Lier Google Calendar', 'toolkit'),
             'manage_options',
-            self::MENU_SLUG . '-settings',
+            self::MENU_SLUG . '-google-calendar',
             [self::class, 'render_settings_page']
+        );
+
+        // Submenu: Configuration Événements WordPress
+        add_submenu_page(
+            self::MENU_SLUG,
+            __('Configuration Événements WordPress', 'toolkit'),
+            __('Lier Événements WordPress', 'toolkit'),
+            'manage_options',
+            self::MENU_SLUG . '-wordpress-events',
+            [self::class, 'render_wordpress_events_page']
         );
     }
 
@@ -74,6 +84,11 @@ class CalendarAdminService
                 'max_results' => 250,
                 'time_min_offset' => '-30',  // days in the past
                 'time_max_offset' => '365',  // days in the future
+            ],
+            'wordpress_events' => [
+                'enabled' => false,
+                'custom_post_type' => 'calendar_event',
+                'acf_field_group' => '',
             ]
         ];
     }
@@ -83,7 +98,9 @@ class CalendarAdminService
      */
     public static function sanitize_settings($input)
     {
-        $sanitized = [];
+        // Get existing settings to preserve values not in the current form
+        $existing = get_option(self::OPTION_NAME, self::get_default_settings());
+        $sanitized = $existing;
 
         if (isset($input['google'])) {
             $sanitized['google'] = [
@@ -97,6 +114,14 @@ class CalendarAdminService
             ];
         }
 
+        if (isset($input['wordpress_events'])) {
+            $sanitized['wordpress_events'] = [
+                'enabled' => !empty($input['wordpress_events']['enabled']),
+                'custom_post_type' => sanitize_text_field($input['wordpress_events']['custom_post_type'] ?? 'calendar_event'),
+                'acf_field_group' => sanitize_text_field($input['wordpress_events']['acf_field_group'] ?? ''),
+            ];
+        }
+
         return $sanitized;
     }
 
@@ -107,6 +132,8 @@ class CalendarAdminService
     {
         $settings = get_option(self::OPTION_NAME, self::get_default_settings());
         $google_enabled = $settings['google']['enabled'] ?? false;
+        $wp_events_enabled = $settings['wordpress_events']['enabled'] ?? false;
+        $wp_events_cpt = $settings['wordpress_events']['custom_post_type'] ?? '';
         $last_sync = get_option('toolkit_calendar_last_sync');
 
         // Get stats
@@ -146,13 +173,32 @@ class CalendarAdminService
                         </tr>
                         <tr style="background: #f9f9f9;">
                             <td style="padding: 15px;">
+                                <strong><?php _e('Liaison Événements WordPress', 'toolkit'); ?>:</strong>
+                            </td>
+                            <td style="padding: 15px;">
+                                <?php if ($wp_events_enabled && !empty($wp_events_cpt)): ?>
+                                    <span style="color: #46b450; font-weight: bold;">
+                                        ✓ <?php _e('Activé', 'toolkit'); ?>
+                                    </span>
+                                    <span style="color: #666; font-size: 0.9em;">
+                                        (<?php echo esc_html($wp_events_cpt); ?>)
+                                    </span>
+                                <?php else: ?>
+                                    <span style="color: #dc3232; font-weight: bold;">
+                                        ✗ <?php _e('Désactivé', 'toolkit'); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 15px;">
                                 <strong><?php _e('Événements publiés', 'toolkit'); ?>:</strong>
                             </td>
                             <td style="padding: 15px;">
                                 <?php echo esc_html($published_events); ?>
                             </td>
                         </tr>
-                        <tr>
+                        <tr style="background: #f9f9f9;">
                             <td style="padding: 15px;">
                                 <strong><?php _e('Dernière synchronisation', 'toolkit'); ?>:</strong>
                             </td>
@@ -173,12 +219,17 @@ class CalendarAdminService
                 <div class="card" style="max-width: 100%; margin-top: 20px;">
                     <h2><?php _e('Actions rapides', 'toolkit'); ?></h2>
                     <p>
-                        <a href="<?php echo admin_url('admin.php?page=' . self::MENU_SLUG . '-settings'); ?>" class="button button-primary">
+                        <a href="<?php echo admin_url('admin.php?page=' . self::MENU_SLUG . '-wordpress-events'); ?>" class="button">
+                            <span class="dashicons dashicons-calendar" style="margin-top: 3px;"></span>
+                            <?php _e('Configurer liaison événements WordPress', 'toolkit'); ?>
+                        </a>
+
+                        <a href="<?php echo admin_url('admin.php?page=' . self::MENU_SLUG . '-google-calendar'); ?>" class="button">
                             <span class="dashicons dashicons-admin-settings" style="margin-top: 3px;"></span>
                             <?php _e('Configurer Google Calendar', 'toolkit'); ?>
                         </a>
                         
-                        <?php if ($google_enabled): ?>
+                        <?php if ($google_enabled || $wp_events_enabled): ?>
                             <form method="post" action="<?php echo admin_url('admin-post.php'); ?>" style="display: inline;">
                                 <?php wp_nonce_field('toolkit_calendar_sync_now', 'toolkit_calendar_sync_nonce'); ?>
                                 <input type="hidden" name="action" value="toolkit_calendar_sync_now">
@@ -189,7 +240,7 @@ class CalendarAdminService
                             </form>
                         <?php endif; ?>
                         
-                        <a href="<?php echo admin_url('edit.php?post_type=calendar_event'); ?>" class="button">
+                        <a href="<?php echo admin_url('edit.php?post_type=calendar_event'); ?>" class="button button-primary">
                             <span class="dashicons dashicons-list-view" style="margin-top: 3px;"></span>
                             <?php _e('Voir tous les événements', 'toolkit'); ?>
                         </a>
@@ -484,20 +535,53 @@ class CalendarAdminService
         if (class_exists('Toolkit\utils\CalendarService')) {
             $results = \Toolkit\utils\CalendarService::sync_all();
             
-            if (!empty($results['google']['success'])) {
-                $message = $results['google']['message'] ?? __('Synchronisation réussie', 'toolkit');
+            $success_messages = [];
+            $error_messages = [];
+            
+            // Check Google Calendar results
+            if (!empty($results['google'])) {
+                if (!empty($results['google']['success'])) {
+                    $success_messages[] = $results['google']['message'] ?? __('Google Calendar synchronisé', 'toolkit');
+                } else {
+                    $error_messages[] = $results['google']['message'] ?? __('Erreur Google Calendar', 'toolkit');
+                }
+            }
+            
+            // Check WordPress Events results
+            if (!empty($results['wordpress_events'])) {
+                if (!empty($results['wordpress_events']['success'])) {
+                    $success_messages[] = $results['wordpress_events']['message'] ?? __('Événements WordPress synchronisés', 'toolkit');
+                } else {
+                    $error_messages[] = $results['wordpress_events']['message'] ?? __('Erreur Événements WordPress', 'toolkit');
+                }
+            }
+            
+            // Add success messages
+            if (!empty($success_messages)) {
                 add_settings_error(
                     'toolkit_calendar_messages',
                     'toolkit_calendar_sync_success',
-                    $message,
+                    implode('<br>', $success_messages),
                     'success'
                 );
-            } else {
-                $error = $results['google']['message'] ?? __('Erreur de synchronisation', 'toolkit');
+            }
+            
+            // Add error messages
+            if (!empty($error_messages)) {
                 add_settings_error(
                     'toolkit_calendar_messages',
                     'toolkit_calendar_sync_error',
-                    $error,
+                    implode('<br>', $error_messages),
+                    'error'
+                );
+            }
+            
+            // If no results at all
+            if (empty($results)) {
+                add_settings_error(
+                    'toolkit_calendar_messages',
+                    'toolkit_calendar_sync_error',
+                    __('Aucune source de calendrier n\'est activée.', 'toolkit'),
                     'error'
                 );
             }
@@ -507,5 +591,194 @@ class CalendarAdminService
 
         wp_redirect(admin_url('admin.php?page=' . self::MENU_SLUG . '&settings-updated=true'));
         exit;
+    }
+
+    /**
+     * Get all ACF fields recursively including sub-fields and repeater fields
+     */
+    private static function get_all_acf_fields($parent_field = null, $prefix = '')
+    {
+        $all_fields = [];
+        
+        if ($parent_field) {
+            // Get sub-fields from parent
+            $fields = [];
+            if (function_exists('acf_get_fields')) {
+                $fields = acf_get_fields($parent_field);
+            }
+        } else {
+            // Get all field groups
+            $field_groups = [];
+            if (function_exists('acf_get_field_groups')) {
+                $field_groups = acf_get_field_groups();
+            }
+            
+            $fields = [];
+            foreach ($field_groups as $group) {
+                if (function_exists('acf_get_fields')) {
+                    $group_fields = acf_get_fields($group['key']);
+                    if ($group_fields) {
+                        foreach ($group_fields as $field) {
+                            $field['_group_title'] = $group['title'];
+                            $fields[] = $field;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (empty($fields)) {
+            return $all_fields;
+        }
+        
+        foreach ($fields as $field) {
+            $field_label = $prefix . $field['label'];
+            $group_title = isset($field['_group_title']) ? $field['_group_title'] . ' → ' : '';
+            
+            $all_fields[] = [
+                'key' => $field['key'],
+                'name' => $field['name'],
+                'label' => $field_label,
+                'type' => $field['type'],
+                'display_label' => $group_title . $field_label . ' (' . $field['type'] . ')'
+            ];
+            
+            // If field has sub-fields (repeater, group, flexible content, etc.)
+            if (in_array($field['type'], ['repeater', 'group', 'flexible_content', 'clone'])) {
+                $sub_fields = self::get_all_acf_fields($field['key'], $prefix . $field['label'] . ' → ');
+                $all_fields = array_merge($all_fields, $sub_fields);
+            }
+        }
+        
+        return $all_fields;
+    }
+
+    /**
+     * Render WordPress Events configuration page
+     */
+    public static function render_wordpress_events_page()
+    {
+        $settings = get_option(self::OPTION_NAME, self::get_default_settings());
+        $wp_events = $settings['wordpress_events'] ?? self::get_default_settings()['wordpress_events'];
+
+        // Get available post types
+        $post_types = get_post_types(['public' => true], 'objects');
+        
+        // Get all ACF fields if ACF is active
+        $all_acf_fields = [];
+        if (function_exists('acf_get_field_groups') && function_exists('acf_get_fields')) {
+            $all_acf_fields = self::get_all_acf_fields();
+        }
+
+        ?>
+        <div class="wrap">
+            <h1>
+                <span class="dashicons dashicons-calendar" style="font-size: 32px; margin-right: 10px;"></span>
+                <?php _e('Lier un Événements WordPress', 'toolkit'); ?>
+            </h1>
+
+            <form method="post" action="options.php">
+                <?php
+                settings_fields('toolkit_calendar_settings_group');
+                ?>
+
+                <!-- WordPress Events Settings -->
+                <div class="card" style="max-width: 100%; margin-top: 20px;">
+                    <h2><?php _e('Configuration Événements WordPress', 'toolkit'); ?></h2>
+                    
+                    <table class="form-table" role="presentation">
+                        <tr>
+                            <th scope="row">
+                                <label for="wordpress_events_enabled">
+                                    <?php _e('Activer Événements WordPress', 'toolkit'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input 
+                                        type="checkbox" 
+                                        name="<?php echo self::OPTION_NAME; ?>[wordpress_events][enabled]" 
+                                        id="wordpress_events_enabled"
+                                        value="1"
+                                        <?php checked($wp_events['enabled'], true); ?>
+                                    >
+                                    <?php _e('Activer la gestion des événements WordPress', 'toolkit'); ?>
+                                </label>
+                                <p class="description">
+                                    <?php _e('Active une liaison personnalisée pour les événements WordPress.', 'toolkit'); ?>
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="wordpress_events_custom_post_type">
+                                    <?php _e('Custom Post Type', 'toolkit'); ?> <span style="color: red;">*</span>
+                                </label>
+                            </th>
+                            <td>
+                                <select 
+                                    name="<?php echo self::OPTION_NAME; ?>[wordpress_events][custom_post_type]" 
+                                    id="wordpress_events_custom_post_type"
+                                    class="regular-text"
+                                >
+                                    <option value=""><?php _e('Sélectionner un Custom Post Type', 'toolkit'); ?></option>
+                                    <?php foreach ($post_types as $post_type): ?>
+                                        <option value="<?php echo esc_attr($post_type->name); ?>" <?php selected($wp_events['custom_post_type'], $post_type->name); ?>>
+                                            <?php echo esc_html($post_type->label . ' (' . $post_type->name . ')'); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description">
+                                    <?php _e('Sélectionnez le Custom Post Type à utiliser pour les événements WordPress.', 'toolkit'); ?>
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="wordpress_events_acf_field_group">
+                                    <?php _e('Champs ACF', 'toolkit'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <?php if (!empty($all_acf_fields)): ?>
+                                    <select 
+                                        name="<?php echo self::OPTION_NAME; ?>[wordpress_events][acf_field_group]" 
+                                        id="wordpress_events_acf_field_group"
+                                        class="regular-text"
+                                        style="width: 100%; max-width: 600px;"
+                                    >
+                                        <option value=""><?php _e('Aucun champ ACF sélectionné', 'toolkit'); ?></option>
+                                        <?php foreach ($all_acf_fields as $field): ?>
+                                            <option value="<?php echo esc_attr($field['key']); ?>" <?php selected($wp_events['acf_field_group'], $field['key']); ?>>
+                                                <?php echo esc_html($field['display_label']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description">
+                                        <?php _e('Sélectionnez le champ ACF (incluant les sous-champs et champs répétés) relatif à une date associé à ce Custom Post Type. (ne prendra en compte que les champs de type DATE, marche si c\'est une date dans un repeater)', 'toolkit'); ?>
+                                        <br>
+                                        <strong><?php echo sprintf(__('%d champs disponibles', 'toolkit'), count($all_acf_fields)); ?></strong>
+                                    </p>
+                                <?php else: ?>
+                                    <p class="description">
+                                        <strong style="color: #dc3232;">
+                                            <?php _e('ACF n\'est pas installé ou aucun champ n\'a été créé.', 'toolkit'); ?>
+                                        </strong>
+                                        <br>
+                                        <?php _e('Installez et activez Advanced Custom Fields pour utiliser cette fonctionnalité.', 'toolkit'); ?>
+                                    </p>
+                                    <input type="hidden" name="<?php echo self::OPTION_NAME; ?>[wordpress_events][acf_field_group]" value="<?php echo esc_attr($wp_events['acf_field_group']); ?>">
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <?php submit_button(__('Enregistrer les paramètres', 'toolkit'), 'primary', 'submit', true); ?>
+            </form>
+        </div>
+        <?php
     }
 }

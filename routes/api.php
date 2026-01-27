@@ -48,6 +48,13 @@ $app_name = sanitize_title(get_bloginfo('name'));
         'callback' => array($toolkitController, 'get_upcoming'),
     ));
 
+    // GET /wp-json/toolkit/v1/events/upcoming-period
+    register_rest_route($toolkit_namespace, '/events/upcoming-period', array(
+        'methods' => 'GET',
+        'permission_callback' => array($toolkitController, 'permission_callback'),
+        'callback' => array($toolkitController, 'get_upcoming_with_period'),
+    ));
+
     // GET /wp-json/toolkit/v1/events/{id}
     register_rest_route($toolkit_namespace, '/events/(?P<id>\d+)', array(
         'methods' => 'GET',

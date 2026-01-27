@@ -60,13 +60,17 @@ class CalendarService
     {
         $settings = self::get_settings();
         
-        if (!isset($settings['google']['enabled']) || !$settings['google']['enabled']) {
-            // If disabled, unschedule
+        $google_enabled = isset($settings['google']['enabled']) && $settings['google']['enabled'];
+        $wp_events_enabled = isset($settings['wordpress_events']['enabled']) && $settings['wordpress_events']['enabled'];
+        
+        // If both are disabled, unschedule
+        if (!$google_enabled && !$wp_events_enabled) {
             self::unschedule_cron();
             return;
         }
         
-        $interval = $settings['google']['sync_interval'] ?? 'daily';
+        // Use Google Calendar interval if enabled, otherwise use daily as default
+        $interval = $google_enabled ? ($settings['google']['sync_interval'] ?? 'daily') : 'daily';
         
         // Check if already scheduled with correct interval
         $scheduled = wp_next_scheduled(self::CRON_HOOK);
@@ -133,7 +137,19 @@ class CalendarService
             } else {
                 $results['google'] = [
                     'success' => false,
-                    'error' => 'GoogleCalendarSource class not found'
+                    'message' => 'GoogleCalendarSource class not found'
+                ];
+            }
+        }
+        
+        // Sync WordPress Events if enabled
+        if (isset($settings['wordpress_events']['enabled']) && $settings['wordpress_events']['enabled']) {
+            if (class_exists('Toolkit\utils\EventWPCalendar')) {
+                $results['wordpress_events'] = \Toolkit\utils\EventWPCalendar::sync();
+            } else {
+                $results['wordpress_events'] = [
+                    'success' => false,
+                    'message' => 'EventWPCalendar class not found'
                 ];
             }
         }
