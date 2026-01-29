@@ -219,6 +219,24 @@ class EventWPCalendar
         } else {
             $result = wp_insert_post($post_data, true);
         }
+
+        // Assign WPML language to the calendar event (same as source post)
+        if (class_exists('SitePress')) {
+            $details = apply_filters('wpml_post_language_details', null, $source_post->ID);
+            
+            if (!empty($details['language_code'])) {
+                error_log('EventWPCalendar: Setting event ' . $result . ' language to: ' . $details['language_code'] . ' (from source post ' . $source_post->ID . ')');
+                
+                do_action('wpml_set_element_language_details', [
+                    'element_id'    => $result,
+                    'element_type'  => 'post_calendar_event',
+                    'trid'          => $details['trid'] ?? false,
+                    'language_code' => $details['language_code'],
+                ]);
+            }
+        }
+        error_log('EventWPCalendar: Saved event for post ' . $source_post->ID . ' with event ID ' . $result);
+
         
         if (is_wp_error($result)) {
             error_log('EventWPCalendar: Error saving event: ' . $result->get_error_message());

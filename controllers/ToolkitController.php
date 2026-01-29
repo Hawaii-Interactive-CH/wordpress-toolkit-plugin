@@ -163,11 +163,13 @@ class ToolkitController
      */
     public function get_upcoming_with_period(WP_REST_Request $request)
     {
-        $limit = $request->get_param('limit') ?: 10;
-        $before = $request->get_param('before') ?: 0;
+        $limit = intval( $request->get_param('limit') );
+        $limit = $limit !== 0 ? $limit : 10;
+        $before = intval( $request->get_param('before') );
+        $before = $before >= 0 ? $before : 0;
+        $lang = sanitize_text_field( $request->get_param('lang') ?: 'fr' );
         
         $now = current_time('mysql');
-        
         $start_date = date('Y-m-d H:i:s', strtotime("-{$before} days", strtotime($now)));
 
         $args = [
@@ -184,8 +186,14 @@ class ToolkitController
                     'compare' => '>=',
                     'type' => 'DATETIME'
                 ]
-            ]
+            ],
+            'suppress_filters' => false,
         ];
+
+        // Add WPML language filter directly in the query
+        if (defined('ICL_LANGUAGE_CODE')) {
+            $args['lang'] = $lang;
+        }
 
         $query = new \WP_Query($args);
         $events = [];
@@ -197,6 +205,13 @@ class ToolkitController
                 
                 $source_post_id = get_post_meta($post_id, '_wp_event_source_post_id', true);
                 $source_post_type = get_post_meta($post_id, '_wp_event_source_post_type', true);
+                
+                // Get WPML language for this post
+                $source_lang = null;
+                if (function_exists('wpml_get_language_information')) {
+                    $lang_info = wpml_get_language_information(null, $post_id);
+                    $source_lang = $lang_info['locale'] ?? null;
+                }
                 
                 $events[] = [
                     'id' => $post_id,
@@ -212,6 +227,7 @@ class ToolkitController
                     'source_post_id' => $source_post_id ?: null,
                     'source_post_type' => $source_post_type ?: null,
                     'source_link' => $source_post_id ? get_permalink($source_post_id) : null,
+                    'lang' => $source_lang,
                 ];
             }
             wp_reset_postdata();
