@@ -476,18 +476,22 @@ class WebPTestPage
                                 <td><code><?php echo esc_html($fly_base_dir); ?></code></td>
                             </tr>
                             <?php
-                            $editor = wp_get_image_editor(get_attached_file(array_key_first((array) get_posts(['post_type'=>'attachment','post_mime_type'=>'image','posts_per_page'=>1,'fields'=>'ids']))));
-                            if (!is_wp_error($editor)):
+                            $test_images = get_posts(['post_type'=>'attachment','post_mime_type'=>'image','posts_per_page'=>1,'fields'=>'ids']);
+                            $test_file = !empty($test_images) ? get_attached_file($test_images[0]) : null;
+                            $editor = $test_file ? wp_get_image_editor($test_file) : null;
                             ?>
                             <tr>
                                 <td><strong>WP Image Editor class</strong></td>
-                                <td><code><?php echo get_class($editor); ?></code></td>
+                                <td><code><?php echo ($editor && !is_wp_error($editor)) ? get_class($editor) : ('Error: ' . ($editor ? $editor->get_error_message() : 'no image found')); ?></code></td>
                             </tr>
                             <tr>
-                                <td><strong>editor->supports_mime_type('image/webp')</strong></td>
-                                <td><?php echo $editor->supports_mime_type('image/webp') ? '✅ Yes' : '❌ No'; ?></td>
+                                <td><strong>supports_mime_type(image/webp)</strong></td>
+                                <td><?php echo ($editor && !is_wp_error($editor) && $editor->supports_mime_type('image/webp')) ? '✅ Yes' : '❌ No'; ?></td>
                             </tr>
-                            <?php endif; ?>
+                            <tr>
+                                <td><strong>WP_Image_Editor_GD::supports_mime_type(image/webp)</strong></td>
+                                <td><?php echo \WP_Image_Editor_GD::supports_mime_type('image/webp') ? '✅ Yes' : '❌ No'; ?></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
