@@ -37,6 +37,15 @@ class Size
         add_action('wp_generate_attachment_metadata', array($this, 'queue_image_for_processing'), 10, 2);
         add_action('fly_images_process_queue', array($this, 'process_image_queue'));
         add_filter('cron_schedules', array($this, 'add_cron_interval'));
+        add_filter('wp_image_editors', function($editors) {
+            // Move GD before Imagick so WebP is supported
+            usort($editors, function($a, $b) {
+                if ($a === 'WP_Image_Editor_GD') return -1;
+                if ($b === 'WP_Image_Editor_GD') return 1;
+                return 0;
+            });
+            return $editors;
+        });
         
         if (!wp_next_scheduled('fly_images_process_queue')) {
             wp_schedule_event(time(), 'every_minute', 'fly_images_process_queue');
