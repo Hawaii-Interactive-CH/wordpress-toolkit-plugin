@@ -475,6 +475,19 @@ class WebPTestPage
                                 <td><strong>Fly Images Directory</strong></td>
                                 <td><code><?php echo esc_html($fly_base_dir); ?></code></td>
                             </tr>
+                            <?php
+                            $editor = wp_get_image_editor(get_attached_file(array_key_first((array) get_posts(['post_type'=>'attachment','post_mime_type'=>'image','posts_per_page'=>1,'fields'=>'ids']))));
+                            if (!is_wp_error($editor)):
+                            ?>
+                            <tr>
+                                <td><strong>WP Image Editor class</strong></td>
+                                <td><code><?php echo get_class($editor); ?></code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>editor->supports_mime_type('image/webp')</strong></td>
+                                <td><?php echo $editor->supports_mime_type('image/webp') ? '✅ Yes' : '❌ No'; ?></td>
+                            </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
