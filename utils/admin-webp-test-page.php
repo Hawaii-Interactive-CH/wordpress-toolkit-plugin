@@ -15,6 +15,19 @@ class WebPTestPage
     public static function init()
     {
         add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
+        add_action('wp_ajax_process_webp_queue', [__CLASS__, 'ajax_process_queue']);
+    }
+
+    public static function ajax_process_queue()
+    {
+        check_ajax_referer('process_webp_queue_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        $size_instance = Size::get_instance();
+        $size_instance->process_image_queue();
+        $queue_status = $size_instance->get_queue_status();
+        wp_send_json_success(['remaining' => $queue_status['count']]);
     }
 
     public static function add_admin_menu()
@@ -50,6 +63,13 @@ class WebPTestPage
             $size_instance = Size::get_instance();
             $size_instance->clear_queue();
             $rebuild_message = '<div class="notice notice-info is-dismissible"><p><strong>Queue cleared.</strong> All pending WebP generation tasks have been removed.</p></div>';
+        }
+
+        // Handle clear logs action
+        if (isset($_POST['clear_webp_logs']) && check_admin_referer('clear_webp_logs_action', 'clear_webp_logs_nonce')) {
+            $size_instance = Size::get_instance();
+            $size_instance->clear_webp_logs();
+            $rebuild_message = '<div class="notice notice-info is-dismissible"><p><strong>Logs cleared.</strong></p></div>';
         }
 
         ?>
@@ -162,6 +182,38 @@ class WebPTestPage
                     gap: 8px;
                     margin: 10px 0;
                 }
+                .log-table {
+                    max-height: 500px;
+                    overflow-y: auto;
+                    border: 1px solid #c3c4c7;
+                }
+                .log-table table {
+                    margin: 0;
+                }
+                .log-level {
+                    display: inline-block;
+                    padding: 2px 8px;
+                    border-radius: 3px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+                .log-level-success { background: #d5e8d4; color: #2d7a2d; }
+                .log-level-error { background: #f8d7da; color: #842029; }
+                .log-level-warning { background: #fff3cd; color: #856404; }
+                .log-level-info { background: #e7f5ff; color: #0c5aa6; }
+                .log-filter-bar {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                    margin-bottom: 10px;
+                    flex-wrap: wrap;
+                }
+                .log-filter-bar .button.active {
+                    background: #2271b1;
+                    color: #fff;
+                    border-color: #2271b1;
+                }
             </style>
         </head>
         <body>
@@ -181,9 +233,53 @@ class WebPTestPage
                     <p>Use this tool to regenerate all WebP images in the background. The process will queue all image attachments and process them via cron.</p>
 
                     <?php if ($queue_status['count'] > 0): ?>
-                        <div class="notice notice-info inline" style="margin: 10px 0; padding: 10px;">
-                            <p><strong>⏳ Queue Status:</strong> <?php echo $queue_status['count']; ?> images waiting to be processed.</p>
+                        <div class="notice notice-info inline" id="queue-status-notice" style="margin: 10px 0; padding: 10px;">
+                            <p><strong>⏳ Queue Status:</strong> <span id="queue-count"><?php echo $queue_status['count']; ?></span> images waiting to be processed.</p>
                         </div>
+                        <button type="button" id="process-now-btn" class="button button-secondary" style="margin-bottom: 10px;">
+                            ▶ Process Queue Now
+                        </button>
+                        <script>
+                        (function() {
+                            var nonce = '<?php echo wp_create_nonce('process_webp_queue_nonce'); ?>';
+                            var btn = document.getElementById('process-now-btn');
+                            var countEl = document.getElementById('queue-count');
+                            var notice = document.getElementById('queue-status-notice');
+
+                            function processQueue() {
+                                btn.disabled = true;
+                                btn.textContent = '⏳ Processing...';
+                                fetch(ajaxurl, {
+                                    method: 'POST',
+                                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                                    body: 'action=process_webp_queue&nonce=' + nonce
+                                })
+                                .then(r => r.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        var remaining = data.data.remaining;
+                                        countEl.textContent = remaining;
+                                        if (remaining > 0) {
+                                            btn.disabled = false;
+                                            btn.textContent = '▶ Process Queue Now (' + remaining + ' left)';
+                                        } else {
+                                            notice.style.display = 'none';
+                                            btn.textContent = '✅ Queue empty — reload to refresh stats';
+                                        }
+                                    } else {
+                                        btn.disabled = false;
+                                        btn.textContent = '▶ Process Queue Now';
+                                    }
+                                })
+                                .catch(() => {
+                                    btn.disabled = false;
+                                    btn.textContent = '▶ Process Queue Now';
+                                });
+                            }
+
+                            btn.addEventListener('click', processQueue);
+                        })();
+                        </script>
                     <?php endif; ?>
 
                     <form method="post" style="display: inline-block;">
@@ -440,6 +536,92 @@ class WebPTestPage
 
 
 
+
+                <?php
+                // Display WebP conversion logs
+                $webp_logs = $size_instance->get_webp_logs();
+                $log_counts = ['success' => 0, 'error' => 0, 'warning' => 0, 'info' => 0];
+                foreach ($webp_logs as $log) {
+                    if (isset($log_counts[$log['level']])) {
+                        $log_counts[$log['level']]++;
+                    }
+                }
+                ?>
+                <div class="test-section">
+                    <h2>📋 Conversion Logs</h2>
+
+                    <?php if (empty($webp_logs)): ?>
+                        <p>No conversion logs yet. Trigger a rebuild to generate logs.</p>
+                    <?php else: ?>
+                        <div class="stats" style="margin-bottom: 15px;">
+                            <div class="stat-box success">
+                                <div class="stat-label">Converted</div>
+                                <div class="stat-value"><?php echo $log_counts['success']; ?></div>
+                            </div>
+                            <div class="stat-box error">
+                                <div class="stat-label">Errors</div>
+                                <div class="stat-value"><?php echo $log_counts['error']; ?></div>
+                            </div>
+                            <div class="stat-box warning">
+                                <div class="stat-label">Warnings</div>
+                                <div class="stat-value"><?php echo $log_counts['warning']; ?></div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Info</div>
+                                <div class="stat-value"><?php echo $log_counts['info']; ?></div>
+                            </div>
+                        </div>
+
+                        <div class="log-filter-bar">
+                            <strong>Filter:</strong>
+                            <button class="button active" onclick="filterLogs('all', this)">All (<?php echo count($webp_logs); ?>)</button>
+                            <button class="button" onclick="filterLogs('success', this)">Success (<?php echo $log_counts['success']; ?>)</button>
+                            <button class="button" onclick="filterLogs('error', this)">Errors (<?php echo $log_counts['error']; ?>)</button>
+                            <button class="button" onclick="filterLogs('warning', this)">Warnings (<?php echo $log_counts['warning']; ?>)</button>
+                            <button class="button" onclick="filterLogs('info', this)">Info (<?php echo $log_counts['info']; ?>)</button>
+
+                            <form method="post" style="margin-left: auto;">
+                                <?php wp_nonce_field('clear_webp_logs_action', 'clear_webp_logs_nonce'); ?>
+                                <button type="submit" name="clear_webp_logs" class="button" onclick="return confirm('Clear all conversion logs?');">Clear Logs</button>
+                            </form>
+                        </div>
+
+                        <div class="log-table">
+                            <table class="widefat striped">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 150px;">Time</th>
+                                        <th style="width: 80px;">Level</th>
+                                        <th style="width: 80px;">Attach. ID</th>
+                                        <th style="width: 120px;">Size</th>
+                                        <th>Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach (array_reverse($webp_logs) as $log): ?>
+                                        <tr class="log-row" data-level="<?php echo esc_attr($log['level']); ?>">
+                                            <td><code style="font-size: 11px;"><?php echo esc_html($log['time']); ?></code></td>
+                                            <td><span class="log-level log-level-<?php echo esc_attr($log['level']); ?>"><?php echo esc_html($log['level']); ?></span></td>
+                                            <td><?php echo $log['attachment_id'] ? '<a href="' . esc_url(admin_url('post.php?post=' . $log['attachment_id'] . '&action=edit')) . '">' . intval($log['attachment_id']) . '</a>' : '-'; ?></td>
+                                            <td><?php echo esc_html($log['size_name'] ?: '-'); ?></td>
+                                            <td><?php echo esc_html($log['message']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <script>
+                        function filterLogs(level, btn) {
+                            document.querySelectorAll('.log-filter-bar .button').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            document.querySelectorAll('.log-row').forEach(row => {
+                                row.style.display = (level === 'all' || row.dataset.level === level) ? '' : 'none';
+                            });
+                        }
+                        </script>
+                    <?php endif; ?>
+                </div>
 
                 <div class="test-section">
                     <h2>🚀 Next Steps</h2>
