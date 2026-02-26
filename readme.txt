@@ -21,6 +21,9 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 2.1.3 =
+- Better WebP conversion
+
 = 2.0.0 =
 - Feat: Add Google calendar integration
 - Feat: Convert png to webp using wp cron
