@@ -39,3 +39,64 @@ Pour mettre à jour le plugin, il faut changer la version `readme.txt` et `wordp
 Une documentation est disponible dans l'administration de Wordpress dans le menu `Toolkit` > `Docs`.
 
 Pour la mettre à jour, il suffit de modifier les fichiers markdown dans le dossier `docs` du plugin et pour mettre à jour la table des matières.
+
+## Claude Code Skills
+
+Ce projet inclut des skills [Claude Code](https://claude.ai/claude-code) pour accélérer le développement. Les skills sont des commandes slash (`/skill-name`) qui guident Claude dans la génération de code respectant les conventions du projet.
+
+### Skills disponibles
+
+| Commande | Description |
+|---|---|
+| `/create-cpt` | Génère une classe `CustomPostType` avec `JsonSerializable` et optionnellement une taxonomy de catégorie |
+
+### Utilisation
+
+Dans Claude Code, invoquer la commande directement :
+
+```
+/create-cpt
+```
+
+Claude posera les questions nécessaires (nom de classe, slug, labels, icône, supports, etc.) et générera les fichiers dans `models/custom/`.
+
+Il est aussi possible de passer des arguments directement :
+
+```
+/create-cpt Product "Products" "Product"
+```
+
+### Ajouter les skills globalement
+
+Les skills du projet sont disponibles uniquement dans ce dépôt (via `.claude/commands/`). Pour les rendre disponibles dans tous vos projets, copiez le fichier dans votre répertoire global :
+
+```bash
+cp .claude/commands/create-cpt.md ~/.claude/commands/create-cpt.md
+```
+
+Pour les organiser en sous-dossier (invocables via `/wordpress:create-cpt`) :
+
+```bash
+mkdir -p ~/.claude/commands/wordpress
+cp .claude/commands/create-cpt.md ~/.claude/commands/wordpress/create-cpt.md
+```
+
+### Ajouter un nouveau skill
+
+Créer un fichier Markdown dans `.claude/commands/` :
+
+```
+.claude/commands/my-skill.md
+```
+
+Le fichier doit commencer par un front-matter avec une description, suivi des instructions pour Claude :
+
+```markdown
+---
+description: 'Ce que fait le skill'
+---
+
+# Mon Skill
+
+Instructions pour Claude...
+```
