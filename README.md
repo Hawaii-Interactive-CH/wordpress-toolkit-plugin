@@ -49,6 +49,10 @@ Ce projet inclut des skills [Claude Code](https://claude.ai/claude-code) pour ac
 | Commande | Description |
 |---|---|
 | `/create-cpt` | Génère une classe `CustomPostType` avec `JsonSerializable` et optionnellement une taxonomy de catégorie |
+| `/create-taxonomy` | Génère une classe `Taxonomy` standalone avec `register()` et `jsonSerialize()` |
+| `/create-block` | Génère une classe `Block` ACF et son template PHP dans `partials/blocks/` |
+| `/create-service` | Génère un service statique dans `utils/` avec `register()` et les hooks WordPress |
+| `/create-option-page` | Génère une classe `OptionPage` ACF avec les accesseurs de champs statiques |
 
 ### Utilisation
 
