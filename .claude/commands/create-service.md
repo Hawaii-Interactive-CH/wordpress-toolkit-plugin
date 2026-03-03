@@ -4,7 +4,7 @@ description: 'Generate a static Service class in utils/ following the Toolkit se
 
 # Create Service
 
-Generate a new Service class in `utils/` for the WordPress Toolkit plugin.
+Generate a new Service class in the **current working directory** (i.e. the theme or project where the skill is invoked — not the Toolkit plugin itself).
 
 ## Instructions
 
@@ -21,7 +21,7 @@ Ask the user for the following information if not already provided in the argume
 
 ## Output
 
-Generate the file at: `utils/{Name}Service.php`
+Generate the file at: `utils/{Name}Service.php` **relative to the current working directory** (the directory from which this skill was invoked, not the Toolkit plugin directory).
 
 Use exactly this template:
 

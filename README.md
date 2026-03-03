@@ -62,7 +62,7 @@ Dans Claude Code, invoquer la commande directement :
 /create-cpt
 ```
 
-Claude posera les questions nécessaires (nom de classe, slug, labels, icône, supports, etc.) et générera les fichiers dans `models/custom/`.
+Claude posera les questions nécessaires (nom de classe, slug, labels, icône, supports, etc.) et générera les fichiers **dans le répertoire courant** (le thème ou projet depuis lequel la commande est invoquée).
 
 Il est aussi possible de passer des arguments directement :
 
@@ -70,20 +70,15 @@ Il est aussi possible de passer des arguments directement :
 /create-cpt Product "Products" "Product"
 ```
 
-### Ajouter les skills globalement
+### Installer les skills globalement
 
-Les skills du projet sont disponibles uniquement dans ce dépôt (via `.claude/commands/`). Pour les rendre disponibles dans tous vos projets, copiez le fichier dans votre répertoire global :
-
-```bash
-cp .claude/commands/create-cpt.md ~/.claude/commands/create-cpt.md
-```
-
-Pour les organiser en sous-dossier (invocables via `/wordpress:create-cpt`) :
+Un script est fourni pour copier tous les skills dans `~/.claude/commands/toolkit/`, les rendant disponibles dans tous vos projets via `/toolkit:create-cpt`, `/toolkit:create-block`, etc.
 
 ```bash
-mkdir -p ~/.claude/commands/wordpress
-cp .claude/commands/create-cpt.md ~/.claude/commands/wordpress/create-cpt.md
+bash bin/install-skills.sh
 ```
+
+Relancer ce script après chaque mise à jour du plugin pour synchroniser les skills.
 
 ### Ajouter un nouveau skill
 

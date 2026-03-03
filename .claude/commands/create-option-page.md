@@ -4,7 +4,7 @@ description: 'Generate an ACF Option Page class extending Toolkit\models\OptionP
 
 # Create Option Page
 
-Generate a new ACF Option Page class for the WordPress Toolkit plugin.
+Generate a new ACF Option Page class in the **current working directory** (i.e. the theme or project where the skill is invoked — not the Toolkit plugin itself).
 
 ## Instructions
 
@@ -21,7 +21,7 @@ Ask the user for the following information if not already provided in the argume
 
 ## Output
 
-Generate the file at: `models/custom/{ClassName}.php`
+Generate the file at: `models/custom/{ClassName}.php` **relative to the current working directory** (the directory from which this skill was invoked, not the Toolkit plugin directory).
 
 Use exactly this template:
 

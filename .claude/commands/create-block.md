@@ -4,7 +4,7 @@ description: 'Generate an ACF Block class extending Toolkit\models\Block and its
 
 # Create Block
 
-Generate a new ACF Block class and its template file for the WordPress Toolkit plugin.
+Generate a new ACF Block class and its template file in the **current working directory** (i.e. the theme or project where the skill is invoked — not the Toolkit plugin itself).
 
 ## Instructions
 
@@ -20,6 +20,8 @@ Ask the user for the following information if not already provided in the argume
 8. **ACF fields** — ask the user to list the ACF field keys the block will use (e.g. `title`, `image`, `items`). These will be scaffolded as `$this->acf('field_key')` calls in the template.
 
 ## Output
+
+Both files are generated **relative to the current working directory** (the directory from which this skill was invoked, not the Toolkit plugin directory).
 
 ### 1. Class file: `models/custom/{ClassName}.php`
 

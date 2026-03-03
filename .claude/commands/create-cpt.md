@@ -4,7 +4,7 @@ description: 'Generate a CustomPostType class that extends CustomPostType and im
 
 # Create Custom Post Type
 
-Generate a new Custom Post Type class for the WordPress Toolkit plugin.
+Generate a new Custom Post Type class in the **current working directory** (i.e. the theme or project where the skill is invoked — not the Toolkit plugin itself).
 
 ## Instructions
 
@@ -23,7 +23,7 @@ Ask the user for the following information if not already provided in the argume
 
 ## Output
 
-Generate the file at: `models/custom/{ClassName}.php`
+Generate the file at: `models/custom/{ClassName}.php` **relative to the current working directory** (the directory from which this skill was invoked, not the Toolkit plugin directory).
 
 Use exactly this template, filling in the values:
 
@@ -94,7 +94,7 @@ class {ClassName} extends CustomPostType implements \JsonSerializable
 }
 ```
 
-If the user requested a companion Category taxonomy, also generate `models/custom/{ClassName}Category.php`:
+If the user requested a companion Category taxonomy, also generate `models/custom/{ClassName}Category.php` in the same current working directory:
 
 ```php
 <?php
