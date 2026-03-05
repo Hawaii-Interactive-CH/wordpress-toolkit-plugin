@@ -86,6 +86,18 @@ class Size
     }
 
     /**
+     * Get the registered width in pixels for a given size name.
+     *
+     * @param string $size_name A size name registered via Size::add().
+     * @return int The width in pixels, or 0 if the size is not registered.
+     */
+    public static function width(string $size_name): int
+    {
+        $size = self::get_instance()->get_image_size($size_name);
+        return $size ? (int) $size['size'][0] : 0;
+    }
+
+    /**
      * Get the path to the directory where all Fly images are stored.
      *
      * @param  string $path
