@@ -70,68 +70,126 @@ abstract class AbstractMedia extends PostType
     /**
      * Render a complete <picture> element with WebP sources and a fallback <img>.
      *
-     * Each entry in $sources defines one <source> element. The last entry in $sources
-     * is also used as the fallback <img> src. Outputs lazy loading and optional CSS class.
+     * Each entry in $sources defines one <source> element. The last resolved source
+     * is used as the fallback <img> src unless $fallback_size is provided explicitly.
+     * Supports two source modes, which can be mixed:
      *
-     * @param array  $sources  Ordered array of source definitions. Each entry is an associative
-     *                         array with the following keys:
-     *                         - 'size'   string  Required. Registered size name (e.g. 'image-xl').
-     *                         - 'media'  string  Optional. Media query (e.g. '(min-width: 1280px)').
-     *                         - 'size2x' string  Optional. Size name for the 2x retina variant.
-     * @param string $class    Optional CSS class added to the <img> element.
-     * @param bool   $lazy     Whether to add loading="lazy" to the <img>. Default true.
-     * @return string          The rendered <picture> HTML, or an empty string if no sources resolved.
+     * Density-descriptor mode (1x/2x):
+     *   - 'size'   string  Required. Registered size name (e.g. 'image-xl').
+     *   - 'size2x' string  Optional. Size name for the 2x retina variant.
      *
-     * @example
+     * Width-descriptor mode (w) — default when 'sizes' is omitted or a non-empty string:
+     *   - 'size'   string       Required. Registered size name. Width is looked up from Size registry.
+     *   - 'size2x' string       Optional. Registered size name for retina. Width is looked up automatically.
+     *   - 'sizes'  string|false Optional. Sizes attribute value. Defaults to '100vw'. Pass false to use density mode.
+     *
+     * Density-descriptor mode (1x/2x) — opt in with 'sizes' => false:
+     *   - 'size'   string  Required. Registered size name (e.g. 'image-xl').
+     *   - 'size2x' string  Optional. Size name for the 2x retina variant.
+     *   - 'sizes'  false   Required to activate this mode.
+     *
+     * Explicit srcset array mode (advanced override):
+     *   - 'srcset' array   Map of size name => custom descriptor (e.g. ['image-xl' => '1920w']).
+     *
+     * Common keys (all modes):
+     *   - 'media'  string  Optional. Media query (e.g. '(min-width: 1280px)').
+     *
+     * @param array  $sources       Ordered array of source definitions.
+     * @param string $class         Optional CSS class added to the <img> element.
+     * @param bool   $lazy          Whether to add loading="lazy" to the <img>. Default true.
+     * @param bool   $decode        Whether to add decoding="async" to the <img>. Default false.
+     * @param string $fallback_size Optional size name to use as the <img> src. Required when
+     *                              all sources carry a media query (no implicit default source).
+     * @return string               The rendered <picture> HTML, or an empty string if no sources resolved.
+     *
+     * @example Width descriptors (w) — default mode, sizes="100vw" applied automatically
      * echo $media->picture([
-     *     ['size' => 'image-s',  'media' => '(max-width: 640px)',  'size2x' => 'image-s-2x'],
-     *     ['size' => 'image-m',  'media' => '(max-width: 1280px)', 'size2x' => 'image-m-2x'],
-     *     ['size' => 'image-xl', 'size2x' => 'image-xl-2x'],
+     *     ['size' => 'image-xl', 'size2x' => 'image-xl-2x', 'media' => '(min-width: 1920px)'],
+     *     ['size' => 'image-s',  'size2x' => 'image-s-2x',  'media' => '(max-width: 400px)'],
+     * ], '', true, true, 'image-xl');
+     *
+     * @example Density descriptors (1x/2x) — opt in with 'sizes' => false
+     * echo $media->picture([
+     *     ['size' => 'image-s',  'size2x' => 'image-s-2x',  'media' => '(max-width: 640px)',  'sizes' => false],
+     *     ['size' => 'image-xl', 'size2x' => 'image-xl-2x', 'sizes' => false],
      * ]);
      */
-    public function picture(array $sources, string $class = '', bool $lazy = true): string
+    public function picture(array $sources, string $class = '', bool $lazy = true, bool $decode = false, string $fallback_size = ''): string
     {
         if (empty($sources)) {
             return '';
         }
 
-        $alt   = esc_attr($this->alt());
-        $class = $class ? ' class="' . esc_attr($class) . '"' : '';
-        $lazy  = $lazy ? ' loading="lazy"' : '';
-
-        $html         = '<picture>';
-        $fallback_src = '';
+        $alt         = esc_attr($this->alt());
+        $class_attr  = $class  ? ' class="' . esc_attr($class) . '"' : '';
+        $lazy_attr   = $lazy   ? ' loading="lazy"' : '';
+        $decode_attr = $decode ? ' decoding="async"' : '';
+        $html        = '<picture>';
+        $last_src    = '';
 
         foreach ($sources as $source) {
-            $size_name = $source['size'] ?? '';
-            $url       = $this->src($size_name);
+            // 'sizes' defaults to '100vw' (width-descriptor mode); pass false for density (1x/2x) mode.
+            $sizes_value = $source['sizes'] ?? '100vw';
 
-            if (!$url) {
-                continue;
-            }
-
-            // Keep track of the last resolved URL to use as <img> fallback.
-            $fallback_src = $url;
-
-            $srcset_value = $url . ' 1x';
-
-            if (!empty($source['size2x'])) {
-                $url_2x = $this->src($source['size2x']);
-                if ($url_2x) {
-                    $srcset_value .= ', ' . $url_2x . ' 2x';
+            if (isset($source['srcset']) && is_array($source['srcset'])) {
+                // Explicit srcset array mode: ['srcset' => ['size-name' => 'Xw', ...]]
+                $srcset_value = $this->srcset($source['srcset']);
+                if (!$srcset_value) {
+                    continue;
+                }
+                if (!$last_src) {
+                    $first_url = $this->src(array_key_first($source['srcset']));
+                    if ($first_url) {
+                        $last_src = $first_url;
+                    }
+                }
+            } elseif ($sizes_value !== false && $sizes_value !== '') {
+                // Width-descriptor mode: auto-derive pixel widths from registered sizes.
+                $size_name = $source['size'] ?? '';
+                $url       = $this->src($size_name);
+                if (!$url) {
+                    continue;
+                }
+                $last_src     = $url;
+                $w            = Size::width($size_name);
+                $srcset_value = $url . ($w ? " {$w}w" : ' 1x');
+                if (!empty($source['size2x'])) {
+                    $url_2x = $this->src($source['size2x']);
+                    if ($url_2x) {
+                        $w_2x          = Size::width($source['size2x']);
+                        $srcset_value .= ', ' . $url_2x . ($w_2x ? " {$w_2x}w" : ' 2x');
+                    }
+                }
+            } else {
+                // Density-descriptor mode: 1x / 2x (opt in with 'sizes' => false).
+                $size_name = $source['size'] ?? '';
+                $url       = $this->src($size_name);
+                if (!$url) {
+                    continue;
+                }
+                $last_src     = $url;
+                $srcset_value = $url . ' 1x';
+                if (!empty($source['size2x'])) {
+                    $url_2x = $this->src($source['size2x']);
+                    if ($url_2x) {
+                        $srcset_value .= ', ' . $url_2x . ' 2x';
+                    }
                 }
             }
 
-            $media_attr = !empty($source['media']) ? ' media="' . esc_attr($source['media']) . '"' : '';
+            $media_attr = !empty($source['media'])           ? ' media="' . esc_attr($source['media']) . '"' : '';
+            $sizes_attr = ($sizes_value && $sizes_value !== true) ? ' sizes="' . esc_attr($sizes_value) . '"' : '';
 
-            $html .= '<source' . $media_attr . ' srcset="' . esc_attr($srcset_value) . '">';
+            $html .= '<source' . $media_attr . ' srcset="' . esc_attr($srcset_value) . '"' . $sizes_attr . '>';
         }
+
+        $fallback_src = $fallback_size ? ($this->src($fallback_size) ?: $last_src) : $last_src;
 
         if (!$fallback_src) {
             return '';
         }
 
-        $html .= '<img src="' . esc_url($fallback_src) . '" alt="' . $alt . '"' . $class . $lazy . '>';
+        $html .= '<img src="' . esc_url($fallback_src) . '" alt="' . $alt . '"' . $class_attr . $lazy_attr . $decode_attr . '>';
         $html .= '</picture>';
 
         return $html;
