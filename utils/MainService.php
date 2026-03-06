@@ -666,7 +666,7 @@ class MainService
      */
     public static function customize_login(array $options = []): void
     {
-        add_action('login_enqueue_scripts', function () use ($options): void {
+        add_action('login_head', function () use ($options): void {
             $css = '';
 
             if (!empty($options['logo'])) {
@@ -682,8 +682,8 @@ class MainService
             if (!empty($options['button_color'])) {
                 $color = esc_attr($options['button_color']);
                 $hover = esc_attr($options['button_hover'] ?? $options['button_color']);
-                $css .= ".login .button-primary { background: {$color} !important; border-color: {$color} !important; box-shadow: none !important; }";
-                $css .= ".login .button-primary:hover, .login .button-primary:focus { background: {$hover} !important; border-color: {$hover} !important; box-shadow: none !important; }";
+                $css .= "body.login .button-primary, #wp-submit { background: {$color}; border-color: {$color}; box-shadow: none; }";
+                $css .= "body.login .button-primary:hover, body.login .button-primary:focus, #wp-submit:hover, #wp-submit:focus { background: {$hover}; border-color: {$hover}; box-shadow: none; }";
             }
 
             if ($css) {
