@@ -21,6 +21,11 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 2.1.4 =
+- Feat: Add add_columns() helper to CustomPostType for admin list columns with sorting support
+- Feat: Add remove_columns() helper to CustomPostType to hide admin list columns
+- Feat: Add MainService::customize_login() to customize wp-login.php logo, background and button color
+
 = 2.1.3 =
 - Better WebP conversion
 
