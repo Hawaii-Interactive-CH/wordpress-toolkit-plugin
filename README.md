@@ -30,9 +30,35 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://github.com/Hawaii-Int
 
 ## Mise à jour
 
-Le plugin integere un système de mise à jour basé sur [plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) et est lié au dépôt git du plugin sur https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin.
+Le plugin intègre un système de mise à jour basé sur [plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker), lié au dépôt GitHub via les **GitHub Releases**.
 
-Pour mettre à jour le plugin, il faut changer la version `readme.txt` et `wordpress-toolkit-plugin.php` et pousser les changements sur le dépôt git. Le plugin detectera automatiquement les mis à jour sur les sites utilisant le plugin et proposera la mise à jour.
+### Publier une nouvelle version
+
+1. Mettre à jour le numéro de version dans `wordpress-toolkit-plugin.php` (header et constante) :
+
+```php
+ * Version: 2.x.x
+define("WP_TOOLKIT_VERSION", "2.x.x");
+```
+
+2. Committer et pousser les changements :
+
+```bash
+git add wordpress-toolkit-plugin.php
+git commit -m "update version to 2.x.x"
+git push origin main
+```
+
+3. Créer un tag et une GitHub Release :
+
+```bash
+git tag v2.x.x
+git push origin v2.x.x
+```
+
+Puis sur GitHub, aller dans **Releases → Draft a new release**, sélectionner le tag `v2.x.x` et publier.
+
+Le plugin détectera automatiquement la nouvelle release sur les sites qui l'utilisent et proposera la mise à jour.
 
 ## Documentation
 
