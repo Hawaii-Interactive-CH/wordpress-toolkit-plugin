@@ -2,6 +2,10 @@
 
 namespace Toolkit\models;
 
+use Toolkit\models\Media;
+use Toolkit\models\File;
+use Toolkit\models\Page;
+
 // Prevent direct access.
 defined( 'ABSPATH' ) or exit;
 
@@ -96,5 +100,40 @@ abstract class Block
     public function has_acf(string $key): bool
     {
         return !empty($this->acf($key));
+    }
+
+    public function acf_publication(
+        string $name,
+        string $class,
+        callable $callback
+    ) {
+        $data = $this->acf($name);
+        $id = gettype($data) == "object" ? $data->ID : $data;
+
+        if (!$id) {
+            return;
+        }
+
+        return $callback(new $class($id));
+    }
+
+    public function acf_media(string $name, callable $callback)
+    {
+        return $this->acf_publication($name, Media::class, $callback);
+    }
+
+    public function acf_file(string $name, callable $callback)
+    {
+        return $this->acf_publication($name, File::class, $callback);
+    }
+
+    public function acf_post(string $name, callable $callback)
+    {
+        return $this->acf_publication($name, Page::class, $callback);
+    }
+
+    public function acf_page(string $name, callable $callback)
+    {
+        return $this->acf_publication($name, Page::class, $callback);
     }
 }
