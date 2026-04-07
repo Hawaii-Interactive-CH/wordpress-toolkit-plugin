@@ -8,6 +8,13 @@ class ApiAuthService
     private static $whitelist_option_name = 'api_auth_whitelist';
     private static $transient_token_name = 'api_auth_token';
 
+    private static function ensure_manage_options_capability()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to perform this action.', 'toolkit'));
+        }
+    }
+
     public static function register()
     {
         add_action('admin_menu', [self::class, 'admin_menu']);
@@ -193,6 +200,7 @@ class ApiAuthService
     /** Génère un master token et le stocke dans les options */
     public static function generate_master_token()
     {
+        self::ensure_manage_options_capability();
         if (isset($_POST['generate_master_token']) && check_admin_referer('generate_master_token_action', 'generate_master_token_nonce')) {
             $token = wp_generate_password(64, false);
             $encrypted_token = self::encrypt_token($token);
@@ -222,6 +230,7 @@ class ApiAuthService
     /** Définit la durée de vie des tokens transients */
     public static function set_transient_expiry()
     {
+        self::ensure_manage_options_capability();
         if (isset($_POST['set_transient_expiry']) && check_admin_referer('set_transient_expiry_action', 'set_transient_expiry_nonce')) {
             $expiry = isset($_POST['transient_expiry']) ? intval($_POST['transient_expiry']) : 10;
             update_option('api_transient_expiry', $expiry);
@@ -275,6 +284,7 @@ class ApiAuthService
     /** Ajoute une IP ou un domaine à la liste blanche */
     public static function add_to_whitelist()
     {
+        self::ensure_manage_options_capability();
         if (isset($_POST['add_whitelist']) && check_admin_referer('add_whitelist_action', 'add_whitelist_nonce')) {
             $ip_or_domain = sanitize_text_field($_POST['whitelist']);
     
@@ -301,6 +311,7 @@ class ApiAuthService
     /** Supprime une IP ou un domaine de la liste blanche */
     public static function remove_from_whitelist()
     {
+        self::ensure_manage_options_capability();
         if (isset($_POST['action']) && $_POST['action'] === 'remove_whitelist' && check_admin_referer('remove_whitelist_action', 'remove_whitelist_nonce')) {
 
             $ip_or_domain = sanitize_text_field($_POST['whitelist_item']);
@@ -322,8 +333,15 @@ class ApiAuthService
 
     public static function generate_encryption_key()
     {
+        self::ensure_manage_options_capability();
+
+        if ('POST' !== strtoupper($_SERVER['REQUEST_METHOD'] ?? '')) {
+            wp_die(esc_html__('Invalid request method.', 'toolkit'));
+        }
+
         if (isset($_POST['generate_encryption_key']) && check_admin_referer('generate_encryption_key_action', 'generate_encryption_key_nonce')) {
             if (defined('ENCRYPTION_KEY')) {
+                set_transient('api_auth_error', 'Encryption key is already defined.', 30);
                 wp_redirect(admin_url('admin.php?page=api-authentication'));
                 exit;
             }
@@ -336,6 +354,11 @@ class ApiAuthService
 
             // Lire le contenu du fichier wp-config.php
             $config_contents = file_get_contents($wp_config_file);
+            if (false === $config_contents) {
+                set_transient('api_auth_error', 'Unable to read wp-config.php.', 30);
+                wp_redirect(admin_url('admin.php?page=api-authentication'));
+                exit;
+            }
 
             // Ajouter la définition de la clé de chiffrement avant la ligne "define('WP_DEBUG',"
             if (strpos($config_contents, "define('ENCRYPTION_KEY',") === false) {
@@ -346,7 +369,12 @@ class ApiAuthService
                 );
 
                 // Écrire les modifications dans le fichier wp-config.php
-                file_put_contents($wp_config_file, $config_contents);
+                $write_result = file_put_contents($wp_config_file, $config_contents);
+                if (false === $write_result) {
+                    set_transient('api_auth_error', 'Unable to write ENCRYPTION_KEY to wp-config.php.', 30);
+                    wp_redirect(admin_url('admin.php?page=api-authentication'));
+                    exit;
+                }
 
                 // Message de confirmation
                 set_transient('api_auth_message', 'Encryption key has been generated and added to wp-config.php.', 30);

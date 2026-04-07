@@ -7,6 +7,33 @@ defined('ABSPATH') or exit;
 
 class CookieService
 {
+    private static function get_allowed_script_hosts()
+    {
+        $host = wp_parse_url(home_url(), PHP_URL_HOST);
+        $hosts = [];
+
+        if (is_string($host) && '' !== $host) {
+            $hosts[] = strtolower($host);
+        }
+
+        /**
+         * Filter allowed hosts for cookie-consent injected external scripts.
+         *
+         * @param array $hosts
+         */
+        $hosts = apply_filters('toolkit_cookie_consent_allowed_script_hosts', $hosts);
+
+        if (!is_array($hosts)) {
+            return [];
+        }
+
+        $hosts = array_map(function ($value) {
+            return is_string($value) ? strtolower(trim($value)) : '';
+        }, $hosts);
+
+        return array_values(array_filter(array_unique($hosts)));
+    }
+
     public static function register()
     {
         add_action('admin_menu', function () {
@@ -48,9 +75,11 @@ class CookieService
 
         add_action('wp_footer', function () {
             $additionalData = get_option('cookie_consent_additional_data', '');
+            $allowedHosts = self::get_allowed_script_hosts();
             ?>
                 <script>
                     localStorage.setItem('cookieConsentAdditionalData', <?php echo json_encode($additionalData); ?>);
+                    localStorage.setItem('cookieConsentAllowedScriptHosts', <?php echo wp_json_encode($allowedHosts); ?>);
                 </script>
             <?php
             self::banner();

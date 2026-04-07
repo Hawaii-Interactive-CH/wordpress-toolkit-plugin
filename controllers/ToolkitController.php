@@ -73,9 +73,6 @@ class ToolkitController {
 					'end_date'              => get_post_meta( $post_id, '_event_end_date', true ),
 					'location'              => get_post_meta( $post_id, '_event_location', true ),
 					'is_all_day'            => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
-					'google_event_id'       => get_post_meta( $post_id, '_google_event_id', true ),
-					'google_calendar_link'  => get_post_meta( $post_id, '_google_calendar_link', true ),
-					'last_synced'           => get_post_meta( $post_id, '_last_synced', true ),
 				];
 			}
 			wp_reset_postdata();
@@ -133,8 +130,6 @@ class ToolkitController {
 					'end_date'             => get_post_meta( $post_id, '_event_end_date', true ),
 					'location'             => get_post_meta( $post_id, '_event_location', true ),
 					'is_all_day'           => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
-					'google_event_id'      => get_post_meta( $post_id, '_google_event_id', true ),
-					'google_calendar_link' => get_post_meta( $post_id, '_google_calendar_link', true ),
 				];
 			}
 			wp_reset_postdata();
@@ -176,9 +171,6 @@ class ToolkitController {
 				'end_date'             => get_post_meta( $post->ID, '_event_end_date', true ),
 				'location'             => get_post_meta( $post->ID, '_event_location', true ),
 				'is_all_day'           => get_post_meta( $post->ID, '_event_is_all_day', true ) === '1',
-				'google_event_id'      => get_post_meta( $post->ID, '_google_event_id', true ),
-				'google_calendar_link' => get_post_meta( $post->ID, '_google_calendar_link', true ),
-				'last_synced'          => get_post_meta( $post->ID, '_last_synced', true ),
 			],
 		], 200 );
 	}

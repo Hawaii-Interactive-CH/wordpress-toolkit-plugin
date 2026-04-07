@@ -14,6 +14,7 @@ class DocService {
     public static function register() {
         add_action('admin_menu', [self::class, 'add_plugin_menu']);
         add_action('admin_enqueue_scripts', [self::class, 'enqueue_scripts']);
+        add_action('admin_post_toolkit_docs_regenerate_index', [self::class, 'handle_regenerate_index']);
     }
 
     public static function enqueue_scripts() {
@@ -45,19 +46,28 @@ class DocService {
         $requested_file = isset($_GET['file']) ? sanitize_text_field($_GET['file']) : 'index.html';
         $base_dir = WP_TOOLKIT_DIR . 'docs/';
         $file_path = realpath($base_dir . $requested_file);
+        $is_index_request = ('index.html' === $requested_file);
 
         // Security check to prevent path traversal attacks
-        if (strpos($file_path, realpath($base_dir)) !== 0 || !file_exists($file_path)) {
+        if (
+            (false === $file_path && !$is_index_request) ||
+            (false !== $file_path && strpos($file_path, realpath($base_dir)) !== 0) ||
+            (false !== $file_path && !file_exists($file_path))
+        ) {
             echo '<p>' . esc_html__('File not found or access denied.', 'toolkit') . '</p>';
             return;
         }
 
-        if ($requested_file === 'index.html') {
-            self::generate_index($base_dir);
+        if ($is_index_request) {
+            $index_file_path = realpath($base_dir . 'index.html');
+            if (false === $index_file_path || !file_exists($index_file_path)) {
+                echo '<div class="notice notice-warning"><p>' . esc_html__('The documentation index has not been generated yet. Use "Regenerate index" below.', 'toolkit') . '</p></div>';
+            }
+            self::render_regenerate_index_form();
         }
 
-        $markdown_content = file_get_contents($file_path);
-        $html_content = $requested_file === 'index.html' ? $markdown_content : self::parse_markdown($markdown_content);
+        $markdown_content = (false !== $file_path && file_exists($file_path)) ? file_get_contents($file_path) : '';
+        $html_content = $is_index_request ? $markdown_content : self::parse_markdown($markdown_content);
 
         echo '<div id="toolkit-docs" class="wrap">' . wp_kses_post( $html_content ) . '</div>';
 
@@ -67,6 +77,28 @@ class DocService {
         if ($requested_file !== 'index.html') {
             echo '<p><a href="' . esc_url( $index_url ) . '">' . esc_html__('Retour à la table des matières', 'toolkit') . '</a></p>';
         }
+    }
+
+    private static function render_regenerate_index_form() {
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="margin: 12px 0 20px;">';
+        wp_nonce_field('toolkit_docs_regenerate_index_action', 'toolkit_docs_regenerate_index_nonce');
+        echo '<input type="hidden" name="action" value="toolkit_docs_regenerate_index">';
+        echo '<button type="submit" class="button button-secondary">' . esc_html__('Regenerate index', 'toolkit') . '</button>';
+        echo '</form>';
+    }
+
+    public static function handle_regenerate_index() {
+        if (!current_user_can('edit_theme_options')) {
+            wp_die(esc_html__('You do not have permission to perform this action.', 'toolkit'));
+        }
+
+        check_admin_referer('toolkit_docs_regenerate_index_action', 'toolkit_docs_regenerate_index_nonce');
+
+        $base_dir = WP_TOOLKIT_DIR . 'docs/';
+        self::generate_index($base_dir);
+
+        wp_redirect(menu_page_url('toolkit-docs', false));
+        exit;
     }
 
     private static function parse_markdown($markdown) {
