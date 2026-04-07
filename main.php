@@ -8,10 +8,14 @@ defined( 'ABSPATH' ) or exit;
 use Toolkit\utils\GravityForm;
 
 function render_partial( $view, $data = [] ) {
-	extract( $data );
-	$path = [ WP_TOOLKIT_THEME_PATH, 'partials', $view ];
+	$path = implode( DIRECTORY_SEPARATOR, [ WP_TOOLKIT_THEME_PATH, 'partials', $view ] ) . '.php';
 	ob_start();
-	include implode( DIRECTORY_SEPARATOR, $path ) . '.php';
+	( static function ( $__path, $__data ) {
+		foreach ( $__data as $__key => $__value ) {
+			$$__key = $__value;
+		}
+		include $__path;
+	} )( $path, $data );
 	return ob_get_clean();
 }
 

@@ -177,7 +177,7 @@ class MainService
                 'Toolkit',
                 'Toolkit',
                 'edit_theme_options',
-                'toolkit',
+                'wp-theme-toolkit',
                 [self::class, 'display_toolkit_page'],
                 'dashicons-hi',
                 2
@@ -185,7 +185,7 @@ class MainService
 
             // Add a submenu for settings
             add_submenu_page(
-                'toolkit', // Parent menu slug
+                'wp-theme-toolkit', // Parent menu slug
                 'Hide menu items', // Page title
                 'Hide menu items', // Menu title
                 'edit_theme_options',
@@ -230,7 +230,7 @@ class MainService
                 'upload.php' => 'Media',
                 'edit.php?post_type=page' => 'Pages',
                 'edit.php' => 'Posts',
-                'toolkit-calendar' => 'Calendrier',
+                'toolkit-calendar' => 'Calendar',
             ];
 
             foreach ($menu_items as $menu_slug => $menu_label) {
@@ -431,7 +431,7 @@ class MainService
             'upload.php' => 'Media',
             'edit.php?post_type=page' => 'Pages',
             'edit.php' => 'Posts',
-            'toolkit-calendar' => 'Calendrier',
+            'toolkit-calendar' => 'Calendar',
         ];
 
         // Check if the form was submitted
@@ -462,7 +462,7 @@ class MainService
 ?>
         <div class="wrap">
             <h2>Toolkit Settings</h2>
-            <p><?= __('Check the boxes below to hide the corresponding menu items.', 'toolkit') ?></p>
+            <p><?= __('Check the boxes below to hide the corresponding menu items.', 'wp-theme-toolkit') ?></p>
             <form method="post">
                 <?php wp_nonce_field('custom_menu_settings_action', 'custom_menu_settings_nonce'); ?>
 
@@ -587,7 +587,7 @@ class MainService
                     <p>
                         <label for="maintenance_mode">
                             <input type="checkbox" name="maintenance_mode" id="maintenance_mode" value="1" <?php checked(get_option('maintenance_mode', 0), 1); ?>>
-                            <?= __('Enable maintenance mode', 'toolkit') ?>
+                            <?= __('Enable maintenance mode', 'wp-theme-toolkit') ?>
                         </label>
                     </p>
                     <p class="submit">
@@ -602,7 +602,7 @@ class MainService
                     <p>
                         <label for="cookie_consent">
                             <input type="checkbox" name="cookie_consent" id="cookie_consent" value="1" <?php checked(get_option('cookie_consent', 0), 1); ?>>
-                            <?= __('Enable cookie consent', 'toolkit') ?>
+                            <?= __('Enable cookie consent', 'wp-theme-toolkit') ?>
                         </label>
                     </p>
                     <p class="submit">
@@ -618,7 +618,7 @@ class MainService
                     <p>
                         <label for="calendar_action">
                             <input type="checkbox" name="calendar" id="calendar" value="1" <?php checked(get_option('calendar', 0), 1); ?>>
-                            <?= __('Enable calendar', 'toolkit') ?>
+                            <?= __('Enable calendar', 'wp-theme-toolkit') ?>
                         </label>
                     </p>
                     <p class="submit">
@@ -635,7 +635,7 @@ class MainService
                     <?php wp_nonce_field('file_size_action', 'file_size_nonce'); ?>
                     <p>
                         <label for="file_size">
-                            <?= __('Taille maximale du fichier (en Mo) :', 'toolkit') ?>
+                            <?= __('Maximum file size (in MB):', 'wp-theme-toolkit') ?>
                             <input type="number" id="file_size" name="file_size" min="1" max="100" step="1" value="<?php echo esc_attr(get_option('file_size', 1) / (1024 * 1024)); ?>" required>
                         </label>
                     </p>

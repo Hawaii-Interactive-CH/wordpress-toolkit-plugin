@@ -10,13 +10,13 @@
  * @wordpress-plugin
  * Plugin Name: WP Theme Toolkit
  * Description: A developer toolkit for building WordPress themes — provides base models, ACF block registration, custom post types, taxonomies, REST API helpers, and utility services.
- * Plugin URI: https://git.hawai.li/hawai-li/wordpress-toolkit-plugin
+ * Plugin URI: https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin
  * Version: 2.1.5
  * Requires at least: 6.8
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
  * Author URI: https://hawaii.do
- * Text Domain: toolkit
+ * Text Domain: wp-theme-toolkit
  * Domain Path: /languages
  * License: GPLv2 or later
  */

@@ -75,7 +75,7 @@ class ModelService
                 wp_die(
                     esc_html__(
                         "You are not allowed to update model settings.",
-                        "toolkit",
+                        "wp-theme-toolkit",
                     ),
                 );
             }
@@ -99,7 +99,7 @@ class ModelService
             <h2>Model Settings</h2>
             <p><?= __(
                 "Check the boxes below to enable the corresponding post type.",
-                "toolkit",
+                "wp-theme-toolkit",
             ) ?></p>
             <form method="post">
                 <?php wp_nonce_field(

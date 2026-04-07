@@ -36,8 +36,8 @@ class RegisterService
 ?>
         <div class="wrap">
             <h2 class="nav-tab-wrapper">
-                <a class="nav-tab nav-tab-active" href="#tab1"><?= __('Model', 'toolkit'); ?></a>
-                <a class="nav-tab" href="#tab2"><?= __('Block', 'toolkit'); ?></a>
+                <a class="nav-tab nav-tab-active" href="#tab1"><?= __('Model', 'wp-theme-toolkit'); ?></a>
+                <a class="nav-tab" href="#tab2"><?= __('Block', 'wp-theme-toolkit'); ?></a>
             </h2>
 
             <?php
@@ -55,44 +55,44 @@ class RegisterService
             <div id="response-message"></div>
             <!-- Model content -->
             <div id="tab1" class="tab-content toolkit">
-                <h3><?= __('Create New Model', 'toolkit'); ?></h3>
+                <h3><?= __('Create New Model', 'wp-theme-toolkit'); ?></h3>
 
                 <form id="create-model-form">
                     <div class="fields">
                         <?php
                         // Define the field data
                         $fields = array(
-                            'model_name' => __("Name", "toolkit"),
-                            'model_label' => __("Label", "toolkit"),
-                            'model_singular_name' => __("Singular Name", "toolkit"),
-                            'model_slug' => __("Slug", "toolkit"),
-                            'model_menu_name' => __("Menu Name", "toolkit"),
-                            'model_all_items' => __("All Items", "toolkit"),
-                            'model_add_new' => __("Add New", "toolkit"),
-                            'model_add_new_item' => __("Add new Item", "toolkit"),
-                            'model_edit_item' => __("Edit Item", "toolkit"),
-                            'model_new_item' => __("New Item", "toolkit"),
-                            'model_view_item' => __("View Item", "toolkit"),
-                            'model_view_items' => __("View Items", "toolkit"),
-                            'model_search_items' => __("Search Items", "toolkit"),
-                            'model_supports' => __("Supports", "toolkit"),
+                            'model_name' => __("Name", "wp-theme-toolkit"),
+                            'model_label' => __("Label", "wp-theme-toolkit"),
+                            'model_singular_name' => __("Singular Name", "wp-theme-toolkit"),
+                            'model_slug' => __("Slug", "wp-theme-toolkit"),
+                            'model_menu_name' => __("Menu Name", "wp-theme-toolkit"),
+                            'model_all_items' => __("All Items", "wp-theme-toolkit"),
+                            'model_add_new' => __("Add New", "wp-theme-toolkit"),
+                            'model_add_new_item' => __("Add new Item", "wp-theme-toolkit"),
+                            'model_edit_item' => __("Edit Item", "wp-theme-toolkit"),
+                            'model_new_item' => __("New Item", "wp-theme-toolkit"),
+                            'model_view_item' => __("View Item", "wp-theme-toolkit"),
+                            'model_view_items' => __("View Items", "wp-theme-toolkit"),
+                            'model_search_items' => __("Search Items", "wp-theme-toolkit"),
+                            'model_supports' => __("Supports", "wp-theme-toolkit"),
                         );
 
                         $placeholder = array(
-                            'model_name' => __("Demo", "toolkit"),
-                            'model_label' => __("Demos", "toolkit"),
-                            'model_singular_name' => __("Demo", "toolkit"),
-                            'model_slug' => __("demos", "toolkit"),
-                            'model_menu_name' => __("Demos", "toolkit"),
-                            'model_all_items' => __("All demos", "toolkit"),
-                            'model_add_new' => __("Add new", "toolkit"),
-                            'model_add_new_item' => __("Add new demo", "toolkit"),
-                            'model_edit_item' => __("Edit demo", "toolkit"),
-                            'model_new_item' => __("New demo", "toolkit"),
-                            'model_view_item' => __("View demo", "toolkit"),
-                            'model_view_items' => __("View demos", "toolkit"),
-                            'model_search_items' => __("Search demo", "toolkit"),
-                            'model_supports' => __("title, editor, thumbnail, excerpt", "toolkit"),
+                            'model_name' => __("Demo", "wp-theme-toolkit"),
+                            'model_label' => __("Demos", "wp-theme-toolkit"),
+                            'model_singular_name' => __("Demo", "wp-theme-toolkit"),
+                            'model_slug' => __("demos", "wp-theme-toolkit"),
+                            'model_menu_name' => __("Demos", "wp-theme-toolkit"),
+                            'model_all_items' => __("All demos", "wp-theme-toolkit"),
+                            'model_add_new' => __("Add new", "wp-theme-toolkit"),
+                            'model_add_new_item' => __("Add new demo", "wp-theme-toolkit"),
+                            'model_edit_item' => __("Edit demo", "wp-theme-toolkit"),
+                            'model_new_item' => __("New demo", "wp-theme-toolkit"),
+                            'model_view_item' => __("View demo", "wp-theme-toolkit"),
+                            'model_view_items' => __("View demos", "wp-theme-toolkit"),
+                            'model_search_items' => __("Search demo", "wp-theme-toolkit"),
+                            'model_supports' => __("title, editor, thumbnail, excerpt", "wp-theme-toolkit"),
                         );
 
                         // HTML form fields
@@ -136,23 +136,23 @@ class RegisterService
 
             <!-- Block content -->
             <div id="tab2" class="tab-content toolkit" style="display: none;">
-                <h3><?= __('Create New Block', 'toolkit'); ?></h3>
+                <h3><?= __('Create New Block', 'wp-theme-toolkit'); ?></h3>
                 <form id="create-block-form">
                     <div class="fields">
                         <div class="field">
-                            <label for="block_title"><?= __("Title", "toolkit"); ?>:</label>
+                            <label for="block_title"><?= __("Title", "wp-theme-toolkit"); ?>:</label>
                             <input type="text" id="block_title" name="block_title" required>
                         </div>
                         <div class="field">
-                            <label for="block_description"><?= __("Description", "toolkit"); ?>:</label>
+                            <label for="block_description"><?= __("Description", "wp-theme-toolkit"); ?>:</label>
                             <input type="text" id="block_description" name="block_description" required>
                         </div>
                         <div class="field">
-                            <label for="block_icon"><?= __("Icon", "toolkit"); ?>:</label>
+                            <label for="block_icon"><?= __("Icon", "wp-theme-toolkit"); ?>:</label>
                             <input type="text" id="block_icon" name="block_icon" value="block-default">
                         </div>
                         <div class="field">
-                            <label for="block_keywords"><?= __("Keywords", "toolkit"); ?>:</label>
+                            <label for="block_keywords"><?= __("Keywords", "wp-theme-toolkit"); ?>:</label>
                             <input type="text" id="block_keywords" name="block_keywords" value="section, hi-block">
                         </div>
                     </div>
@@ -172,19 +172,19 @@ class RegisterService
     {
         check_ajax_referer('create_model_nonce', 'security');
         if (!current_user_can('edit_theme_options')) {
-            wp_send_json_error(__('Unauthorized request.', 'toolkit'), 403);
+            wp_send_json_error(__('Unauthorized request.', 'wp-theme-toolkit'), 403);
         }
 
         $formData = self::sanitize_model_form_data($_POST['formData'] ?? []);
         if (empty($formData['model_name']) || empty($formData['model_slug'])) {
-            wp_send_json_error(__('Invalid model payload.', 'toolkit'), 400);
+            wp_send_json_error(__('Invalid model payload.', 'wp-theme-toolkit'), 400);
         }
 
         $className = ucfirst($formData['model_name']);
         $filename = WP_TOOLKIT_THEME_PATH . '/models/custom/' . $className . '.php';
 
         if (file_exists($filename)) {
-            wp_send_json_error(__("Model already exists.", 'toolkit'), 409);
+            wp_send_json_error(__("Model already exists.", 'wp-theme-toolkit'), 409);
         }
 
         // Generate class PHP file content
@@ -199,19 +199,19 @@ class RegisterService
         $phpContent .= '    {' . PHP_EOL;
         $phpContent .= '        return [' . PHP_EOL;
         $phpContent .= '            "menu_position" => 2,' . PHP_EOL;
-        $phpContent .= '            "label" => __("' . addslashes($formData['model_label']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '            "label" => __("' . addslashes($formData['model_label']) . '", "wp-theme-toolkit"),' . PHP_EOL;
         $phpContent .= '            "labels" => [' . PHP_EOL;
-        $phpContent .= '                "name" => __("' . addslashes($formData['model_label']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "singular_name" => __("' . addslashes($formData['model_singular_name']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "menu_name" => __("' . addslashes($formData['model_menu_name']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "all_items" => __("' . addslashes($formData['model_all_items']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "add_new" => __("' . addslashes($formData['model_add_new']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "add_new_item" => __("' . addslashes($formData['model_add_new_item']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "edit_item" => __("' . addslashes($formData['model_edit_item']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "new_item" => __("' . addslashes($formData['model_new_item']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "view_item" => __("' . addslashes($formData['model_view_item']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "view_items" => __("' . addslashes($formData['model_view_items']) . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "search_items" => __("' . addslashes($formData['model_search_items']) . '", "toolkit")' . PHP_EOL;
+        $phpContent .= '                "name" => __("' . addslashes($formData['model_label']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "singular_name" => __("' . addslashes($formData['model_singular_name']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "menu_name" => __("' . addslashes($formData['model_menu_name']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "all_items" => __("' . addslashes($formData['model_all_items']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "add_new" => __("' . addslashes($formData['model_add_new']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "add_new_item" => __("' . addslashes($formData['model_add_new_item']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "edit_item" => __("' . addslashes($formData['model_edit_item']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "new_item" => __("' . addslashes($formData['model_new_item']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "view_item" => __("' . addslashes($formData['model_view_item']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "view_items" => __("' . addslashes($formData['model_view_items']) . '", "wp-theme-toolkit"),' . PHP_EOL;
+        $phpContent .= '                "search_items" => __("' . addslashes($formData['model_search_items']) . '", "wp-theme-toolkit")' . PHP_EOL;
         $phpContent .= '            ],' . PHP_EOL;
         $phpContent .= '            "description" => "",' . PHP_EOL;
         $phpContent .= '            "public" => true,' . PHP_EOL;
@@ -249,18 +249,18 @@ class RegisterService
 
         // Save PHP file
         if (file_put_contents($filename, $phpContent) === false) {
-            wp_send_json_error(__('Unable to create custom post type file.', 'toolkit'), 500);
+            wp_send_json_error(__('Unable to create custom post type file.', 'wp-theme-toolkit'), 500);
         }
 
         if (empty($formData['create_category'])) {
-            wp_send_json_success(__('Custom post type created successfully.', 'toolkit'));
+            wp_send_json_success(__('Custom post type created successfully.', 'wp-theme-toolkit'));
         }
 
         // Generate category file
         $categoryFilename = WP_TOOLKIT_THEME_PATH . '/models/custom/' . $className . 'Category.php';
 
         if (file_exists($categoryFilename)) {
-            wp_send_json_error(__("Category already exists.", 'toolkit'), 409);
+            wp_send_json_error(__("Category already exists.", 'wp-theme-toolkit'), 409);
         }
 
         // Generate class PHP file content
@@ -279,10 +279,10 @@ class RegisterService
 
         // Save PHP file
         if (file_put_contents($categoryFilename, $phpCategoryContent) === false) {
-            wp_send_json_error(__('Unable to create custom post type category file.', 'toolkit'), 500);
+            wp_send_json_error(__('Unable to create custom post type category file.', 'wp-theme-toolkit'), 500);
         }
 
-        wp_send_json_success(__('Custom post type and category created successfully.', 'toolkit'));
+        wp_send_json_success(__('Custom post type and category created successfully.', 'wp-theme-toolkit'));
     }
 
     /**
@@ -292,12 +292,12 @@ class RegisterService
     {
         check_ajax_referer('create_block_nonce', 'security');
         if (!current_user_can('edit_theme_options')) {
-            wp_send_json_error(__('Unauthorized request.', 'toolkit'), 403);
+            wp_send_json_error(__('Unauthorized request.', 'wp-theme-toolkit'), 403);
         }
 
         $formData = self::sanitize_block_form_data($_POST['formData'] ?? []);
         if (empty($formData['block_title'])) {
-            wp_send_json_error(__('Invalid block payload.', 'toolkit'), 400);
+            wp_send_json_error(__('Invalid block payload.', 'wp-theme-toolkit'), 400);
         }
         // Title to CamelCase for class name
         $camelTitle = str_replace(' ', '', ucwords($formData['block_title']));
@@ -307,7 +307,7 @@ class RegisterService
         $filename = WP_TOOLKIT_THEME_PATH . '/models/custom/Block' . $camelTitle . '.php';
 
         if (file_exists($filename)) {
-            wp_send_json_error(__("Block already exists.", 'toolkit'), 409);
+            wp_send_json_error(__("Block already exists.", 'wp-theme-toolkit'), 409);
         }
 
         // Generate class PHP file content
@@ -325,7 +325,7 @@ class RegisterService
 
         // Save PHP file
         if (file_put_contents($filename, $phpContent) === false) {
-            wp_send_json_error(__('Unable to create block file.', 'toolkit'), 500);
+            wp_send_json_error(__('Unable to create block file.', 'wp-theme-toolkit'), 500);
         }
 
         // Create block template
@@ -334,11 +334,11 @@ class RegisterService
             $blockTemplateContent = '<?php' . PHP_EOL . PHP_EOL;
             $blockTemplateContent .= 'echo "Block template";' . PHP_EOL;
             if (file_put_contents($blockTemplate, $blockTemplateContent) === false) {
-                wp_send_json_error(__('Unable to create block template file.', 'toolkit'), 500);
+                wp_send_json_error(__('Unable to create block template file.', 'wp-theme-toolkit'), 500);
             }
         }
 
-        wp_send_json_success(__('Block created successfully.', 'toolkit'));
+        wp_send_json_success(__('Block created successfully.', 'wp-theme-toolkit'));
     }
 
     public static function prepare_category()
@@ -349,17 +349,17 @@ class RegisterService
             'publicly_queryable' => false,
             'show_in_rest' => true,
             'labels' => [
-                'name'              => __('Catégories', ''),
-                'singular_name'     => __('Catégorie', ''),
-                'search_items'      => __('Rechercher une catégorie', ''),
-                'all_items'         => __('Tout les catégories', ''),
-                'parent_item'       => __('Catégorie parente', ''),
-                'parent_item_colon' => __('Catégorie parente:', ''),
-                'edit_item'         => __('Éditer la catégorie', ''),
-                'update_item'       => __('Modifier la catégorie', ''),
-                'add_new_item'      => __('Ajouter une nouvelle catégorie', ''),
-                'new_item_name'     => __('Nouvelle catégorie', ''),
-                'menu_name'         => __('Catégories', ''),
+                'name'              => __('Categories', 'wp-theme-toolkit'),
+                'singular_name'     => __('Category', 'wp-theme-toolkit'),
+                'search_items'      => __('Search Categories', 'wp-theme-toolkit'),
+                'all_items'         => __('All Categories', 'wp-theme-toolkit'),
+                'parent_item'       => __('Parent Category', 'wp-theme-toolkit'),
+                'parent_item_colon' => __('Parent Category:', 'wp-theme-toolkit'),
+                'edit_item'         => __('Edit Category', 'wp-theme-toolkit'),
+                'update_item'       => __('Update Category', 'wp-theme-toolkit'),
+                'add_new_item'      => __('Add New Category', 'wp-theme-toolkit'),
+                'new_item_name'     => __('New Category Name', 'wp-theme-toolkit'),
+                'menu_name'         => __('Categories', 'wp-theme-toolkit'),
             ]
         ];
     }
@@ -367,9 +367,9 @@ class RegisterService
     public static function prepare_block_settings(array $formData)
     {
         return [
-            'title' => __($formData['block_title'], 'toolkit'),
+            'title' => __($formData['block_title'], 'wp-theme-toolkit'),
             'mode' => 'auto',
-            'description' => __($formData['block_description'], 'toolkit'),
+            'description' => __($formData['block_description'], 'wp-theme-toolkit'),
             'icon' => $formData['block_icon'],
             'keywords' => explode(", ", $formData['block_keywords']),
         ];

@@ -66,7 +66,7 @@ WordPress Toolkit is a professional development framework for building complex W
 
 ### WordPress Requirements
 
-Requires at least: 5.0
+Requires at least: 6.4
 Requires PHP: 8.0
 
 ### Installation

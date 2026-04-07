@@ -11,7 +11,7 @@ class ApiAuthService
     private static function ensure_manage_options_capability()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to perform this action.', 'toolkit'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'wp-theme-toolkit'));
         }
     }
 
@@ -37,7 +37,7 @@ class ApiAuthService
     public static function admin_menu()
     {
         add_submenu_page(
-            'toolkit',
+            'wp-theme-toolkit',
             'API Authentication',
             'API Authentication',
             'manage_options',
@@ -336,7 +336,7 @@ class ApiAuthService
         self::ensure_manage_options_capability();
 
         if ('POST' !== strtoupper($_SERVER['REQUEST_METHOD'] ?? '')) {
-            wp_die(esc_html__('Invalid request method.', 'toolkit'));
+            wp_die(esc_html__('Invalid request method.', 'wp-theme-toolkit'));
         }
 
         if (isset($_POST['generate_encryption_key']) && check_admin_referer('generate_encryption_key_action', 'generate_encryption_key_nonce')) {
