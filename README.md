@@ -65,9 +65,6 @@ Requires PHP: 8.0
 
 Download the [wordpress-toolkit-plugin](https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin) as a zip and install it via the WordPress admin.
 
-## Updates
-
-The plugin includes an update system based on [plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker), linked to the GitHub repository via **GitHub Releases**.
 
 ### Publishing a new version
 
