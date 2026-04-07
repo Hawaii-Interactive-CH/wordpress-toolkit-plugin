@@ -44,6 +44,14 @@ WordPress Toolkit is a professional development framework for building complex W
 - `GET /wp-json/toolkit/v1/events/upcoming` — Get the next N upcoming events.
 - `GET /wp-json/toolkit/v1/events/{id}` — Get a single event.
 
+### Security Model (Nonces and Auth)
+
+- **Admin forms and admin AJAX** use WordPress nonces and must verify requests server-side (`wp_nonce_field()` / `check_admin_referer()` or `check_ajax_referer()`), plus capability checks (`current_user_can()`).
+- **REST routes** in this plugin are not protected by WordPress nonce by default:
+  - `/api/v1/auth` uses master token + IP whitelist checks.
+  - `/toolkit/v1/events*` routes are intentionally public.
+- If a REST endpoint is later intended for authenticated wp-admin users (cookie auth), use standard REST nonce flow with `wp_create_nonce('wp_rest')` and `X-WP-Nonce`.
+
 ### Integrations
 
 - **ACF** (Advanced Custom Fields) — Block registration, option pages, field resolution throughout all models.

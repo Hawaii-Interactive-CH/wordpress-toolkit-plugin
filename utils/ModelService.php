@@ -71,6 +71,20 @@ class ModelService
 
         $post_data = wp_unslash($_POST);
         if (isset($post_data["submit"])) {
+            if (!current_user_can("edit_theme_options")) {
+                wp_die(
+                    esc_html__(
+                        "You are not allowed to update model settings.",
+                        "toolkit",
+                    ),
+                );
+            }
+
+            check_admin_referer(
+                "toolkit_model_settings_save",
+                "toolkit_model_settings_nonce",
+            );
+
             // Process form submission
             $options = [];
             foreach ($models as $model) {
@@ -88,6 +102,10 @@ class ModelService
                 "toolkit",
             ) ?></p>
             <form method="post">
+                <?php wp_nonce_field(
+                    "toolkit_model_settings_save",
+                    "toolkit_model_settings_nonce",
+                ); ?>
                 <?php foreach ($models as $model):
                     $model_key = basename($model, ".php"); ?>
                     <label>

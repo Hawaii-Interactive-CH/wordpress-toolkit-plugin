@@ -451,7 +451,6 @@ class AssetService
         echo "<script>window.toolkitConfig = " .
             wp_json_encode([
                 "ajaxUrl" => admin_url("admin-ajax.php"),
-                "nonce" => wp_create_nonce("toolkit-nonce"),
                 "debug" => defined("WP_DEBUG") && WP_DEBUG,
             ]) .
             ";</script>" .
