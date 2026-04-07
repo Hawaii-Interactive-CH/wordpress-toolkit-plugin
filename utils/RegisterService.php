@@ -100,7 +100,7 @@ class RegisterService
                         ?>
                             <div class="field">
                                 <label for="<?php echo esc_attr($field_name); ?>"><?php echo esc_html($label); ?>:</label>
-                                <input value="<?php echo $placeholder[$field_name] ?>" type="text" id="<?php echo esc_attr($field_name); ?>" name="<?php echo esc_attr($field_name); ?>" required>
+                                <input value="<?php echo esc_attr($placeholder[$field_name]); ?>" type="text" id="<?php echo esc_attr($field_name); ?>" name="<?php echo esc_attr($field_name); ?>" required>
                             </div>
                         <?php
                         }

@@ -52,7 +52,7 @@ class WebPTestPage
             $queued_count = $size_instance->rebuild_all_webp_images($force_rebuild);
 
             if ($queued_count > 0) {
-                $rebuild_message = '<div class="notice notice-success is-dismissible"><p><strong>Success!</strong> ' . $queued_count . ' images queued for WebP regeneration. Processing will happen in the background.</p></div>';
+                $rebuild_message = '<div class="notice notice-success is-dismissible"><p><strong>Success!</strong> ' . intval($queued_count) . ' images queued for WebP regeneration. Processing will happen in the background.</p></div>';
             } else {
                 $rebuild_message = '<div class="notice notice-warning"><p><strong>Notice:</strong> No images found to queue.</p></div>';
             }
@@ -221,7 +221,7 @@ class WebPTestPage
                 <h1>🎨 WebP Optimization Test Results</h1>
 
                 <?php
-                echo $rebuild_message;
+                echo wp_kses_post($rebuild_message);
 
                 // Get queue status
                 $size_instance = Size::get_instance();
@@ -234,14 +234,14 @@ class WebPTestPage
 
                     <?php if ($queue_status['count'] > 0): ?>
                         <div class="notice notice-info inline" id="queue-status-notice" style="margin: 10px 0; padding: 10px;">
-                            <p><strong>⏳ Queue Status:</strong> <span id="queue-count"><?php echo $queue_status['count']; ?></span> images waiting to be processed.</p>
+                            <p><strong>⏳ Queue Status:</strong> <span id="queue-count"><?php echo esc_html($queue_status['count']); ?></span> images waiting to be processed.</p>
                         </div>
                         <button type="button" id="process-now-btn" class="button button-secondary" style="margin-bottom: 10px;">
                             ▶ Process Queue Now
                         </button>
                         <script>
                         (function() {
-                            var nonce = '<?php echo wp_create_nonce('process_webp_queue_nonce'); ?>';
+                            var nonce = <?php echo wp_json_encode(wp_create_nonce('process_webp_queue_nonce')); ?>;
                             var btn = document.getElementById('process-now-btn');
                             var countEl = document.getElementById('queue-count');
                             var notice = document.getElementById('queue-status-notice');
@@ -323,7 +323,7 @@ class WebPTestPage
 
                 if (empty($images)) {
                     echo '<div class="notice notice-warning"><p><strong>No images found.</strong> Please upload some images first.</p></div>';
-                    echo '<p><a href="' . admin_url('upload.php') . '" class="button button-primary">Go to Media Library</a></p>';
+                    echo '<p><a href="' . esc_url(admin_url('upload.php')) . '" class="button button-primary">Go to Media Library</a></p>';
                     return;
                 }
 
@@ -421,15 +421,15 @@ class WebPTestPage
                             <div class="stat-label">WebP Files Created</div>
                             <div class="stat-value"><?php echo number_format($webp_count); ?></div>
                         </div>
-                        <div class="stat-box <?php echo $png_count > 0 ? 'warning' : ''; ?>">
+                        <div class="stat-box <?php echo esc_attr($png_count > 0 ? 'warning' : ''); ?>">
                             <div class="stat-label">PNG/JPG Fallbacks</div>
                             <div class="stat-value"><?php echo number_format($png_count); ?></div>
                         </div>
-                        <div class="stat-box <?php echo $queue_status['count'] > 0 ? 'warning' : 'success'; ?>">
+                        <div class="stat-box <?php echo esc_attr($queue_status['count'] > 0 ? 'warning' : 'success'); ?>">
                             <div class="stat-label">Queue Status</div>
                             <div class="stat-value"><?php echo number_format($queue_status['count']); ?></div>
                         </div>
-                        <div class="stat-box <?php echo $savings_percent > 30 ? 'success' : ($savings_percent > 20 ? 'warning' : 'error'); ?>">
+                        <div class="stat-box <?php echo esc_attr($savings_percent > 30 ? 'success' : ($savings_percent > 20 ? 'warning' : 'error')); ?>">
                             <div class="stat-label">Space Saved</div>
                             <div class="stat-value"><?php echo number_format($savings_percent, 1); ?>%</div>
                         </div>
@@ -464,7 +464,7 @@ class WebPTestPage
                             ?>
                             <tr>
                                 <td><strong>GD Version</strong></td>
-                                <td><?php echo $gd_info['GD Version']; ?></td>
+                                <td><?php echo esc_html($gd_info['GD Version']); ?></td>
                             </tr>
                             <tr>
                                 <td><strong>WebP Support</strong></td>
@@ -482,7 +482,7 @@ class WebPTestPage
                             ?>
                             <tr>
                                 <td><strong>WP Image Editor class</strong></td>
-                                <td><code><?php echo ($editor && !is_wp_error($editor)) ? get_class($editor) : ('Error: ' . ($editor ? $editor->get_error_message() : 'no image found')); ?></code></td>
+                                <td><code><?php echo esc_html(($editor && !is_wp_error($editor)) ? get_class($editor) : ('Error: ' . ($editor ? $editor->get_error_message() : 'no image found'))); ?></code></td>
                             </tr>
                             <tr>
                                 <td><strong>supports_mime_type(image/webp)</strong></td>
@@ -526,25 +526,25 @@ class WebPTestPage
                                 <td>≥ 1920px</td>
                                 <td><span class="quality-indicator">60%</span></td>
                                 <td>Very large images tolerate higher compression</td>
-                                <td><strong><?php echo $quality_counts[60]; ?> files</strong></td>
+                                <td><strong><?php echo esc_html($quality_counts[60]); ?> files</strong></td>
                             </tr>
                             <tr>
                                 <td>≥ 1280px</td>
                                 <td><span class="quality-indicator">65%</span></td>
                                 <td>Large images, good balance</td>
-                                <td><strong><?php echo $quality_counts[65]; ?> files</strong></td>
+                                <td><strong><?php echo esc_html($quality_counts[65]); ?> files</strong></td>
                             </tr>
                             <tr>
                                 <td>≥ 640px</td>
                                 <td><span class="quality-indicator">70%</span></td>
                                 <td>Medium images</td>
-                                <td><strong><?php echo $quality_counts[70]; ?> files</strong></td>
+                                <td><strong><?php echo esc_html($quality_counts[70]); ?> files</strong></td>
                             </tr>
                             <tr>
                                 <td>&lt; 640px</td>
                                 <td><span class="quality-indicator">75%</span></td>
                                 <td>Small images need better quality</td>
-                                <td><strong><?php echo $quality_counts[75]; ?> files</strong></td>
+                                <td><strong><?php echo esc_html($quality_counts[75]); ?> files</strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -573,29 +573,29 @@ class WebPTestPage
                         <div class="stats" style="margin-bottom: 15px;">
                             <div class="stat-box success">
                                 <div class="stat-label">Converted</div>
-                                <div class="stat-value"><?php echo $log_counts['success']; ?></div>
+                                <div class="stat-value"><?php echo esc_html($log_counts['success']); ?></div>
                             </div>
                             <div class="stat-box error">
                                 <div class="stat-label">Errors</div>
-                                <div class="stat-value"><?php echo $log_counts['error']; ?></div>
+                                <div class="stat-value"><?php echo esc_html($log_counts['error']); ?></div>
                             </div>
                             <div class="stat-box warning">
                                 <div class="stat-label">Warnings</div>
-                                <div class="stat-value"><?php echo $log_counts['warning']; ?></div>
+                                <div class="stat-value"><?php echo esc_html($log_counts['warning']); ?></div>
                             </div>
                             <div class="stat-box">
                                 <div class="stat-label">Info</div>
-                                <div class="stat-value"><?php echo $log_counts['info']; ?></div>
+                                <div class="stat-value"><?php echo esc_html($log_counts['info']); ?></div>
                             </div>
                         </div>
 
                         <div class="log-filter-bar">
                             <strong>Filter:</strong>
-                            <button class="button active" onclick="filterLogs('all', this)">All (<?php echo count($webp_logs); ?>)</button>
-                            <button class="button" onclick="filterLogs('success', this)">Success (<?php echo $log_counts['success']; ?>)</button>
-                            <button class="button" onclick="filterLogs('error', this)">Errors (<?php echo $log_counts['error']; ?>)</button>
-                            <button class="button" onclick="filterLogs('warning', this)">Warnings (<?php echo $log_counts['warning']; ?>)</button>
-                            <button class="button" onclick="filterLogs('info', this)">Info (<?php echo $log_counts['info']; ?>)</button>
+                            <button class="button active" onclick="filterLogs('all', this)">All (<?php echo esc_html(count($webp_logs)); ?>)</button>
+                            <button class="button" onclick="filterLogs('success', this)">Success (<?php echo esc_html($log_counts['success']); ?>)</button>
+                            <button class="button" onclick="filterLogs('error', this)">Errors (<?php echo esc_html($log_counts['error']); ?>)</button>
+                            <button class="button" onclick="filterLogs('warning', this)">Warnings (<?php echo esc_html($log_counts['warning']); ?>)</button>
+                            <button class="button" onclick="filterLogs('info', this)">Info (<?php echo esc_html($log_counts['info']); ?>)</button>
 
                             <form method="post" style="margin-left: auto;">
                                 <?php wp_nonce_field('clear_webp_logs_action', 'clear_webp_logs_nonce'); ?>
@@ -649,9 +649,9 @@ class WebPTestPage
                         <li>✅ <strong>Monitor cron job</strong> <code>fly_images_process_queue</code> for queue processing</li>
                     </ul>
                     <p>
-                        <a href="<?php echo admin_url('upload.php'); ?>" class="button button-primary">Upload New Image</a>
-                        <a href="<?php echo admin_url('tools.php'); ?>" class="button">View Tools</a>
-                        <a href="<?php echo admin_url('admin.php?page=webp-optimization-test'); ?>" class="button">Refresh Test</a>
+                        <a href="<?php echo esc_url(admin_url('upload.php')); ?>" class="button button-primary">Upload New Image</a>
+                        <a href="<?php echo esc_url(admin_url('tools.php')); ?>" class="button">View Tools</a>
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=webp-optimization-test')); ?>" class="button">Refresh Test</a>
                     </p>
                 </div>
 

@@ -410,12 +410,23 @@ class CalendarAdminService
 
             <script>
             jQuery(document).ready(function($) {
+                var i18n = {
+                    testing: <?php echo wp_json_encode(__('Test en cours...', 'toolkit')); ?>,
+                    connecting: <?php echo wp_json_encode(__('Connexion à Google Calendar...', 'toolkit')); ?>,
+                    successTitle: <?php echo wp_json_encode(__('✓ Connexion réussie!', 'toolkit')); ?>,
+                    calendarLabel: <?php echo wp_json_encode(__('Calendrier:', 'toolkit')); ?>,
+                    eventsFoundLabel: <?php echo wp_json_encode(__('Événements trouvés:', 'toolkit')); ?>,
+                    unknownError: <?php echo wp_json_encode(__('Erreur inconnue', 'toolkit')); ?>,
+                    failureTitle: <?php echo wp_json_encode(__('✗ Échec de la connexion', 'toolkit')); ?>,
+                    testButton: <?php echo wp_json_encode(__('Tester la connexion', 'toolkit')); ?>
+                };
+
                 $('#test-google-connection').on('click', function() {
                     var button = $(this);
                     var result = $('#test-result');
                     
-                    button.prop('disabled', true).text('<?php _e('Test en cours...', 'toolkit'); ?>');
-                    result.html('<p><?php _e('Connexion à Google Calendar...', 'toolkit'); ?></p>');
+                    button.prop('disabled', true).text(i18n.testing);
+                    result.empty().append($('<p>').text(i18n.connecting));
                     
                     var apiKey = '<?php echo esc_js($google['api_key']); ?>';
                     var calendarId = '<?php echo esc_js($google['calendar_id']); ?>';
@@ -433,27 +444,23 @@ class CalendarAdminService
                             return response.json();
                         })
                         .then(data => {
-                            result.html(
-                                '<div class="notice notice-success inline">' +
-                                '<p><strong><?php _e('✓ Connexion réussie!', 'toolkit'); ?></strong></p>' +
-                                '<p><?php _e('Calendrier:', 'toolkit'); ?> ' + (data.summary || calendarId) + '</p>' +
-                                '<p><?php _e('Événements trouvés:', 'toolkit'); ?> ' + (data.items ? data.items.length : 0) + '</p>' +
-                                '</div>'
-                            );
+                            var successNotice = $('<div>').addClass('notice notice-success inline');
+                            $('<p>').append($('<strong>').text(i18n.successTitle)).appendTo(successNotice);
+                            $('<p>').text(i18n.calendarLabel + ' ' + (data.summary || calendarId)).appendTo(successNotice);
+                            $('<p>').text(i18n.eventsFoundLabel + ' ' + (data.items ? data.items.length : 0)).appendTo(successNotice);
+                            result.empty().append(successNotice);
                         })
                         .catch(error => {
-                            var errorMsg = error.error ? error.error.message : error.message || '<?php _e('Erreur inconnue', 'toolkit'); ?>';
-                            result.html(
-                                '<div class="notice notice-error inline">' +
-                                '<p><strong><?php _e('✗ Échec de la connexion', 'toolkit'); ?></strong></p>' +
-                                '<p>' + errorMsg + '</p>' +
-                                '</div>'
-                            );
+                            var errorMsg = error && error.error ? error.error.message : error && error.message ? error.message : i18n.unknownError;
+                            var errorNotice = $('<div>').addClass('notice notice-error inline');
+                            $('<p>').append($('<strong>').text(i18n.failureTitle)).appendTo(errorNotice);
+                            $('<p>').text(errorMsg).appendTo(errorNotice);
+                            result.empty().append(errorNotice);
                         })
                         .finally(() => {
                             button.prop('disabled', false).html(
                                 '<span class="dashicons dashicons-yes-alt" style="margin-top: 3px;"></span> ' +
-                                '<?php _e('Tester la connexion', 'toolkit'); ?>'
+                                i18n.testButton
                             );
                         });
                 });
@@ -470,8 +477,12 @@ class CalendarAdminService
     public static function handle_sync_now()
     {
         // Verify nonce
+        $sync_nonce = isset($_POST['toolkit_calendar_sync_nonce'])
+            ? sanitize_text_field(wp_unslash($_POST['toolkit_calendar_sync_nonce']))
+            : '';
+
         if (!isset($_POST['toolkit_calendar_sync_nonce']) || 
-            !wp_verify_nonce($_POST['toolkit_calendar_sync_nonce'], 'toolkit_calendar_sync_now')) {
+            !wp_verify_nonce($sync_nonce, 'toolkit_calendar_sync_now')) {
             wp_die(__('Vérification de sécurité échouée.', 'toolkit'));
         }
 
