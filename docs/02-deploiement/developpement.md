@@ -1,32 +1,32 @@
-# Comment compiler le thème en mode staging et le déployer sur un serveur de test
+# How to Build the Theme in Development Mode
 
 ## Introduction
 
-Il est nécessaire de compiler le thème en mode local pour indiquer le bon chemin des assets une fois sur le serveur de test. Lorsque le site se trouve dans un sous-dossier, par example dans le cas d'un serveur de Local by Flywheel, il est nécessaire de compiler le thème en mode local uniquement pour indiquer le bon chemin des assets quand `vite` n'est pas utilisé pour le développement.
+You need to build the theme in local mode to specify the correct asset paths when running on a local server. When the site is in a subfolder — for example with Local by Flywheel — you need to build in local mode to set the correct asset paths when `vite` is not used for development.
 
-Example: `http://mon-site.local`
+Example: `http://my-site.local`
 
-Pour que le site fonctionne correctement avec `vite`, il est nécessaire d'avoir un fichier `.dev` à la racine du projet. Cela permet de charger les assets depuis le serveur de développement. Le fichier `.dev` est automatiquement créé lors de l'utilisation de la commande `npm run watch`.
+For the site to work correctly with `vite`, a `.dev` file must exist at the project root. This enables assets to be loaded from the development server. The `.dev` file is automatically created when running `npm run watch`.
 
 ## Configuration
 
-### 1. S'assurer d'avoir le nom du theme ou sous dossier dans le fichier `.env` à la racine du projet
+### 1. Make sure the theme name or subfolder is set in the `.env` file at the project root
 
 ```bash
 # .env
-APP_NAME=mon-theme
+APP_NAME=my-theme
 ```
 
-### 2. Lancer la commande de compilation de development hot reload
+### 2. Start the development server with hot reload
 
 ```bash
 npm run watch
 ```
 
-### 3. Lancer la commande de compilation en mode local (preview du site compilé)
+### 3. Build in local mode (preview of the compiled site)
 
 ```bash
 npm run local
 ```
 
-Si le site compilé en local convient, il est possible de le déployer sur le serveur de test en compilant en mode `staging` ou `production` pour le site live.
+If the locally compiled site looks correct, you can deploy it to the test server by building in `staging` or `production` mode for the live site.

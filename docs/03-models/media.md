@@ -1,10 +1,10 @@
-# Média
+# Media
 
 ## Introduction
 
-Le modèle `AbstractMedia` est la classe de base pour les pièces jointes WordPress (images, SVG, etc.). Il fournit des méthodes pour récupérer l'URL optimisée d'une image, générer des attributs `srcset`, rendre un élément `<picture>` complet, et insérer un SVG en ligne.
+The `AbstractMedia` model is the base class for WordPress attachments (images, SVGs, etc.). It provides methods to retrieve the optimised URL of an image, generate `srcset` attributes, render a full `<picture>` element, and insert an SVG inline.
 
-Pour l'utiliser, créez une classe dans `models/custom/` qui étend `AbstractMedia` :
+To use it, create a class in `models/custom/` that extends `AbstractMedia`:
 
 ```php
 <?php
@@ -18,23 +18,23 @@ class Media extends AbstractMedia {}
 
 ---
 
-## Méthodes disponibles
+## Available Methods
 
 ### src()
 
-Retourne l'URL optimisée d'une image pour une taille donnée. Priorité WebP → PNG/JPG → original. Si la taille demandée n'existe pas, retourne l'URL de l'image originale.
+Returns the optimised URL of an image for a given size. Priority: WebP → PNG/JPG → original. If the requested size does not exist, returns the original image URL.
 
 ```php
 $media = new Media($attachment_id);
 
-// URL de la version WebP générée pour la taille "image-xl"
+// URL of the WebP version generated for the "image-xl" size
 echo $media->src('image-xl');
 
-// URL de l'image originale
+// URL of the original image
 echo $media->src('full');
 ```
 
-Exemple dans un template :
+Example in a template:
 
 ```php
 <img
@@ -46,7 +46,7 @@ Exemple dans un template :
 
 ### srcset()
 
-Construit la valeur de l'attribut `srcset` à partir d'un tableau associatif `[nom de taille => descripteur de largeur]`. Seules les tailles déjà générées sont incluses.
+Builds the `srcset` attribute value from an associative array `[size name => width descriptor]`. Only already-generated sizes are included.
 
 ```php
 $media = new Media($attachment_id);
@@ -61,7 +61,7 @@ echo $media->srcset([
 // → "https://…/image-640x….webp 640w, https://…/image-960x….webp 960w, …"
 ```
 
-Exemple dans un template :
+Example in a template:
 
 ```php
 <img
@@ -75,44 +75,44 @@ Exemple dans un template :
 
 ### picture()
 
-Génère un élément `<picture>` complet avec des éléments `<source>` et un `<img>` de secours. Chaque entrée du tableau `$sources` correspond à un `<source>`. Supporte les variantes retina (2x) et les media queries.
+Generates a full `<picture>` element with `<source>` elements and a fallback `<img>`. Each entry in the `$sources` array corresponds to a `<source>`. Supports retina variants (2x) and media queries.
 
-**Paramètres :**
+**Parameters:**
 
-| Paramètre | Type    | Description |
+| Parameter | Type    | Description |
 |-----------|---------|-------------|
-| `$sources` | `array` | Tableau de définitions de sources (voir ci-dessous) |
-| `$class`  | `string` | Classe CSS optionnelle ajoutée à l'élément `<img>` |
-| `$lazy`   | `bool`  | Ajoute `loading="lazy"` à l'`<img>`. Défaut : `true` |
+| `$sources` | `array` | Array of source definitions (see below) |
+| `$class`  | `string` | Optional CSS class added to the `<img>` element |
+| `$lazy`   | `bool`  | Adds `loading="lazy"` to the `<img>`. Default: `true` |
 
-Chaque entrée de `$sources` est un tableau associatif :
+Each entry in `$sources` is an associative array:
 
-| Clé      | Type     | Description |
+| Key      | Type     | Description |
 |----------|----------|-------------|
-| `size`   | `string` | **Requis.** Nom de taille enregistrée (ex: `'image-xl'`) |
-| `media`  | `string` | Optionnel. Media query CSS (ex: `'(min-width: 1280px)'`) |
-| `size2x` | `string` | Optionnel. Nom de taille pour la variante retina 2x |
+| `size`   | `string` | **Required.** Registered size name (e.g. `'image-xl'`) |
+| `media`  | `string` | Optional. CSS media query (e.g. `'(min-width: 1280px)'`) |
+| `size2x` | `string` | Optional. Size name for the retina 2x variant |
 
-Le dernier `<source>` résolu est également utilisé comme `src` de l'`<img>` de secours.
+The last resolved `<source>` is also used as the `src` of the fallback `<img>`.
 
 ```php
 $media = new Media($attachment_id);
 
-// Exemple simple : une seule source avec retina
+// Simple example: one source with retina
 echo $media->picture([
     ['size' => 'image-xl', 'size2x' => 'image-xl-2x'],
 ]);
 ```
 
 ```html
-<!-- Résultat -->
+<!-- Output -->
 <picture>
     <source srcset="https://…/image-xl.webp 1x, https://…/image-xl-2x.webp 2x">
     <img src="https://…/image-xl.webp" alt="…" loading="lazy">
 </picture>
 ```
 
-Exemple avec plusieurs breakpoints :
+Example with multiple breakpoints:
 
 ```php
 echo $media->picture([
@@ -123,7 +123,7 @@ echo $media->picture([
 ```
 
 ```html
-<!-- Résultat -->
+<!-- Output -->
 <picture>
     <source media="(max-width: 640px)"  srcset="https://…/image-s.webp 1x, https://…/image-s-2x.webp 2x">
     <source media="(max-width: 1280px)" srcset="https://…/image-m.webp 1x, https://…/image-m-2x.webp 2x">
@@ -136,9 +136,9 @@ echo $media->picture([
 
 ### inline_svg()
 
-Retourne le contenu brut du fichier SVG pour l'insérer directement dans le HTML. Utile pour contrôler les icônes ou illustrations via CSS/JS. Ne fonctionne que pour les pièces jointes avec l'extension `.svg`.
+Returns the raw SVG file content for direct inline insertion in HTML. Useful for controlling icons or illustrations via CSS/JS. Only works for attachments with the `.svg` extension.
 
-La déclaration `<?xml ?>` et le DOCTYPE sont supprimés automatiquement.
+The `<?xml ?>` declaration and DOCTYPE are automatically stripped.
 
 ```php
 $icon = new Media($svg_attachment_id);
@@ -148,12 +148,12 @@ echo $icon->inline_svg();
 // → <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">…</svg>
 ```
 
-Exemple dans un template :
+Example in a template:
 
 ```php
 <button class="btn">
     <?= $icon->inline_svg() ?>
-    Télécharger
+    Download
 </button>
 ```
 
@@ -161,35 +161,35 @@ Exemple dans un template :
 
 ### alt()
 
-Retourne le texte alternatif défini dans la médiathèque WordPress.
+Returns the alternative text defined in the WordPress media library.
 
 ```php
 echo $media->alt();
-// → "Photo de présentation de l'équipe"
+// → "Team presentation photo"
 ```
 
 ---
 
 ### caption()
 
-Retourne la légende définie dans la médiathèque WordPress.
+Returns the caption defined in the WordPress media library.
 
 ```php
 echo $media->caption();
-// → "Photo prise lors de l'événement annuel 2024"
+// → "Photo taken at the 2024 annual event"
 ```
 
 ---
 
-## Exemple complet
+## Full Example
 
 ```php
 <?php
-// Dans functions.php ou un fichier de thème
+// In functions.php or a theme file
 
 use Toolkit\models\custom\Media;
 
-// Depuis un champ ACF (retourne un ID)
+// From an ACF field (returns an ID)
 $attachment_id = get_field('hero_image');
 
 if ($attachment_id) :
@@ -215,6 +215,6 @@ if ($attachment_id) :
 
 ## Notes
 
-- Les tailles d'image doivent être enregistrées via `Size::add()` dans `functions.php`. L'image originale est retournée si une taille n'est pas encore générée (traitement en arrière-plan via cron).
-- `picture()` et `srcset()` omettent silencieusement les tailles non encore générées.
-- `inline_svg()` lit le fichier directement sur le disque. Ne pas utiliser avec des SVG provenant de sources non fiables.
+- Image sizes must be registered via `Size::add()` in `functions.php`. The original image is returned if a size has not yet been generated (background processing via cron).
+- `picture()` and `srcset()` silently omit sizes that have not yet been generated.
+- `inline_svg()` reads the file directly from disk. Do not use with SVGs from untrusted sources.

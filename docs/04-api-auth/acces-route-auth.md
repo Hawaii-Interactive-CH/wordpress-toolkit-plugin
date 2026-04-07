@@ -1,59 +1,61 @@
-# Guide d'Authentification pour Accéder aux Routes API Sécurisées
+# Authentication Guide for Accessing Secured API Routes
 
 ## Introduction
-Pour accéder aux routes API sécurisées, un client doit suivre un processus d'authentification qui implique l'obtention d'un token transient en utilisant un token master. Voici comment procéder :
+To access secured API routes, a client must follow an authentication process that involves obtaining a transient token using a master token. Here is how to proceed:
 
-## Étapes d'Authentification
+## Authentication Steps
 
-### 1. Obtenir un Token Master
-Le client doit d'abord obtenir un token master de l'administrateur du site. Ce token est essentiel pour générer un token transient qui sera utilisé pour les requêtes API sécurisées.
+### 1. Obtain a Master Token
+The client must first obtain a master token from the site administrator. This token is required to generate a transient token used for secured API requests.
 
-### 2. Faire une Requête à la Route `/auth`
-Avec le token master en main, le client doit envoyer une requête POST à la route `/auth`. Cette requête doit inclure le token master dans l'en-tête `Authorization`.
+### 2. Make a Request to the `/auth` Route
+With the master token in hand, the client must send a POST request to the `/auth` route. This request must include the master token in the `Authorization` header.
 
-**Exemple de Requête** :
-- **URL** : `https://votre-site.com/wp-json/api/v1/auth`
-- **Méthode** : POST
-- **En-tête** : Authorization: Bearer VOTRE_TOKEN_MASTER
+**Request Example:**
+- **URL**: `https://your-site.com/wp-json/api/v1/auth`
+- **Method**: POST
+- **Header**: Authorization: Bearer YOUR_MASTER_TOKEN
 
-**Exemple de Code (cURL)** :
+**cURL Example:**
 ```sh
-curl -X POST https://votre-site.com/wp-json/api/v1/auth \
--H "Authorization: Bearer VOTRE_TOKEN_MASTER"
+curl -X POST https://your-site.com/wp-json/api/v1/auth \
+-H "Authorization: Bearer YOUR_MASTER_TOKEN"
 ```
-### 3. Réception du Token Transient
 
-Si la requête est réussie, la réponse contiendra un token transient. Ce token doit être utilisé pour toutes les requêtes suivantes aux routes sécurisées de l’API.
+### 3. Receiving the Transient Token
 
-**Exemple de Réponse** :
+If the request is successful, the response will contain a transient token. This token must be used for all subsequent requests to secured API routes.
+
+**Response Example:**
 
 ```json
 {
-  "transient_token": "TOKEN_TRANSIENT_GÉNÉRÉ"
+  "transient_token": "GENERATED_TRANSIENT_TOKEN"
 }
 ```
-### 4. Utiliser le Token Transient pour les Requêtes API
 
-Pour accéder aux autres routes de l’API, le client doit inclure le token transient dans les en-têtes de ses requêtes.
+### 4. Using the Transient Token for API Requests
 
-**Exemple de Requête** :
+To access other API routes, the client must include the transient token in the request headers.
 
-- **URL**: https://votre-site.com/wp-json/api/v1/auth/test
-- **Méthode** : POST
-- **En-tête** :	En-tête : Authorization: Bearer VOTRE_TOKEN_TRANSIENT
+**Request Example:**
 
-**Exemple de Code (cURL)** :
+- **URL**: https://your-site.com/wp-json/api/v1/auth/test
+- **Method**: POST
+- **Header**: Authorization: Bearer YOUR_TRANSIENT_TOKEN
+
+**cURL Example:**
 
 ```sh
-curl -X POST https://votre-site.com/wp-json/api/v1/auth/test \
--H "Authorization: Bearer VOTRE_TOKEN_TRANSIENT"
+curl -X POST https://your-site.com/wp-json/api/v1/auth/test \
+-H "Authorization: Bearer YOUR_TRANSIENT_TOKEN"
 ```
 
-### 5. Comment Définir une Route API Sécurisée
+### 5. How to Define a Secured API Route
 
-Pour définir une route API sécurisée, vous devez utiliser la fonction register_rest_route. Il est essentiel d’inclure une vérification du token transient dans la définition de la route pour s’assurer que seuls les clients authentifiés peuvent accéder à cette route.
+To define a secured API route, use the `register_rest_route` function. Make sure to include a transient token check in the route definition to ensure only authenticated clients can access it.
 
-**Voici un exemple de définition de route**
+**Route definition example:**
 
 ```php
 register_rest_route($namespace, '/test', array(
@@ -64,17 +66,18 @@ register_rest_route($namespace, '/test', array(
     },
 ));
 ```
-**Dans cet exemple :**
-- **permission_callback** : Cette clé est définie pour appeler la méthode verify_transient_token de l’objet $authController. Cette méthode vérifie la validité du token transient fourni par le client dans l’en-tête de la requête.
-- **callback** : Cette clé définit la fonction à exécuter si la vérification du token est réussie. Dans cet exemple, elle retourne simplement “test”.
 
-## Cas d’Erreur
+**In this example:**
+- **permission_callback**: Calls the `verify_transient_token` method on the `$authController` object. This method validates the transient token provided by the client in the request header.
+- **callback**: Defines the function to execute if the token check passes. In this example, it simply returns "test".
 
-### Token Master Invalide ou Manquant
+## Error Cases
 
-Si le token master fourni est invalide ou manquant, la requête à la route /auth échouera avec une erreur 403.
+### Invalid or Missing Master Token
 
-**Exemple de Réponse** :
+If the master token is invalid or missing, the request to `/auth` will fail with a 403 error.
+
+**Response Example:**
 ```json
 {
   "code": "invalid_master_token",
@@ -84,11 +87,12 @@ Si le token master fourni est invalide ou manquant, la requête à la route /aut
   }
 }
 ```
-### Token Transient Invalide ou Expiré
 
-Si le token transient est invalide ou a expiré, la requête à une route sécurisée échouera avec une erreur 403.
+### Invalid or Expired Transient Token
 
-**Exemple de Réponse** :
+If the transient token is invalid or has expired, the request to a secured route will fail with a 403 error.
+
+**Response Example:**
 ```json
 {
   "code": "invalid_transient_token",
@@ -101,4 +105,4 @@ Si le token transient est invalide ou a expiré, la requête à une route sécur
 
 ### Conclusion
 
-En suivant ces étapes, un client peut s’authentifier et accéder aux routes API sécurisées en utilisant des tokens transients générés à partir d’un token master. Assurez-vous de gérer correctement les tokens et de renouveler les tokens transients avant leur expiration pour maintenir un accès continu aux API sécurisées.
+By following these steps, a client can authenticate and access secured API routes using transient tokens generated from a master token. Make sure to handle tokens correctly and renew transient tokens before they expire to maintain continuous access to secured APIs.

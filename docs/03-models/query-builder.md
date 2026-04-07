@@ -2,13 +2,13 @@
 
 ## Introduction
 
-Le model `QueryBuilder` est un modèle de base pour les requêtes. Il est utilisé pour récupérer des informations sur une requête.
+The `QueryBuilder` model is a base model for queries. It is used to retrieve posts with a fluent, chainable API.
 
-## Utilisation
+## Usage
 
 ### from()
 
-La méthode `from` permet de récupérer toutes les informations d'une table. Elle prend en paramètre le nom de la table et une fonction de rappel.
+The `from` method retrieves all records of a given type. It takes the post type name and an optional callback.
 
 ```php
 <?php
@@ -33,7 +33,7 @@ use Toolkit\models\Post;
 
 ### where()
 
-La méthode `where` permet de récupérer toutes les informations d'une table en fonction d'une condition. Elle prend en paramètre la clé, la valeur et une fonction de rappel.
+The `where` method filters results by a condition. It takes a key, a value, and an optional callback.
 
 ```php
 <?php
@@ -58,7 +58,7 @@ use Toolkit\models\Post;
 
 ### paginate()
 
-La méthode `paginate` permet de paginer les résultats. Elle prend en paramètre le nombre de résultats par page et une fonction de rappel.
+The `paginate` method paginates the results. It takes the number of results per page and an optional callback.
 
 ```php
 <?php
@@ -83,7 +83,7 @@ use Toolkit\models\Post;
 
 ### search()
 
-La méthode `search` permet de rechercher des informations dans une table. Elle prend en paramètre la recherche et une fonction de rappel.
+The `search` method searches posts by a keyword. It takes a search string and an optional callback.
 
 ```php
 <?php
@@ -108,7 +108,7 @@ use Toolkit\models\Post;
 
 ### where_ids()
 
-La méthode `where_ids` permet de récupérer toutes les informations d'une table en fonction d'une liste d'identifiants. Elle prend en paramètre la liste d'identifiants et une fonction de rappel.
+The `where_ids` method retrieves posts by a list of IDs. It takes an array of IDs and an optional callback.
 
 ```php
 <?php
@@ -133,7 +133,7 @@ use Toolkit\models\Post;
 
 ### order()
 
-La méthode `order` permet de trier les résultats. Elle prend en paramètre la clé, le type de tri et une fonction de rappel.
+The `order` method sorts results. It takes a key, a sort direction, and an optional callback.
 
 ```php
 <?php
@@ -158,7 +158,7 @@ use Toolkit\models\Post;
 
 ### meta_order()
 
-La méthode `meta_order` permet de trier les résultats en fonction des métadonnées. Elle prend en paramètre la clé, le type de tri et une fonction de rappel.
+The `meta_order` method sorts results by a meta field. It takes a meta key, a sort direction, and an optional callback.
 
 ```php
 <?php
@@ -183,7 +183,7 @@ use Toolkit\models\Post;
 
 ### meta_query_relation()
 
-La méthode `meta_query_relation` permet de définir la relation entre les requêtes de métadonnées. Elle prend en paramètre la relation et une fonction de rappel.
+The `meta_query_relation` method sets the relation between meta queries (`AND` or `OR`).
 
 ```php
 <?php
@@ -208,7 +208,7 @@ use Toolkit\models\Post;
 
 ### add_meta_query()
 
-La méthode `add_meta_query` permet d'ajouter une requête de métadonnées. Elle prend en paramètre la clé, la valeur, le type de comparaison et une fonction de rappel.
+The `add_meta_query` method adds a meta query. It takes a key, a value, a comparison operator, and an optional callback.
 
 ```php
 <?php
@@ -233,7 +233,7 @@ use Toolkit\models\Post;
 
 ### tax_query_relation()
 
-La méthode `tax_query_relation` permet de définir la relation entre les requêtes de taxonomie. Elle prend en paramètre la relation et une fonction de rappel.
+The `tax_query_relation` method sets the relation between taxonomy queries (`AND` or `OR`).
 
 ```php
 <?php
@@ -258,7 +258,7 @@ use Toolkit\models\Post;
 
 ### add_tax_query()
 
-La méthode `add_tax_query` permet d'ajouter une requête de taxonomie. Elle prend en paramètre la clé, la valeur, le type de comparaison et une fonction de rappel.
+The `add_tax_query` method adds a taxonomy query. It takes a taxonomy, a term, a comparison operator, and an optional callback.
 
 ```php
 <?php
@@ -283,7 +283,7 @@ use Toolkit\models\Post;
 
 ### after()
 
-La méthode `after` permet de récupérer toutes les informations d'une table après une date. Elle prend en paramètre la date et une fonction de rappel.
+The `after` method retrieves posts published after a given date.
 
 ```php
 <?php
@@ -308,7 +308,7 @@ use Toolkit\models\Post;
 
 ### before()
 
-La méthode `before` permet de récupérer toutes les informations d'une table avant une date. Elle prend en paramètre la date et une fonction de rappel.
+The `before` method retrieves posts published before a given date.
 
 ```php
 <?php
@@ -333,7 +333,7 @@ use Toolkit\models\Post;
 
 ### add_date_filter()
 
-La méthode `add_date_filter` permet d'ajouter un filtre de date. Elle prend en paramètre la clé, la valeur et une fonction de rappel.
+The `add_date_filter` method adds a date filter by key and value.
 
 ```php
 <?php
@@ -358,7 +358,7 @@ use Toolkit\models\Post;
 
 ### find_all()
 
-La méthode `find_all` permet de récupérer toutes les informations d'une table.
+The `find_all` method returns all matching posts as an array.
 
 ```php
 <?php
@@ -383,7 +383,7 @@ use Toolkit\models\Post;
 
 ### find_one()
 
-La méthode `find_one` permet de récupérer une information d'une table.
+The `find_one` method returns the first matching post.
 
 ```php
 <?php
@@ -403,7 +403,7 @@ $post = QueryBuilder::from('posts')->find_one();
 
 ### limit()
 
-La méthode `limit` permet de limiter le nombre de résultats. Elle prend en paramètre le nombre de résultats et une fonction de rappel.
+The `limit` method limits the number of results.
 
 ```php
 <?php
@@ -428,7 +428,7 @@ use Toolkit\models\Post;
 
 ### find_by_id()
 
-La méthode `find_by_id` permet de récupérer une information d'une table en fonction de son identifiant.
+The `find_by_id` method retrieves a single post by its ID.
 
 ```php
 <?php
@@ -448,7 +448,7 @@ $post = QueryBuilder::from('posts')->find_by_id(1);
 
 ### count_all()
 
-La méthode `count_all` permet de compter toutes les informations d'une table.
+The `count_all` method counts all matching posts.
 
 ```php
 <?php
@@ -466,7 +466,7 @@ $count = QueryBuilder::from('posts')->count_all();
 
 ### count_displayed()
 
-La méthode `count_displayed` permet de compter toutes les informations d'une table en fonction des paramètres de requête.
+The `count_displayed` method counts all posts matching the current query parameters.
 
 ```php
 <?php
@@ -484,7 +484,7 @@ $count = QueryBuilder::from('posts')->where('post_type', 'post')->count_displaye
 
 ### page_number()
 
-La méthode `page_number` permet de récupérer le numéro de la page.
+The `page_number` method returns the current page number.
 
 ```php
 <?php
@@ -502,4 +502,4 @@ $page_number = QueryBuilder::from('posts')->page_number();
 
 ### pagination()
 
-La méthode `pagination` permet de récupérer la pagination.
+The `pagination` method returns the pagination HTML.

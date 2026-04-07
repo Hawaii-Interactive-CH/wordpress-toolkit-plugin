@@ -1,58 +1,58 @@
-# Vite et WordPress
+# Vite and WordPress
 
 ## Introduction
 
-Vite est un outil de build rapide pour le développement de projets modernes. Il est basé sur la technologie ESBuild et permet de compiler les fichiers JavaScript, CSS, et autres fichiers statiques.
+Vite is a fast build tool for modern project development. It is based on ESBuild technology and compiles JavaScript, CSS, and other static files.
 
-Il est important de copier le fichier `.env.example` en `.env` et de le configurer selon les besoins du projet.
+Make sure to copy the `.env.example` file to `.env` and configure it according to the project's needs.
 
 ## Configuration
 
-### 1. Installer les dépendances
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Lancer le serveur de développement
+### 2. Start the development server
 
 ```bash
 npm run watch
 ```
 
-### 3. Compiler le thème pour la production
+### 3. Build the theme for production
 
 ```bash
 npm run production
 ```
 
-### 4. Compiler le thème pour le staging
+### 4. Build the theme for staging
 
 ```bash
 npm run staging
 ```
 
-## Utilisation
+## Usage
 
-### 1. Ajouter des fichiers
+### 1. Adding files
 
-Ajouter les fichiers dans le dossier `src` du thème. Les fichiers seront automatiquement compilés et minifiés.
+Add files to the theme's `src` folder. They will be automatically compiled and minified.
 
-### 2. Utiliser les alias
+### 2. Using aliases
 
-Les alias sont configurés dans le fichier `vite.config.js` et permettent de simplifier l'import des fichiers. Au lieu d'écrire:
+Aliases are configured in `vite.config.js` and simplify file imports. Instead of writing:
 
 ```javascript
 import { myFunction } from '../../../utils/<file>';
 ```
 
-Il est possible d'écrire:
+You can write:
 
 ```javascript
 import { myFunction } from '@utils/<file>';
 ```
 
-Pour ajouter un alias, il suffit de modifier le fichier `vite.config.js`:
+To add an alias, edit `vite.config.js`:
 
 ```javascript
 export default defineConfig({
@@ -66,27 +66,27 @@ export default defineConfig({
 });
 ```
 
-### 3. Plugins installés
+### 3. Installed plugins
 
 #### 3.1. Vue.js
 
-Le thème est configuré pour utiliser Vue.js. Il est possible d'ajouter des fichiers `.vue` dans le dossier `src/javascript/vue` et de les utiliser dans les fichiers JavaScript.
+The theme is configured to use Vue.js. You can add `.vue` files in `src/javascript/vue` and use them in JavaScript files.
 
-Le main du vue est dans le fichier `src/javascript/vue/main.js`.
+The Vue entry point is `src/javascript/vue/main.js`.
 
 #### 3.2. React
 
-Le thème est configuré pour utiliser React. Il est possible d'ajouter des fichiers `.jsx` dans le dossier `src/javascript/react` et de les utiliser dans les fichiers JavaScript.
+The theme is configured to use React. You can add `.jsx` files in `src/javascript/react` and use them in JavaScript files.
 
-Le main du react est dans le fichier `src/javascript/react/main.jsx`.
+The React entry point is `src/javascript/react/main.jsx`.
 
 #### Dynamic import
 
-Que ce soit pour Vue.js ou React, il est possible d'utiliser le dynamic import pour charger les composants à la demande dans leur main respectif.
+For both Vue.js and React, you can use dynamic imports to load components on demand in their respective entry files.
 
-Cela permet de charger les composants uniquement lorsqu'ils sont nécessaires. Il suffit de les imports dans l'object `componentImports`.
+This loads components only when needed. Simply add them to the `componentImports` object.
 
-Exemple:
+Example:
 
 ```javascript
 const componentImports = {

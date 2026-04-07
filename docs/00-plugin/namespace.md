@@ -1,18 +1,18 @@
-# Systeme de Namespace entre le plugin et le thème
+# Namespace System Between the Plugin and the Theme
 
 ## Introduction
 
-Le système de namespace permet de définir des chemins de fichiers pour les classes, les fonctions et les constantes. Cela permet de mieux organiser le code et de le rendre plus lisible.
+The namespace system allows defining file paths for classes, functions, and constants. This helps organize code and makes it more readable.
 
-Afin d'avoir un acces aux classes du plugin dans le thème, il est nécessaire d'utiliser le même système de namespace qui est `Toolkit`.
+To access plugin classes from the theme, you must use the same namespace: `Toolkit`.
 
-De base les fichiers seront d'abord chargés depuis le plugin, puis depuis le thème si le fichier existe dans ce dernier.
+By default, files are first loaded from the plugin, then from the theme if the file exists there.
 
-Cela permet de surcharger les classes du plugin dans le thème.
+This allows overriding plugin classes in the theme.
 
 ## Configuration
 
-### 1. Ajouter le namespace dans le haut du fichier
+### 1. Add the namespace at the top of the file
 
 ```php
 <?php
@@ -24,7 +24,7 @@ class Post {
 }
 ```
 
-### 2. Utiliser la classe dans le thème
+### 2. Use the class in the theme
 
 ```php
 namespace Toolkit;
@@ -34,15 +34,15 @@ use Toolkit\Post;
 $post = new Post();
 ```
 
-Nous pouvons remarquer que le namespace est le même que celui du plugin. En général, il est recommandé de nommer selon la structure du dossier du plugin ou du thème.
+Note that the namespace is the same as the plugin's. In general, it is recommended to name namespaces according to the folder structure of the plugin or theme.
 
 Example:
 
-Dans le cas ou un fichier se trouve dans le dossier `inc` du plugin, le namespace sera `Toolkit\Inc`.
+If a file is located in the `inc` folder of the plugin, the namespace will be `Toolkit\Inc`.
 
-## Structure de base
+## Base Structure
 
-Voici la structure de base du plugin et du thème:
+Here is the base structure of the plugin and theme:
 
 ### Utils
 
@@ -58,19 +58,19 @@ Voici la structure de base du plugin et du thème:
 - Toolkit\utils\ShareLinks
 - Toolkit\utils\Size
 - Toolkit\utils\Slugify
-- Toolkit\utils\Updscale
+- Toolkit\utils\Upscale
 - Toolkit\utils\WPML
 ```
 
 ### Models
 
-Les models sont des classes qui permettent de gérer les custom post type et les custom taxonomy.
+Models are classes used to manage custom post types and custom taxonomies.
 
-Afin de pouvoir les surcharger dans le thème, il est nécessaire de les modifiers dans le dossier `models` du thème. Les Abstracts du dans le dossoer `models` du plugin (Ex: `AbstractPost` ...) sont des classes qui permettent de définir des méthodes par défaut pour les models et de les surcharger dans le thème (Ex: `Post` ...) si besoin.
+To override them in the theme, modify them in the theme's `models` folder. The Abstract classes in the plugin's `models` folder (e.g. `AbstractPost`, ...) define default methods that can be overridden in the theme (e.g. `Post`, ...) if needed.
 
-Concernant les custom post type propre au thème, il est recommandé de les placer dans le dossier `models/custom` du thème ou d'utiliser le générateur intégré au plugin.
+For custom post types specific to the theme, it is recommended to place them in the theme's `models/custom` folder or use the plugin's built-in generator.
 
-Par default les `models` sont:
+The default models are:
 
 ```md
 - Toolkit\models\AbstractCategory

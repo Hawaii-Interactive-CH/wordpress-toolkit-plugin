@@ -1,85 +1,85 @@
-# Documentation pour l'Authentification API avec Transients dans WordPress
+# API Authentication with Transients in WordPress
 
-Ce document explique le fonctionnement et l'utilisation de l'interface d'authentification API que nous avons créée avec la classe `ApiAuthService`.
+This document explains how the API authentication interface built with the `ApiAuthService` class works and how to use it.
 
 ## Introduction
 
-L'interface d'authentification API permet de gérer des tokens d'authentification pour sécuriser l'accès aux endpoints de votre API WordPress. Les principales fonctionnalités comprennent :
+The API authentication interface manages authentication tokens to secure access to your WordPress API endpoints. Key features include:
 
-- Génération et stockage d'une clé de chiffrement.
-- Génération d'un token master.
-- Gestion de la durée de vie des tokens transients.
-- Ajout et suppression d'adresses IP et de domaines dans une liste blanche.
-- Nettoyage des tokens transients expirés.
+- Generating and storing an encryption key.
+- Generating a master token.
+- Managing the lifetime of transient tokens.
+- Adding and removing IP addresses and domains from a whitelist.
+- Cleaning up expired transient tokens.
 
-## Fonctionnalités
+## Features
 
-### Génération de la clé de chiffrement
+### Generating the Encryption Key
 
-Cette fonctionnalité génère une clé de chiffrement unique et l'ajoute automatiquement au fichier `wp-config.php`.
+This feature generates a unique encryption key and automatically adds it to the `wp-config.php` file.
 
-1. Accédez à la page d'administration `API Authentication`.
-2. Cliquez sur le bouton **Generate Encryption Key**.
-3. Si une clé de chiffrement est déjà définie, le bouton sera désactivé et un message vous en informera.
+1. Go to the `API Authentication` admin page.
+2. Click the **Generate Encryption Key** button.
+3. If an encryption key is already defined, the button will be disabled and a message will inform you.
 
-### Génération du token master
+### Generating the Master Token
 
-Le token master est nécessaire pour générer des tokens transients.
+The master token is required to generate transient tokens.
 
-1. Accédez à la page d'administration `API Authentication`.
-2. Cliquez sur le bouton **Generate Master Token**.
-3. Si la clé de chiffrement n'est pas définie, le bouton sera désactivé. Veuillez générer la clé de chiffrement d'abord.
+1. Go to the `API Authentication` admin page.
+2. Click the **Generate Master Token** button.
+3. If the encryption key is not defined, the button will be disabled. Generate the encryption key first.
 
-### Configuration de la durée de vie des tokens transients
+### Configuring Transient Token Lifetime
 
-Vous pouvez définir la durée de vie des tokens transients en minutes.
+You can set the lifetime of transient tokens in minutes.
 
-1. Accédez à la page d'administration `API Authentication`.
-2. Saisissez la durée de vie souhaitée (en minutes) dans le champ **Expiry Time (in minutes)**.
-3. Cliquez sur le bouton **Save Expiry Time** pour enregistrer les modifications.
+1. Go to the `API Authentication` admin page.
+2. Enter the desired lifetime (in minutes) in the **Expiry Time (in minutes)** field.
+3. Click **Save Expiry Time** to save the changes.
 
-### Gestion de la liste blanche d'IP/Domaine
+### Managing the IP/Domain Whitelist
 
-Cette section permet d'ajouter ou de supprimer des adresses IP ou des domaines autorisés à accéder à l'API.
+This section allows adding or removing IP addresses or domains authorised to access the API.
 
-1. **Ajouter une IP/Un domaine :**
-    - Accédez à la page d'administration `API Authentication`.
-    - Saisissez l'adresse IP ou le domaine dans le champ **IP/Domain**.
-    - Cliquez sur le bouton **Add to Whitelist**.
+1. **Adding an IP/Domain:**
+    - Go to the `API Authentication` admin page.
+    - Enter the IP address or domain in the **IP/Domain** field.
+    - Click **Add to Whitelist**.
 
-2. **Supprimer une IP/Un domaine :**
-    - Accédez à la page d'administration `API Authentication`.
-    - Dans la section **Current Settings**, trouvez l'IP ou le domaine que vous souhaitez supprimer.
-    - Cliquez sur le bouton **Remove** à côté de l'IP ou du domaine.
+2. **Removing an IP/Domain:**
+    - Go to the `API Authentication` admin page.
+    - In the **Current Settings** section, find the IP or domain you want to remove.
+    - Click the **Remove** button next to it.
 
-## Nettoyage des tokens transients expirés
+## Cleaning Up Expired Transient Tokens
 
-Un cron job est configuré pour nettoyer automatiquement les tokens transients expirés toutes les heures. Cette tâche de nettoyage supprime les transients dont la date d'expiration est dépassée.
+A cron job is configured to automatically clean up expired transient tokens every hour. This task removes transients whose expiry date has passed.
 
-## Interface d'administration
+## Admin Interface
 
-La page d'administration `API Authentication` fournit une interface utilisateur pour gérer les fonctionnalités décrites ci-dessus. Voici un aperçu des sections disponibles :
+The `API Authentication` admin page provides a UI for managing the features described above. Here is an overview of the available sections:
 
 1. **Generate Encryption Key**
-    - Générer une clé de chiffrement unique.
-    - Le bouton est désactivé si une clé est déjà définie.
+    - Generate a unique encryption key.
+    - The button is disabled if a key is already defined.
 
 2. **Generate Master Token**
-    - Générer un token master.
-    - Le bouton est désactivé si la clé de chiffrement n'est pas définie.
+    - Generate a master token.
+    - The button is disabled if the encryption key is not defined.
 
 3. **Set Transient Token Expiry**
-    - Définir la durée de vie des tokens transients en minutes.
-    - Un champ de saisie pour la durée de vie et un bouton pour enregistrer les modifications.
+    - Set the lifetime of transient tokens in minutes.
+    - An input field for the lifetime and a button to save changes.
 
 4. **Whitelist IP/Domain**
-    - Ajouter des adresses IP ou des domaines à la liste blanche.
-    - Un champ de saisie pour l'IP ou le domaine et un bouton pour ajouter à la liste blanche.
+    - Add IP addresses or domains to the whitelist.
+    - An input field for the IP or domain and a button to add to the whitelist.
 
 5. **Current Settings**
-    - Afficher les adresses IP et les domaines actuels dans la liste blanche.
-    - Un bouton pour supprimer chaque IP ou domaine de la liste blanche.
+    - Display current whitelisted IP addresses and domains.
+    - A button to remove each IP or domain from the whitelist.
 
 ---
 
-Cette documentation vous aide à comprendre et utiliser l'interface d'authentification API que nous avons mise en place. Pour toute question ou assistance supplémentaire, veuillez consulter le développeur de votre projet ou la documentation officielle de WordPress.
+For any questions or further assistance, consult your project developer or the official WordPress documentation.

@@ -1,47 +1,47 @@
-# Utilisation du plugin
+# Plugin Usage
 
-Ce plugin permet de charger les fonctionnalités de base d'un thème WordPress.
+This plugin loads the core features of a WordPress theme.
 
-- [x] Activation du mode maintenance
-- [x] Creation de custom post type (CPT) et activation/désactivation de ceux-ci
-- [x] Creation de block gutenberg
-- [x] Gestion des menus wordpress (Masqué dans le menu d'administration)
+- [x] Maintenance mode activation
+- [x] Custom post type (CPT) creation and activation/deactivation
+- [x] Gutenberg block creation
+- [x] WordPress menu management (hidden in the admin menu)
 - [ ] Cookie banner (TODO)
-- [ ] Plus de CPT par défaut (ex: FAQ, Team, ...) (TODO)
+- [ ] More default CPTs (e.g. FAQ, Team, ...) (TODO)
 
-## Constantes disponibles
+## Available Constants
 
 ```php
-// Chemin absolu du plugin
+// Absolute path to the plugin
 define( 'WP_TOOLKIT_DIR', plugin_dir_path(__FILE__) );
 
-// URL du plugin
+// Plugin URL
 define( 'WP_TOOLKIT_URL', plugin_dir_url(__FILE__) );
 
-// Chemin absolu du thème
+// Absolute path to the theme
 define( 'WP_TOOLKIT_THEME_PATH', get_template_directory() );
 
-// URL du thème
+// Theme URL
 define( 'WP_TOOLKIT_THEME_URL', get_template_directory_uri() );
 
-// Chemin absolu des vues.php du thème
+// Absolute path to the theme's view files
 define( 'WP_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
 ```
 
-## Personnaliser la page de connexion — `MainService::customize_login()`
+## Customizing the Login Page — `MainService::customize_login()`
 
-Permet de remplacer le logo, la couleur de fond et la couleur du bouton de la page `/wp-login.php`.
+Allows replacing the logo, background color, and button color on the `/wp-login.php` page.
 
 ### Options
 
-| Clé | Type | Description |
+| Key | Type | Description |
 |---|---|---|
-| `logo` | `string` | URL de l'image de logo (remplace le logo WordPress) |
-| `background` | `string` | Couleur de fond CSS (ex. `'#f5f5f5'`) |
-| `button_color` | `string` | Couleur CSS du bouton Submit |
-| `button_hover` | `string` | *(optionnel)* Couleur CSS au survol — par défaut égale à `button_color` |
+| `logo` | `string` | URL of the logo image (replaces the WordPress logo) |
+| `background` | `string` | CSS background color (e.g. `'#f5f5f5'`) |
+| `button_color` | `string` | CSS color for the Submit button |
+| `button_hover` | `string` | *(optional)* CSS hover color — defaults to `button_color` |
 
-### Exemple
+### Example
 
 ```php
 use Toolkit\utils\MainService;
@@ -54,12 +54,12 @@ MainService::customize_login([
 ]);
 ```
 
-À appeler depuis le fichier `functions.php` du thème ou dans un hook `init`.
+Call this from the theme's `functions.php` file or inside an `init` hook.
 
 ---
 
 ## Intelephense (VSCode)
 
-Pour que Intelephense fonctionne correctement, il est nécessaire de déclarer le nom de son user dans le fichier `autoload.js` du thème.
+For Intelephense to work correctly, you need to declare your username in the theme's `autoload.js` file.
 
-Ce script permet de charger les classes et les fonctions du thème dans Intelephense.
+This script loads the theme's classes and functions into Intelephense.

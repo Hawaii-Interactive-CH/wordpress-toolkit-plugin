@@ -1,28 +1,28 @@
-# Comment compiler le thème en mode staging et le déployer sur un serveur de test
+# How to Build the Theme for Production and Deploy to a Live Server
 
 ## Introduction
 
-Il est nécessaire de compiler le thème en mode production pour indiquer le bon chemin des assets une fois sur le serveur de test.
+You need to build the theme in production mode to specify the correct asset paths for the live server.
 
-Example: `http://mon-site.domain`
+Example: `http://my-site.domain`
 
 ## Configuration
 
-### 1. S'assurer d'avoir le nom du theme ou sous dossier dans le fichier `.env` à la racine du projet
+### 1. Make sure the theme name or subfolder is set in the `.env` file at the project root
 
 ```bash
 # .env
-APP_NAME=mon-theme
+APP_NAME=my-theme
 ```
 
-### 2. Lancer la commande de compilation
+### 2. Run the build command
 
 ```bash
 npm run production
 ```
 
-## Déploiement
+## Deployment
 
-- 1. Copier le dossier `toolkit` sur le serveur de production dans le dossier `wp-content/themes`.
-- 2. S'assurer de ne pas avoir un fichie `.dev` à la racine du thème.
-- 3. Activer le thème dans l'administration de WordPress.
+- 1. Copy the `toolkit` folder to the production server in the `wp-content/themes` directory.
+- 2. Make sure there is no `.dev` file at the theme root.
+- 3. Activate the theme in the WordPress admin.

@@ -1,8 +1,8 @@
 # Custom Post Type
 
-## Créer un Custom Post Type
+## Creating a Custom Post Type
 
-Pour créer un `Custom Post Type`, ajouter un fichier dans le dossier `models/custom` du thème, ou en générer un via `Toolkit > Models` dans l'administration.
+To create a `Custom Post Type`, add a file in the theme's `models/custom` folder, or generate one via `Toolkit > Models` in the admin.
 
 ```php
 <?php
@@ -82,35 +82,35 @@ class Demo extends CustomPostType implements \JsonSerializable
 
 ---
 
-## Colonnes de la liste admin
+## Admin List Columns
 
-### Ajouter des colonnes — `add_columns()`
+### Adding columns — `add_columns()`
 
-Insère des colonnes personnalisées juste après la colonne **Titre**. Idempotent : appeler `add_columns()` plusieurs fois pour le même type n'enregistre les hooks qu'une seule fois.
+Inserts custom columns immediately after the **Title** column. Idempotent: calling `add_columns()` multiple times for the same type only registers the hooks once.
 
-#### Options par colonne
+#### Column options
 
-| Clé | Type | Description |
+| Key | Type | Description |
 |---|---|---|
-| `label` | `string` | Libellé de l'en-tête de colonne |
-| `render` | `callable` | Reçoit l'instance du modèle, doit afficher (echo) le contenu |
-| `format` | `string` | *(optionnel)* Raccourci date — remplace `render` par `$post->date($format)` |
-| `sortable` | `bool\|string\|array` | *(optionnel)* Rend la colonne triable |
+| `label` | `string` | Column header label |
+| `render` | `callable` | Receives the model instance, must output (echo) the content |
+| `format` | `string` | *(optional)* Date shortcut — replaces `render` with `$post->date($format)` |
+| `sortable` | `bool\|string\|array` | *(optional)* Makes the column sortable |
 
-> `format` et `render` sont mutuellement exclusifs. Si `format` est défini, `render` est ignoré.
+> `format` and `render` are mutually exclusive. If `format` is set, `render` is ignored.
 
-#### Valeurs de `sortable`
+#### `sortable` values
 
-| Valeur | Comportement |
+| Value | Behaviour |
 |---|---|
-| `true` | Tri par meta_key = slug de la colonne (alphabétique) |
-| `'ma_cle'` | Tri par la meta_key spécifiée (alphabétique) |
-| `['key' => 'ma_cle', 'numeric' => true]` | Tri numérique par la meta_key spécifiée |
+| `true` | Sort by meta_key = column slug (alphabetical) |
+| `'my_key'` | Sort by the specified meta_key (alphabetical) |
+| `['key' => 'my_key', 'numeric' => true]` | Numeric sort by the specified meta_key |
 
-#### Exemple
+#### Example
 
 ```php
-// Dans functions.php ou l'initialisation du thème
+// In functions.php or the theme initialisation
 Demo::add_columns([
     'illustration' => [
         'label'  => __('Illustration', 'theme'),
@@ -118,31 +118,31 @@ Demo::add_columns([
             fn($img) => '<img src="' . esc_url($img->src('thumbnail')) . '" width="60">'
         ),
     ],
-    'categorie' => [
-        'label'    => __('Catégorie', 'theme'),
+    'category' => [
+        'label'    => __('Category', 'theme'),
         'render'   => fn($post) => esc_html(
             implode(', ', $post->terms(DemoCategory::class, fn($t) => $t->name()))
         ),
         'sortable' => true,
     ],
-    'prix' => [
-        'label'    => __('Prix', 'theme'),
-        'render'   => fn($post) => esc_html($post->acf('prix')) . ' CHF',
-        'sortable' => ['key' => 'prix', 'numeric' => true],
+    'price' => [
+        'label'    => __('Price', 'theme'),
+        'render'   => fn($post) => esc_html($post->acf('price')) . ' CHF',
+        'sortable' => ['key' => 'price', 'numeric' => true],
     ],
-    'date_publication' => [
+    'publish_date' => [
         'label'  => __('Date', 'theme'),
         'format' => 'd.m.Y',
     ],
 ]);
 ```
 
-### Supprimer des colonnes — `remove_columns()`
+### Removing columns — `remove_columns()`
 
-Supprime une ou plusieurs colonnes par leur slug.
+Removes one or more columns by their slug.
 
 ```php
 Demo::remove_columns(['title', 'date']);
 ```
 
-Slugs courants : `cb` (checkbox), `title`, `author`, `date`, `comments`.
+Common slugs: `cb` (checkbox), `title`, `author`, `date`, `comments`.

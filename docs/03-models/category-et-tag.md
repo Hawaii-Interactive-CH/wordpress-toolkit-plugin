@@ -1,12 +1,12 @@
-# Catégories et Tags
+# Categories and Tags
 
-## Créer une catégorie pour un Custom Post Type
+## Creating a Category for a Custom Post Type
 
-Pour créer une catégorie pour un Custom Post Type, il suffit d'ajouter un fichier dans le dossier `models/custom` du thème.
+To create a category for a Custom Post Type, add a file in the theme's `models/custom` folder.
 
-`Tag` et `Category` sont des taxonomies et fonctionnent de la même manière.
+`Tag` and `Category` are taxonomies and work the same way.
 
-Il est possible d'en générer un lors de la création d'un `model` via l'onglet `Toolkit > models` dans l'administration de WordPress ou en copiant et modifiant le code suivant:
+You can generate one when creating a `model` via the `Toolkit > Models` tab in the WordPress admin, or by copying and modifying the following code:
 
 ```php
 <?php
@@ -28,24 +28,24 @@ class DemoCategory extends Taxonomy
       'show_in_rest' => true,
       'labels' =>
       array(
-        'name' => 'Catégories',
-        'singular_name' => 'Catégorie',
-        'search_items' => 'Rechercher une catégorie',
-        'all_items' => 'Tout les catégories',
-        'parent_item' => 'Catégorie parente',
-        'parent_item_colon' => 'Catégorie parente:',
-        'edit_item' => 'Éditer la catégorie',
-        'update_item' => 'Modifier la catégorie',
-        'add_new_item' => 'Ajouter une nouvelle catégorie',
-        'new_item_name' => 'Nouvelle catégorie',
-        'menu_name' => 'Catégories',
+        'name' => 'Categories',
+        'singular_name' => 'Category',
+        'search_items' => 'Search categories',
+        'all_items' => 'All categories',
+        'parent_item' => 'Parent category',
+        'parent_item_colon' => 'Parent category:',
+        'edit_item' => 'Edit category',
+        'update_item' => 'Update category',
+        'add_new_item' => 'Add new category',
+        'new_item_name' => 'New category',
+        'menu_name' => 'Categories',
       ),
     ));
   }
 }
 ```
 
-## Utilisation
+## Usage
 
 ### all()
 
@@ -71,7 +71,7 @@ use Toolkit\models\custom\DemoCategory;
 
 ### all_by_type()
 
-La méthode `all_by_type` permet de récupérer toutes les catégories d'un type spécifique.
+The `all_by_type` method retrieves all categories of a specific type.
 
 ```php
 <?php
@@ -96,7 +96,7 @@ use Toolkit\models\custom\DemoCategory;
 
 ### current()
 
-Le model `current` permet de récupérer la catégorie courante dans une boucle WordPress.
+The `current` method retrieves the current category in a WordPress loop.
 
 ```php
 <?php
@@ -114,7 +114,7 @@ use Toolkit\models\custom\DemoCategory;
 
 ### id()
 
-Renvoie l'ID de la catégorie.
+Returns the category ID.
 
 ```php
 <?php
@@ -132,7 +132,7 @@ $category = DemoCategory::find_by_id(1);
 
 ### slug()
 
-Renvoie le slug de la catégorie.
+Returns the category slug.
 
 ```php
 <?php
@@ -150,7 +150,7 @@ $category = DemoCategory::find_by_id(1);
 
 ### title()
 
-Renovie le titre de la catégorie.
+Returns the category title.
 
 ```php
 <?php
@@ -168,7 +168,7 @@ $category = DemoCategory::find_by_id(1);
 
 ### link()
 
-Renvoie le lien vers la catégorie.
+Returns the link to the category.
 
 ```php
 <?php
@@ -181,12 +181,12 @@ $category = DemoCategory::find_by_id(1);
 
 ?>
 
-<a href="<?= $category->link() ?>">Lien vers la catégorie</a>
+<a href="<?= $category->link() ?>">Link to category</a>
 ```
 
 ### find_by_id()
 
-Trouve une catégorie par son ID.
+Finds a category by its ID.
 
 ```php
 <?php
@@ -202,7 +202,7 @@ $category = DemoCategory::find_by_id(1);
 
 ### find_by_slug()
 
-Trouve une catégorie par son slug.
+Finds a category by its slug.
 
 ```php
 <?php
@@ -218,7 +218,7 @@ $category = DemoCategory::find_by_slug('slug_of_category');
 
 ### acf()
 
-Renvoie la valeur d'un champ ACF.
+Returns the value of an ACF field.
 
 ```php
 <?php
@@ -236,7 +236,7 @@ $category = DemoCategory::find_by_id(1);
 
 ### jsonSerialize()
 
-Renvoie un tableau associatif contenant les données du modèle sous forme de JSON.
+Returns an associative array containing the model data as JSON.
 
 ```php
 <?php
