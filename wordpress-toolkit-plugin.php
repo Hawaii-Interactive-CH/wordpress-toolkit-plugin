@@ -33,8 +33,6 @@ define( 'WP_TOOLKIT_URL', plugin_dir_url( __FILE__ ) );
 define( 'WP_TOOLKIT_THEME_PATH', get_template_directory() );
 define( 'WP_TOOLKIT_THEME_URL', get_template_directory_uri() );
 define( 'WP_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
-define( 'JB_FLY_PLUGIN_PATH', WP_TOOLKIT_DIR . 'vendor/jb-fly' );
-
 
 // Autoload classes.
 spl_autoload_register( function ( $class ) {

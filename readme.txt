@@ -61,7 +61,6 @@ No data is sent to any external service by default. External connections are opt
 
 This plugin includes the following third-party libraries:
 
-* **Fly Images** (jb-fly) — dynamic image resizing library. Licensed under GPLv2 or later. [Source](https://github.com/junaidbhura/fly-dynamic-image-resizer).
 * **Parsedown** and **ParsedownExtra** — Markdown parser by Emanuil Rusev. Licensed under the MIT License. [Source](https://github.com/erusev/parsedown).
 
 == Screenshots ==
