@@ -59,13 +59,13 @@ class DocService {
         $markdown_content = file_get_contents($file_path);
         $html_content = $requested_file === 'index.html' ? $markdown_content : self::parse_markdown($markdown_content);
 
-        echo '<div id="toolkit-docs" class="wrap">' . $html_content . '</div>';
+        echo '<div id="toolkit-docs" class="wrap">' . wp_kses_post( $html_content ) . '</div>';
 
         // Add the bottom navigation links
         $index_url = menu_page_url('toolkit-docs', false);
         
         if ($requested_file !== 'index.html') {
-            echo '<p><a href="' . $index_url . '">' . esc_html__('Retour à la table des matières', 'toolkit') . '</a></p>';
+            echo '<p><a href="' . esc_url( $index_url ) . '">' . esc_html__('Retour à la table des matières', 'toolkit') . '</a></p>';
         }
     }
 
@@ -116,13 +116,15 @@ class DocService {
                 $dirName = preg_replace('/^\d+\s*/', '', $dirName);
                 $sectionNumber++;
                 // Add the section with a toggle link
-                $toc .= "<div class='toggle-section' data-toggle-id='section-$sectionNumber'\" data-section-id='section-$sectionNumber'\" class='section-header'>
-                            <h2>$dirName</h2>
+                $escaped_dir_name    = esc_html( $dirName );
+                $escaped_section_num = (int) $sectionNumber;
+                $toc .= "<div class='toggle-section' data-toggle-id='section-{$escaped_section_num}' data-section-id='section-{$escaped_section_num}' class='section-header'>
+                            <h2>{$escaped_dir_name}</h2>
                             <svg height=\"20px\" width=\"20px\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\">
                                 <path d=\"M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z\"/>
                             </svg>
                         </div>\n";
-                $toc .= "<div id='section-$sectionNumber' class='section flex flex-col'>\n";
+                $toc .= "<div id='section-{$escaped_section_num}' class='section flex flex-col'>\n";
             }
         
             // Only process files, not directories
@@ -132,7 +134,7 @@ class DocService {
                 $formattedName = ucfirst(strtolower($formattedName));
         
                 $url = menu_page_url('toolkit-docs', false) . '&file=' . urlencode($relativePath);
-                $toc .= "<a href=\"$url\">$formattedName</a>\n";
+                $toc .= "<a href=\"" . esc_url( $url ) . "\">" . esc_html( $formattedName ) . "</a>\n";
             }
         }
         
