@@ -7,7 +7,6 @@ defined( 'ABSPATH' ) or exit;
 
 use Toolkit\models\PostType;
 
-abstract class AbstractPage extends PostType
-{
-    const TYPE = "page";
+abstract class AbstractPage extends PostType {
+	const TYPE = 'page';
 }

@@ -1,12 +1,5 @@
 # Wordpress Toolkit Plugin
 
-## Responsables du projet
-
-Hawaii Interactive
-<dev@hawaii.do>
-+41 21 519 02 87
-Dev team
-
 ## Description
 
 Ce plugin permet de charger les fonctionnalités de base du thème.
@@ -14,7 +7,6 @@ Ce plugin permet de charger les fonctionnalités de base du thème.
 - Activation du mode maintenance
 - Creation de custom post type (CPT) et activation/désactivation de ceux-ci
 - Gestion des menus wordpress
-- Cookie banner
 - API Authentication avec whitelist
 
 ## Documentation technique
@@ -106,22 +98,6 @@ bash bin/install-skills.sh
 
 Relancer ce script après chaque mise à jour du plugin pour synchroniser les skills.
 
-### Ajouter un nouveau skill
+## Contributing
 
-Créer un fichier Markdown dans `.claude/commands/` :
-
-```
-.claude/commands/my-skill.md
-```
-
-Le fichier doit commencer par un front-matter avec une description, suivi des instructions pour Claude :
-
-```markdown
----
-description: 'Ce que fait le skill'
----
-
-# Mon Skill
-
-Instructions pour Claude...
-```
+Les contributions sont les bienvenues ! Forkez le projet, faites vos modifications et ouvrez une pull request. Assurez-vous de suivre les conventions de code et de mettre à jour la documentation si nécessaire.
