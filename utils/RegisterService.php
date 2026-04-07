@@ -25,9 +25,7 @@ class RegisterService
         });
         // Register AJAX actions.
         add_action("wp_ajax_create_cpt_models", [self::class, "create_model_action"]);
-        add_action("wp_ajax_nopriv_create_cpt_models", [self::class, "create_model_action"]);
         add_action("wp_ajax_create_cpt_blocks", [self::class, "create_block_action"]);
-        add_action("wp_ajax_nopriv_create_cpt_blocks", [self::class, "create_block_action"]);
     }
 
     /**
@@ -173,42 +171,47 @@ class RegisterService
     public static function create_model_action()
     {
         check_ajax_referer('create_model_nonce', 'security');
+        if (!current_user_can('edit_theme_options')) {
+            wp_send_json_error(__('Unauthorized request.', 'toolkit'), 403);
+        }
 
-        // Get form data
-        $formData = $_POST['formData'];
-        $formData = array_column($formData, 'value', 'name');
+        $formData = self::sanitize_model_form_data($_POST['formData'] ?? []);
+        if (empty($formData['model_name']) || empty($formData['model_slug'])) {
+            wp_send_json_error(__('Invalid model payload.', 'toolkit'), 400);
+        }
 
-        $filename = WP_TOOLKIT_THEME_PATH . '/models/custom/' . ucfirst(sanitize_text_field($formData['model_name'])) . '.php';
+        $className = ucfirst($formData['model_name']);
+        $filename = WP_TOOLKIT_THEME_PATH . '/models/custom/' . $className . '.php';
 
         if (file_exists($filename)) {
-            return __("Model already exists.", 'toolkit');
+            wp_send_json_error(__("Model already exists.", 'toolkit'), 409);
         }
 
         // Generate class PHP file content
         $phpContent = '<?php' . PHP_EOL . PHP_EOL;
         $phpContent .= 'namespace Toolkit\models\custom;' . PHP_EOL . PHP_EOL;
         $phpContent .= 'use Toolkit\models\CustomPostType;' . PHP_EOL . PHP_EOL;
-        $phpContent .= 'class ' . ucfirst(sanitize_text_field($formData['model_name'])) . ' extends CustomPostType implements \\JsonSerializable' . PHP_EOL;
+        $phpContent .= 'class ' . $className . ' extends CustomPostType implements \\JsonSerializable' . PHP_EOL;
         $phpContent .= '{' . PHP_EOL;
-        $phpContent .= '    const TYPE = \'' . strtolower(sanitize_text_field($formData['model_name'])) . '\';' . PHP_EOL;
-        $phpContent .= '    const SLUG = \'' . strtolower(sanitize_text_field($formData['model_slug'])) . '\';' . PHP_EOL . PHP_EOL;
+        $phpContent .= '    const TYPE = \'' . strtolower($formData['model_name']) . '\';' . PHP_EOL;
+        $phpContent .= '    const SLUG = \'' . $formData['model_slug'] . '\';' . PHP_EOL . PHP_EOL;
         $phpContent .= '    public static function type_settings()' . PHP_EOL;
         $phpContent .= '    {' . PHP_EOL;
         $phpContent .= '        return [' . PHP_EOL;
         $phpContent .= '            "menu_position" => 2,' . PHP_EOL;
-        $phpContent .= '            "label" => __("' . $formData['model_label'] . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '            "label" => __("' . addslashes($formData['model_label']) . '", "toolkit"),' . PHP_EOL;
         $phpContent .= '            "labels" => [' . PHP_EOL;
-        $phpContent .= '                "name" => __("' . $formData['model_label'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "singular_name" => __("' . $formData['model_singular_name'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "menu_name" => __("' . $formData['model_menu_name'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "all_items" => __("' . $formData['model_all_items'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "add_new" => __("' . $formData['model_add_new'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "add_new_item" => __("' . $formData['model_add_new_item'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "edit_item" => __("' . $formData['model_edit_item'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "new_item" => __("' . $formData['model_new_item'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "view_item" => __("' . $formData['model_view_item'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "view_items" => __("' . $formData['model_view_items'] . '", "toolkit"),' . PHP_EOL;
-        $phpContent .= '                "search_items" => __("' . $formData['model_search_items'] . '", "toolkit")' . PHP_EOL;
+        $phpContent .= '                "name" => __("' . addslashes($formData['model_label']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "singular_name" => __("' . addslashes($formData['model_singular_name']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "menu_name" => __("' . addslashes($formData['model_menu_name']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "all_items" => __("' . addslashes($formData['model_all_items']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "add_new" => __("' . addslashes($formData['model_add_new']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "add_new_item" => __("' . addslashes($formData['model_add_new_item']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "edit_item" => __("' . addslashes($formData['model_edit_item']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "new_item" => __("' . addslashes($formData['model_new_item']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "view_item" => __("' . addslashes($formData['model_view_item']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "view_items" => __("' . addslashes($formData['model_view_items']) . '", "toolkit"),' . PHP_EOL;
+        $phpContent .= '                "search_items" => __("' . addslashes($formData['model_search_items']) . '", "toolkit")' . PHP_EOL;
         $phpContent .= '            ],' . PHP_EOL;
         $phpContent .= '            "description" => "",' . PHP_EOL;
         $phpContent .= '            "public" => true,' . PHP_EOL;
@@ -246,46 +249,40 @@ class RegisterService
 
         // Save PHP file
         if (file_put_contents($filename, $phpContent) === false) {
-            echo __('Unable to create custom post type file.', 'toolkit');
-            die();
+            wp_send_json_error(__('Unable to create custom post type file.', 'toolkit'), 500);
         }
 
-
-        echo __('Custom post type created successfully.', 'toolkit');
-
-        if (!isset($formData['create_category'])) {
-            die();
+        if (empty($formData['create_category'])) {
+            wp_send_json_success(__('Custom post type created successfully.', 'toolkit'));
         }
 
         // Generate category file
-        $categoryFilename = WP_TOOLKIT_THEME_PATH . '/models/custom/' . ucfirst(sanitize_text_field($formData['model_name'])) . 'Category.php';
+        $categoryFilename = WP_TOOLKIT_THEME_PATH . '/models/custom/' . $className . 'Category.php';
 
         if (file_exists($categoryFilename)) {
-            return __("Category already exists.", 'toolkit');
+            wp_send_json_error(__("Category already exists.", 'toolkit'), 409);
         }
 
         // Generate class PHP file content
         $phpCategoryContent = '<?php' . PHP_EOL . PHP_EOL;
         $phpCategoryContent .= 'namespace Toolkit\models\custom;' . PHP_EOL . PHP_EOL;
         $phpCategoryContent .= 'use Toolkit\models\Taxonomy;' . PHP_EOL;
-        $phpCategoryContent .= 'use Toolkit\models\custom\\' . ucfirst(sanitize_text_field($formData['model_name'])) . ';' . PHP_EOL . PHP_EOL;
-        $phpCategoryContent .= 'class ' . ucfirst(sanitize_text_field($formData['model_name'])) . 'Category extends Taxonomy' . PHP_EOL;
+        $phpCategoryContent .= 'use Toolkit\models\custom\\' . $className . ';' . PHP_EOL . PHP_EOL;
+        $phpCategoryContent .= 'class ' . $className . 'Category extends Taxonomy' . PHP_EOL;
         $phpCategoryContent .= '{' . PHP_EOL;
-        $phpCategoryContent .= '    const TYPE = \'' . strtolower(sanitize_text_field($formData['model_name'])) . '_category\';' . PHP_EOL;
+        $phpCategoryContent .= '    const TYPE = \'' . strtolower($formData['model_name']) . '_category\';' . PHP_EOL;
         $phpCategoryContent .= '    public static function register()' . PHP_EOL;
         $phpCategoryContent .= '    {' . PHP_EOL;
-        $phpCategoryContent .= '        register_taxonomy(self::TYPE, ' . ucfirst(sanitize_text_field($formData['model_name'])) . '::TYPE, ' . var_export(self::prepare_category(), true) . ');' . PHP_EOL;
+        $phpCategoryContent .= '        register_taxonomy(self::TYPE, ' . $className . '::TYPE, ' . var_export(self::prepare_category(), true) . ');' . PHP_EOL;
         $phpCategoryContent .= '    }' . PHP_EOL;
         $phpCategoryContent .= '}' . PHP_EOL;
 
         // Save PHP file
         if (file_put_contents($categoryFilename, $phpCategoryContent) === false) {
-            echo __('Unable to create custom post type category file.', 'toolkit');
-            die();
+            wp_send_json_error(__('Unable to create custom post type category file.', 'toolkit'), 500);
         }
 
-
-        die();
+        wp_send_json_success(__('Custom post type and category created successfully.', 'toolkit'));
     }
 
     /**
@@ -294,19 +291,23 @@ class RegisterService
     public static function create_block_action()
     {
         check_ajax_referer('create_block_nonce', 'security');
+        if (!current_user_can('edit_theme_options')) {
+            wp_send_json_error(__('Unauthorized request.', 'toolkit'), 403);
+        }
 
-        // Get form data
-        $formData = $_POST['formData'];
-        $formData = array_column($formData, 'value', 'name');
+        $formData = self::sanitize_block_form_data($_POST['formData'] ?? []);
+        if (empty($formData['block_title'])) {
+            wp_send_json_error(__('Invalid block payload.', 'toolkit'), 400);
+        }
         // Title to CamelCase for class name
         $camelTitle = str_replace(' ', '', ucwords($formData['block_title']));
         // Title to slug
-        $slugTitle = strtolower(str_replace(' ', '-', $formData['block_title']));
+        $slugTitle = sanitize_title($formData['block_title']);
 
         $filename = WP_TOOLKIT_THEME_PATH . '/models/custom/Block' . $camelTitle . '.php';
 
         if (file_exists($filename)) {
-            return __("Block already exists.", 'toolkit');
+            wp_send_json_error(__("Block already exists.", 'toolkit'), 409);
         }
 
         // Generate class PHP file content
@@ -315,7 +316,7 @@ class RegisterService
         $phpContent .= 'use Toolkit\models\Block;' . PHP_EOL . PHP_EOL;
         $phpContent .= 'class Block' . $camelTitle . ' extends Block' . PHP_EOL;
         $phpContent .= '{' . PHP_EOL;
-        $phpContent .= '    const TYPE = \''. 'block-' . strtolower(sanitize_text_field($slugTitle)) . '\';' . PHP_EOL . PHP_EOL;
+        $phpContent .= '    const TYPE = \''. 'block-' . $slugTitle . '\';' . PHP_EOL . PHP_EOL;
         $phpContent .= '    public static function settings()' . PHP_EOL;
         $phpContent .= '    {' . PHP_EOL;
         $phpContent .= '        return ' . var_export(self::prepare_block_settings($formData), true) . ';' . PHP_EOL;
@@ -324,24 +325,20 @@ class RegisterService
 
         // Save PHP file
         if (file_put_contents($filename, $phpContent) === false) {
-            echo __('Unable to create block file.', 'toolkit');
-            die();
+            wp_send_json_error(__('Unable to create block file.', 'toolkit'), 500);
         }
 
         // Create block template
-        $blockTemplate = WP_TOOLKIT_THEME_PATH . '/partials/blocks/block-' . strtolower(sanitize_text_field($slugTitle)) . '.php';
+        $blockTemplate = WP_TOOLKIT_THEME_PATH . '/partials/blocks/block-' . $slugTitle . '.php';
         if (!file_exists($blockTemplate)) {
             $blockTemplateContent = '<?php' . PHP_EOL . PHP_EOL;
             $blockTemplateContent .= 'echo "Block template";' . PHP_EOL;
             if (file_put_contents($blockTemplate, $blockTemplateContent) === false) {
-                echo __('Unable to create block template file.', 'toolkit');
-                die();
+                wp_send_json_error(__('Unable to create block template file.', 'toolkit'), 500);
             }
         }
 
-        echo __('Block created successfully.', 'toolkit');
-
-        die();
+        wp_send_json_success(__('Block created successfully.', 'toolkit'));
     }
 
     public static function prepare_category()
@@ -376,5 +373,57 @@ class RegisterService
             'icon' => $formData['block_icon'],
             'keywords' => explode(", ", $formData['block_keywords']),
         ];
+    }
+
+    private static function sanitize_model_form_data($rawFormData)
+    {
+        $safe = [];
+        if (!is_array($rawFormData)) {
+            return $safe;
+        }
+
+        $unslashed = wp_unslash($rawFormData);
+        $formData = array_column($unslashed, 'value', 'name');
+
+        $safe['model_name'] = sanitize_key($formData['model_name'] ?? '');
+        $safe['model_slug'] = sanitize_title($formData['model_slug'] ?? '');
+        $safe['model_label'] = sanitize_text_field($formData['model_label'] ?? '');
+        $safe['model_singular_name'] = sanitize_text_field($formData['model_singular_name'] ?? '');
+        $safe['model_menu_name'] = sanitize_text_field($formData['model_menu_name'] ?? '');
+        $safe['model_all_items'] = sanitize_text_field($formData['model_all_items'] ?? '');
+        $safe['model_add_new'] = sanitize_text_field($formData['model_add_new'] ?? '');
+        $safe['model_add_new_item'] = sanitize_text_field($formData['model_add_new_item'] ?? '');
+        $safe['model_edit_item'] = sanitize_text_field($formData['model_edit_item'] ?? '');
+        $safe['model_new_item'] = sanitize_text_field($formData['model_new_item'] ?? '');
+        $safe['model_view_item'] = sanitize_text_field($formData['model_view_item'] ?? '');
+        $safe['model_view_items'] = sanitize_text_field($formData['model_view_items'] ?? '');
+        $safe['model_search_items'] = sanitize_text_field($formData['model_search_items'] ?? '');
+        $safe['model_icon'] = sanitize_key($formData['model_icon'] ?? '');
+        $safe['model_supports'] = sanitize_text_field($formData['model_supports'] ?? '');
+        $safe['create_category'] = !empty($formData['create_category']) ? 1 : 0;
+
+        if (!array_key_exists($safe['model_icon'], Icon::ICONS)) {
+            $safe['model_icon'] = array_key_first(Icon::ICONS);
+        }
+
+        return $safe;
+    }
+
+    private static function sanitize_block_form_data($rawFormData)
+    {
+        $safe = [];
+        if (!is_array($rawFormData)) {
+            return $safe;
+        }
+
+        $unslashed = wp_unslash($rawFormData);
+        $formData = array_column($unslashed, 'value', 'name');
+
+        $safe['block_title'] = sanitize_text_field($formData['block_title'] ?? '');
+        $safe['block_description'] = sanitize_text_field($formData['block_description'] ?? '');
+        $safe['block_icon'] = sanitize_key($formData['block_icon'] ?? 'block-default');
+        $safe['block_keywords'] = sanitize_text_field($formData['block_keywords'] ?? '');
+
+        return $safe;
     }
 }

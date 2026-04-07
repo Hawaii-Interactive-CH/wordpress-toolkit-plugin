@@ -18,31 +18,36 @@ class ToolkitController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_events( WP_REST_Request $request ) {
+		$per_page = absint( $request->get_param( 'per_page' ) ?: 100 );
+		$per_page = max( 1, min( $per_page, 100 ) );
+
 		$args = [
 			'post_type'      => 'calendar_event',
 			'post_status'    => 'publish',
-			'posts_per_page' => $request->get_param( 'per_page' ) ?: 100,
+			'posts_per_page' => $per_page,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
 		];
 
 		// Filter by date range
-		if ( $request->get_param( 'start_date' ) || $request->get_param( 'end_date' ) ) {
+		$start_date = $request->get_param( 'start_date' );
+		$end_date   = $request->get_param( 'end_date' );
+		if ( $start_date || $end_date ) {
 			$meta_query = [ 'relation' => 'AND' ];
 
-			if ( $request->get_param( 'start_date' ) ) {
+			if ( $start_date ) {
 				$meta_query[] = [
 					'key'     => '_event_start_date',
-					'value'   => $request->get_param( 'start_date' ),
+					'value'   => sanitize_text_field( wp_unslash( $start_date ) ),
 					'compare' => '>=',
 					'type'    => 'DATETIME',
 				];
 			}
 
-			if ( $request->get_param( 'end_date' ) ) {
+			if ( $end_date ) {
 				$meta_query[] = [
 					'key'     => '_event_start_date',
-					'value'   => $request->get_param( 'end_date' ),
+					'value'   => sanitize_text_field( wp_unslash( $end_date ) ),
 					'compare' => '<=',
 					'type'    => 'DATETIME',
 				];
@@ -90,7 +95,8 @@ class ToolkitController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_upcoming( WP_REST_Request $request ) {
-		$limit = $request->get_param( 'limit' ) ?: 10;
+		$limit = absint( $request->get_param( 'limit' ) ?: 10 );
+		$limit = max( 1, min( $limit, 100 ) );
 		$now   = current_time( 'mysql' );
 
 		$args = [
@@ -148,7 +154,7 @@ class ToolkitController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_event( WP_REST_Request $request ) {
-		$id   = $request->get_param( 'id' );
+		$id   = absint( $request->get_param( 'id' ) );
 		$post = get_post( $id );
 
 		if ( ! $post || 'calendar_event' !== $post->post_type ) {

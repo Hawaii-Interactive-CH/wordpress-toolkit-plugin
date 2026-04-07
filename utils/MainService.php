@@ -417,6 +417,8 @@ class MainService
 
     public static function display_settings_page()
     {
+        $post_data = wp_unslash($_POST);
+
         // Define the menu items to be managed
         $menu_items = [
             'edit-comments.php' => 'Comments',
@@ -433,8 +435,8 @@ class MainService
         ];
 
         // Check if the form was submitted
-        if (isset($_POST['submit'])) {
-            if (!isset($_POST['custom_menu_settings_nonce']) || !wp_verify_nonce($_POST['custom_menu_settings_nonce'], 'custom_menu_settings_action')) {
+        if (isset($post_data['submit'])) {
+            if (!isset($post_data['custom_menu_settings_nonce']) || !wp_verify_nonce(sanitize_text_field($post_data['custom_menu_settings_nonce']), 'custom_menu_settings_action')) {
                 print 'Sorry, your nonce did not verify.';
                 exit;
             } else {
@@ -446,7 +448,7 @@ class MainService
                     $post_key = str_replace('.', '_', $menu_slug);
 
                     // Check if the option exists in the POST data before accessing it
-                    $options[$menu_slug] = isset($_POST[$post_key]) ? 1 : 0;
+                    $options[$menu_slug] = isset($post_data[$post_key]) ? 1 : 0;
                 }
 
                 update_option('custom_menu_settings', $options);
@@ -494,38 +496,39 @@ class MainService
 
     public static function display_toolkit_page()
     {
+        $post_data = wp_unslash($_POST);
 
-        if (isset($_POST['submit']) && isset($_POST['maintenance_mode_nonce']) && wp_verify_nonce($_POST['maintenance_mode_nonce'], 'maintenance_mode_action')) {
+        if (isset($post_data['submit']) && isset($post_data['maintenance_mode_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['maintenance_mode_nonce']), 'maintenance_mode_action')) {
                 $options = [];
 
-                $options['maintenance_mode'] = isset($_POST['maintenance_mode']) ? 1 : 0;
+                $options['maintenance_mode'] = isset($post_data['maintenance_mode']) ? 1 : 0;
 
                 update_option('maintenance_mode', $options['maintenance_mode']);
         }
 
-        if (isset($_POST['submit']) && isset($_POST['cookie_consent_nonce']) && wp_verify_nonce($_POST['cookie_consent_nonce'], 'cookie_consent_action')) {
+        if (isset($post_data['submit']) && isset($post_data['cookie_consent_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['cookie_consent_nonce']), 'cookie_consent_action')) {
             // Save the user's choices to options
             $options = [];
 
-            $options['cookie_consent'] = isset($_POST['cookie_consent']) ? 1 : 0;
+            $options['cookie_consent'] = isset($post_data['cookie_consent']) ? 1 : 0;
 
             update_option('cookie_consent', $options['cookie_consent']);
         }
 
-        if (isset($_POST['submit']) && isset($_POST['calendar_nonce']) && wp_verify_nonce($_POST['calendar_nonce'], 'calendar_action')) {
+        if (isset($post_data['submit']) && isset($post_data['calendar_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['calendar_nonce']), 'calendar_action')) {
             // Save the user's choices to options
             $options = [];
 
-            $options['calendar'] = isset($_POST['calendar']) ? 1 : 0;
+            $options['calendar'] = isset($post_data['calendar']) ? 1 : 0;
 
             update_option('calendar', $options['calendar']);
         }
 
-        if (isset($_POST['submit']) && isset($_POST['file_size_nonce']) && wp_verify_nonce($_POST['file_size_nonce'], 'file_size_action')) {
+        if (isset($post_data['submit']) && isset($post_data['file_size_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['file_size_nonce']), 'file_size_action')) {
             // Save the user's choices to options
             $options = [];
 
-            $file_size_mo = isset($_POST['file_size']) ? floatval($_POST['file_size']) : 0;
+            $file_size_mo = isset($post_data['file_size']) ? floatval($post_data['file_size']) : 0;
             $file_size_bytes = $file_size_mo * 1024 * 1024;
 
             $max_size_bytes = 100 * 1024 * 1024; // 100 Mo en octets

@@ -79,9 +79,11 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function add_media_grid_category_filter() {
 		global $pagenow;
+		$get_data = wp_unslash( $_GET );
+		$mode     = isset( $get_data['mode'] ) ? sanitize_key( $get_data['mode'] ) : '';
 
 		// Only on media library page in grid mode
-		if ( 'upload.php' !== $pagenow || ! isset( $_GET['mode'] ) || 'grid' !== $_GET['mode'] ) {
+		if ( 'upload.php' !== $pagenow || 'grid' !== $mode ) {
 			return;
 		}
 
@@ -97,7 +99,7 @@ class MediaTaxonomy extends Taxonomy {
 		}
 
 		// Get the current filter value
-		$current = isset( $_GET[ self::TYPE ] ) ? $_GET[ self::TYPE ] : '';
+		$current = isset( $get_data[ self::TYPE ] ) ? sanitize_text_field( $get_data[ self::TYPE ] ) : '';
 
 		// Add the category dropdown script
 		?>
@@ -142,9 +144,11 @@ class MediaTaxonomy extends Taxonomy {
 			// Add all necessary hidden inputs to preserve current state
 			<?php
 			// Keep all current GET parameters (except our taxonomy) to preserve filters
-			foreach ( $_GET as $key => $value ) {
+			foreach ( $get_data as $key => $value ) {
 				if ( $key !== self::TYPE && 'paged' !== $key ) {
-					echo 'filterForm.append($(\'<input type="hidden" name="' . esc_js( $key ) . '" value="' . esc_js( $value ) . '">\'));' . "\n";
+					$safe_key = sanitize_key( $key );
+					$safe_val = sanitize_text_field( $value );
+					echo 'filterForm.append($(\'<input type="hidden" name="' . esc_js( $safe_key ) . '" value="' . esc_js( $safe_val ) . '">\'));' . "\n";
 				}
 			}
 			?>
@@ -469,9 +473,11 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function add_media_category_filter() {
 		global $pagenow;
+		$get_data = wp_unslash( $_GET );
+		$mode     = isset( $get_data['mode'] ) ? sanitize_key( $get_data['mode'] ) : '';
 
 		// Only add on the media library page in list mode
-		if ( 'upload.php' !== $pagenow || ( isset( $_GET['mode'] ) && 'grid' === $_GET['mode'] ) ) {
+		if ( 'upload.php' !== $pagenow || 'grid' === $mode ) {
 			return;
 		}
 
@@ -487,7 +493,7 @@ class MediaTaxonomy extends Taxonomy {
 		}
 
 		// Get the current filter value
-		$current = isset( $_GET[ self::TYPE ] ) ? $_GET[ self::TYPE ] : '';
+		$current = isset( $get_data[ self::TYPE ] ) ? sanitize_text_field( $get_data[ self::TYPE ] ) : '';
 
 		// Display dropdown
 		echo '<label for="media-category-filter" class="screen-reader-text">' . esc_html__( 'Filter by category', 'wordpress-toolkit-plugin' ) . '</label>';
@@ -515,14 +521,15 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function filter_media_by_category( $query ) {
 		global $pagenow;
+		$get_data = wp_unslash( $_GET );
 
 		// Only filter on the media library page
-		if ( 'upload.php' !== $pagenow || ! isset( $_GET[ self::TYPE ] ) || empty( $_GET[ self::TYPE ] ) ) {
+		if ( 'upload.php' !== $pagenow || ! isset( $get_data[ self::TYPE ] ) || empty( $get_data[ self::TYPE ] ) ) {
 			return $query;
 		}
 
 		// Get the selected category
-		$category = sanitize_text_field( $_GET[ self::TYPE ] );
+		$category = sanitize_text_field( $get_data[ self::TYPE ] );
 
 		// Set tax query for filtering
 		$tax_query = $query->get( 'tax_query' );

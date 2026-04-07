@@ -69,12 +69,13 @@ class ModelService
 
         $options = get_option("toolkit_enabled_models", []);
 
-        if (isset($_POST["submit"])) {
+        $post_data = wp_unslash($_POST);
+        if (isset($post_data["submit"])) {
             // Process form submission
             $options = [];
             foreach ($models as $model) {
                 $model_key = basename($model, ".php");
-                $options[$model_key] = isset($_POST[$model_key]) ? 1 : 0;
+                $options[$model_key] = isset($post_data[$model_key]) ? 1 : 0;
             }
             update_option("toolkit_enabled_models", $options);
         }
