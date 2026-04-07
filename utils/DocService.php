@@ -179,7 +179,6 @@ class DocService {
         $toc .= "</div>\n";
 
         // Add JavaScript function for toggling sections
-        $toc .= "<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>\n"; // Include jQuery
         $toc .= "<script>\n";
         $toc .= "$(document).ready(function() {\n";
         $toc .= "  $('.toggle-section').click(function() {\n"; // Bind click event to elements with class 'toggle-section'

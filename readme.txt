@@ -4,7 +4,7 @@ Tags: toolkit, theme, custom post type, gutenberg, acf, blocks, developer
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 2.1.5
+Stable tag: 3.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,7 @@ No. WooCommerce support is disabled by default and can be enabled via the plugin
 This plugin may connect to the following external services depending on your configuration:
 
 * **Google Calendar API** — used by `GoogleCalendarSource` to fetch calendar events. This connection is only made when the Google Calendar integration is configured and active. See [Google's Privacy Policy](https://policies.google.com/privacy).
+* **Highlight.js (cdnjs.cloudflare.com)** — used in the admin Docs page to syntax-highlight code blocks. Loaded from `https://cdnjs.cloudflare.com` only when the Docs admin page is visited. See [Cloudflare's Privacy Policy](https://www.cloudflare.com/privacypolicy/).
 
 No data is sent to any external service by default. External connections are opt-in and initiated by your theme code.
 
@@ -68,6 +69,23 @@ This plugin includes the following third-party libraries:
 1. No admin UI screenshots currently available. This is a developer toolkit plugin.
 
 == Changelog ==
+
+= 3.0.0 =
+* Security: Encryption key is now stored in wp_options — no longer writes to wp-config.php
+* Security: Fixed bug where get_encryption_key() returned a boolean instead of the actual key value
+* Security: All inline &lt;script&gt; and &lt;style&gt; tags replaced with wp_add_inline_script() and wp_add_inline_style()
+* Security: Nonce protection added across admin form submissions
+* Security: Improved data sanitization and output escaping throughout
+* Security: Removed third-party update checker
+* Feat: Block model — new ACF helpers: acf_media(), acf_file(), acf_post(), acf_page(), acf_publication()
+* Compatibility: Full WordPress coding standards compliance across all models, controllers, and services
+* Compatibility: Removed unused vendor/jb-fly library
+* Compatibility: Added if(!defined()) guards for all plugin constants
+* Compatibility: Plugin name and text domain unified to wp-theme-toolkit
+* Compatibility: Disclosed Highlight.js external CDN usage in readme.txt
+* Docs: English translation of internal documentation and file names
+* Docs: GPL license file added
+* Docs: Code conventions documented
 
 = 2.1.5 =
 * Security: Added nonce protection
@@ -169,6 +187,9 @@ This plugin includes the following third-party libraries:
 * Initial release
 
 == Upgrade Notice ==
+
+= 3.0.0 =
+Major release. Full WordPress coding standards compliance, security overhaul (encryption key no longer modifies wp-config.php), and new ACF helpers for the Block model. Review your theme's Block subclasses after upgrading.
 
 = 2.1.5 =
 Security improvements: nonce protection and data sanitization added. Update recommended for all users.

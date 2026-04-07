@@ -15,6 +15,76 @@ class CalendarAdminService
         add_action('admin_menu', [self::class, 'register_menu'], 10);
         add_action('admin_init', [self::class, 'register_settings']);
         add_action('admin_post_toolkit_calendar_sync_now', [self::class, 'handle_sync_now']);
+        add_action('admin_enqueue_scripts', [self::class, 'enqueue_scripts']);
+    }
+
+    public static function enqueue_scripts($hook)
+    {
+        if ('toolkit-calendar_page_toolkit-calendar-settings' !== $hook) {
+            return;
+        }
+
+        $settings = get_option(self::OPTION_NAME, self::get_default_settings());
+        $google = $settings['google'] ?? self::get_default_settings()['google'];
+        if (!$google['enabled'] || empty($google['api_key']) || empty($google['calendar_id'])) {
+            return;
+        }
+
+        wp_enqueue_script('toolkit-calendar-test', false, ['jquery'], false, true);
+        wp_localize_script('toolkit-calendar-test', 'toolkitCalendarTest', [
+            'apiKey'     => $google['api_key'],
+            'calendarId' => $google['calendar_id'],
+            'i18n'       => [
+                'testing'         => __('Testing...', 'wp-theme-toolkit'),
+                'connecting'      => __('Connecting to Google Calendar...', 'wp-theme-toolkit'),
+                'successTitle'    => __('✓ Connection successful!', 'wp-theme-toolkit'),
+                'calendarLabel'   => __('Calendar:', 'wp-theme-toolkit'),
+                'eventsFoundLabel'=> __('Events found:', 'wp-theme-toolkit'),
+                'unknownError'    => __('Unknown error', 'wp-theme-toolkit'),
+                'failureTitle'    => __('✗ Connection failed', 'wp-theme-toolkit'),
+                'testButton'      => __('Test Connection', 'wp-theme-toolkit'),
+            ],
+        ]);
+        wp_add_inline_script('toolkit-calendar-test', '
+            jQuery(document).ready(function($) {
+                var cfg = toolkitCalendarTest;
+                $("#test-google-connection").on("click", function() {
+                    var button = $(this);
+                    var result = $("#test-result");
+                    button.prop("disabled", true).text(cfg.i18n.testing);
+                    result.empty().append($("<p>").text(cfg.i18n.connecting));
+                    var testUrl = "https://www.googleapis.com/calendar/v3/calendars/" +
+                        encodeURIComponent(cfg.calendarId) +
+                        "/events?key=" + cfg.apiKey +
+                        "&maxResults=1&singleEvents=true&orderBy=startTime&" +
+                        "timeMin=" + new Date().toISOString();
+                    fetch(testUrl)
+                        .then(function(response) {
+                            if (!response.ok) { return response.json().then(function(err) { return Promise.reject(err); }); }
+                            return response.json();
+                        })
+                        .then(function(data) {
+                            var box = $("<div>").addClass("notice notice-success inline");
+                            $("<p>").append($("<strong>").text(cfg.i18n.successTitle)).appendTo(box);
+                            $("<p>").text(cfg.i18n.calendarLabel + " " + (data.summary || cfg.calendarId)).appendTo(box);
+                            $("<p>").text(cfg.i18n.eventsFoundLabel + " " + (data.items ? data.items.length : 0)).appendTo(box);
+                            result.empty().append(box);
+                        })
+                        .catch(function(error) {
+                            var msg = error && error.error ? error.error.message : error && error.message ? error.message : cfg.i18n.unknownError;
+                            var box = $("<div>").addClass("notice notice-error inline");
+                            $("<p>").append($("<strong>").text(cfg.i18n.failureTitle)).appendTo(box);
+                            $("<p>").text(msg).appendTo(box);
+                            result.empty().append(box);
+                        })
+                        .finally(function() {
+                            button.prop("disabled", false).html(
+                                "<span class=\"dashicons dashicons-yes-alt\" style=\"margin-top:3px\"></span> " + cfg.i18n.testButton
+                            );
+                        });
+                });
+            });
+        ');
     }
 
     /**
@@ -408,64 +478,6 @@ class CalendarAdminService
                 <div id="test-result" style="margin-top: 15px;"></div>
             </div>
 
-            <script>
-            jQuery(document).ready(function($) {
-                var i18n = {
-                    testing: <?php echo wp_json_encode(__('Testing...', 'wp-theme-toolkit')); ?>,
-                    connecting: <?php echo wp_json_encode(__('Connecting to Google Calendar...', 'wp-theme-toolkit')); ?>,
-                    successTitle: <?php echo wp_json_encode(__('✓ Connection successful!', 'wp-theme-toolkit')); ?>,
-                    calendarLabel: <?php echo wp_json_encode(__('Calendar:', 'wp-theme-toolkit')); ?>,
-                    eventsFoundLabel: <?php echo wp_json_encode(__('Events found:', 'wp-theme-toolkit')); ?>,
-                    unknownError: <?php echo wp_json_encode(__('Unknown error', 'wp-theme-toolkit')); ?>,
-                    failureTitle: <?php echo wp_json_encode(__('✗ Connection failed', 'wp-theme-toolkit')); ?>,
-                    testButton: <?php echo wp_json_encode(__('Test Connection', 'wp-theme-toolkit')); ?>
-                };
-
-                $('#test-google-connection').on('click', function() {
-                    var button = $(this);
-                    var result = $('#test-result');
-                    
-                    button.prop('disabled', true).text(i18n.testing);
-                    result.empty().append($('<p>').text(i18n.connecting));
-                    
-                    var apiKey = '<?php echo esc_js($google['api_key']); ?>';
-                    var calendarId = '<?php echo esc_js($google['calendar_id']); ?>';
-                    var testUrl = 'https://www.googleapis.com/calendar/v3/calendars/' + 
-                                  encodeURIComponent(calendarId) + 
-                                  '/events?key=' + apiKey + 
-                                  '&maxResults=1&singleEvents=true&orderBy=startTime&' +
-                                  'timeMin=' + new Date().toISOString();
-                    
-                    fetch(testUrl)
-                        .then(response => {
-                            if (!response.ok) {
-                                return response.json().then(err => Promise.reject(err));
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            var successNotice = $('<div>').addClass('notice notice-success inline');
-                            $('<p>').append($('<strong>').text(i18n.successTitle)).appendTo(successNotice);
-                            $('<p>').text(i18n.calendarLabel + ' ' + (data.summary || calendarId)).appendTo(successNotice);
-                            $('<p>').text(i18n.eventsFoundLabel + ' ' + (data.items ? data.items.length : 0)).appendTo(successNotice);
-                            result.empty().append(successNotice);
-                        })
-                        .catch(error => {
-                            var errorMsg = error && error.error ? error.error.message : error && error.message ? error.message : i18n.unknownError;
-                            var errorNotice = $('<div>').addClass('notice notice-error inline');
-                            $('<p>').append($('<strong>').text(i18n.failureTitle)).appendTo(errorNotice);
-                            $('<p>').text(errorMsg).appendTo(errorNotice);
-                            result.empty().append(errorNotice);
-                        })
-                        .finally(() => {
-                            button.prop('disabled', false).html(
-                                '<span class="dashicons dashicons-yes-alt" style="margin-top: 3px;"></span> ' +
-                                i18n.testButton
-                            );
-                        });
-                });
-            });
-            </script>
             <?php endif; ?>
         </div>
         <?php

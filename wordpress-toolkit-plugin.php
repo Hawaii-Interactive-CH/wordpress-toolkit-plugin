@@ -11,7 +11,7 @@
  * Plugin Name: WP Theme Toolkit
  * Description: A developer toolkit for building WordPress themes — provides base models, ACF block registration, custom post types, taxonomies, REST API helpers, and utility services.
  * Plugin URI: https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin
- * Version: 2.1.5
+ * Version: 3.0.0
  * Requires at least: 6.8
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
@@ -27,12 +27,12 @@ namespace Toolkit;
 defined( 'ABSPATH' ) or exit();
 
 // Define plugin constants.
-define( 'WP_TOOLKIT_VERSION', '2.1.5' );
-define( 'WP_TOOLKIT_DIR', plugin_dir_path( __FILE__ ) );
-define( 'WP_TOOLKIT_URL', plugin_dir_url( __FILE__ ) );
-define( 'WP_TOOLKIT_THEME_PATH', get_template_directory() );
-define( 'WP_TOOLKIT_THEME_URL', get_template_directory_uri() );
-define( 'WP_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
+if ( ! defined( 'WP_TOOLKIT_VERSION' ) )         define( 'WP_TOOLKIT_VERSION', '3.0.0' );
+if ( ! defined( 'WP_TOOLKIT_DIR' ) )             define( 'WP_TOOLKIT_DIR', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'WP_TOOLKIT_URL' ) )             define( 'WP_TOOLKIT_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'WP_TOOLKIT_THEME_PATH' ) )      define( 'WP_TOOLKIT_THEME_PATH', get_template_directory() );
+if ( ! defined( 'WP_TOOLKIT_THEME_URL' ) )       define( 'WP_TOOLKIT_THEME_URL', get_template_directory_uri() );
+if ( ! defined( 'WP_TOOLKIT_THEME_VIEWS_PATH' ) ) define( 'WP_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
 
 // Autoload classes.
 spl_autoload_register( function ( $class ) {

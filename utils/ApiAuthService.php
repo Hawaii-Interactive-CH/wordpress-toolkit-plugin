@@ -24,6 +24,7 @@ class ApiAuthService
         add_action('admin_post_remove_whitelist', [self::class, 'remove_from_whitelist']);
         add_action('admin_post_generate_encryption_key', [self::class, 'generate_encryption_key']);
         add_action('admin_notices', [self::class, 'display_admin_notices']);
+        add_action('admin_enqueue_scripts', [self::class, 'enqueue_styles']);
 
         // Planifier l'événement cron
         if (!wp_next_scheduled('api_auth_cleanup_expired_transients')) {
@@ -58,6 +59,24 @@ class ApiAuthService
         }
     }
 
+    public static function enqueue_styles($hook)
+    {
+        if ('wp-theme-toolkit_page_api-authentication' !== $hook) {
+            return;
+        }
+        $css = '
+            .api-auth-section { margin-bottom: 20px; padding: 20px; border: 1px solid #ddd; background-color: #f9f9f9; border-radius: 5px; }
+            .api-auth-section h2 { margin-top: 0; }
+            .api-auth-section p { margin: 10px 0; }
+            .api-auth-section label { display: block; font-weight: bold; }
+            .api-auth-section input[type="number"], .api-auth-section input[type="text"] { width: 100%; padding: 5px; margin: 5px 0; }
+            .api-auth-section .button-primary { margin-right: 10px; }
+        ';
+        wp_register_style('api-auth-admin', false);
+        wp_enqueue_style('api-auth-admin');
+        wp_add_inline_style('api-auth-admin', $css);
+    }
+
     public static function display_api_authentication_page()
     {
         $master_token = self::get_master_token();
@@ -66,35 +85,6 @@ class ApiAuthService
         $encryption_key_defined = self::get_encryption_key();
 
         ?>
-        <style>
-            .api-auth-section {
-                margin-bottom: 20px;
-                padding: 20px;
-                border: 1px solid #ddd;
-                background-color: #f9f9f9;
-                border-radius: 5px;
-            }
-            .api-auth-section h2 {
-                margin-top: 0;
-            }
-            .api-auth-section p {
-                margin: 10px 0;
-            }
-            .api-auth-section label {
-                display: block;
-                font-weight: bold;
-            }
-            .api-auth-section input[type="number"],
-            .api-auth-section input[type="text"] {
-                width: 100%;
-                padding: 5px;
-                margin: 5px 0;
-            }
-            .api-auth-section .button-primary {
-                margin-right: 10px;
-            }
-        </style>
-
         <div class="wrap">
             <h1>API Authentication</h1>
 
@@ -108,6 +98,8 @@ class ApiAuthService
                     </p>
                     <?php if ($encryption_key_defined) : ?>
                         <p>Encryption key is already defined.</p>
+                    <?php else : ?>
+                        <p class="description"><?php esc_html_e('Generates and stores a secure encryption key. You may also define ENCRYPTION_KEY manually in wp-config.php.', 'wp-theme-toolkit'); ?></p>
                     <?php endif; ?>
                 </form>
             </div>
@@ -179,10 +171,14 @@ class ApiAuthService
         <?php
     }
 
-    /** Récupère la clé de chiffrement à partir de la configuration de WordPress. */
+    /** Récupère la clé de chiffrement. Supporte la constante ENCRYPTION_KEY pour les installations manuelles. */
     private static function get_encryption_key()
     {
-        return defined('ENCRYPTION_KEY');
+        if (defined('ENCRYPTION_KEY')) {
+            return ENCRYPTION_KEY;
+        }
+        $key = get_option('api_encryption_key', false);
+        return $key ?: false;
     }
 
     /** Chiffre le token */
@@ -340,47 +336,15 @@ class ApiAuthService
         }
 
         if (isset($_POST['generate_encryption_key']) && check_admin_referer('generate_encryption_key_action', 'generate_encryption_key_nonce')) {
-            if (defined('ENCRYPTION_KEY')) {
+            if (self::get_encryption_key()) {
                 set_transient('api_auth_error', 'Encryption key is already defined.', 30);
                 wp_redirect(admin_url('admin.php?page=api-authentication'));
                 exit;
             }
 
-            // Générer une clé de chiffrement unique
             $key = bin2hex(random_bytes(32));
-
-            // Chemin vers le fichier wp-config.php
-            $wp_config_file = ABSPATH . 'wp-config.php';
-
-            // Lire le contenu du fichier wp-config.php
-            $config_contents = file_get_contents($wp_config_file);
-            if (false === $config_contents) {
-                set_transient('api_auth_error', 'Unable to read wp-config.php.', 30);
-                wp_redirect(admin_url('admin.php?page=api-authentication'));
-                exit;
-            }
-
-            // Ajouter la définition de la clé de chiffrement avant la ligne "define('WP_DEBUG',"
-            if (strpos($config_contents, "define('ENCRYPTION_KEY',") === false) {
-                $config_contents = str_replace(
-                    "define('WP_DEBUG',",
-                    "define('ENCRYPTION_KEY', '$key');\n\ndefine('WP_DEBUG',",
-                    $config_contents
-                );
-
-                // Écrire les modifications dans le fichier wp-config.php
-                $write_result = file_put_contents($wp_config_file, $config_contents);
-                if (false === $write_result) {
-                    set_transient('api_auth_error', 'Unable to write ENCRYPTION_KEY to wp-config.php.', 30);
-                    wp_redirect(admin_url('admin.php?page=api-authentication'));
-                    exit;
-                }
-
-                // Message de confirmation
-                set_transient('api_auth_message', 'Encryption key has been generated and added to wp-config.php.', 30);
-            } else {
-                set_transient('api_auth_error', 'Encryption key is already defined in wp-config.php.', 30);
-            }
+            update_option('api_encryption_key', $key, false);
+            set_transient('api_auth_message', 'Encryption key has been generated and stored securely.', 30);
 
             wp_redirect(admin_url('admin.php?page=api-authentication'));
             exit;

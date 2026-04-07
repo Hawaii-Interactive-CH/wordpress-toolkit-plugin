@@ -669,7 +669,7 @@ class MainService
      */
     public static function customize_login(array $options = []): void
     {
-        add_action('login_head', function () use ($options): void {
+        add_action('login_enqueue_scripts', function () use ($options): void {
             $css = '';
 
             if (!empty($options['logo'])) {
@@ -690,7 +690,7 @@ class MainService
             }
 
             if ($css) {
-                echo '<style>' . $css . '</style>';
+                wp_add_inline_style('login', $css);
             }
         });
 
