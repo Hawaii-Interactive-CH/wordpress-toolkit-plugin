@@ -18,8 +18,8 @@ abstract class Block
 
 		public static function settings() {
 			return [
-				'title'       => __( 'Chiffres-clés', 'text-domain' ),
-				'description' => __( 'A custom number block.', 'text-domain' ),
+				'title'       => __( 'Key Numbers', 'wp-theme-toolkit' ),
+				'description' => __( 'A custom number block.', 'wp-theme-toolkit' ),
 				'mode'        => 'auto',
 				'align'       => 'full',
 				'icon'        => 'admin-comments',

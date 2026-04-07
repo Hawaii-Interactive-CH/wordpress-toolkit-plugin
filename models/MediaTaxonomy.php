@@ -29,17 +29,17 @@ class MediaTaxonomy extends Taxonomy {
 				'show_tagcloud'           => false,
 				'update_count_callback'   => '_update_generic_term_count',
 				'labels'                  => [
-					'name'              => __( 'Categories', 'wordpress-toolkit-plugin' ),
-					'singular_name'     => __( 'Category', 'wordpress-toolkit-plugin' ),
-					'search_items'      => __( 'Search Categories', 'wordpress-toolkit-plugin' ),
-					'all_items'         => __( 'All Categories', 'wordpress-toolkit-plugin' ),
-					'parent_item'       => __( 'Parent Category', 'wordpress-toolkit-plugin' ),
-					'parent_item_colon' => __( 'Parent Category:', 'wordpress-toolkit-plugin' ),
-					'edit_item'         => __( 'Edit Category', 'wordpress-toolkit-plugin' ),
-					'update_item'       => __( 'Update Category', 'wordpress-toolkit-plugin' ),
-					'add_new_item'      => __( 'Add New Category', 'wordpress-toolkit-plugin' ),
-					'new_item_name'     => __( 'New Category Name', 'wordpress-toolkit-plugin' ),
-					'menu_name'         => __( 'Categories', 'wordpress-toolkit-plugin' ),
+					'name'              => __( 'Categories', 'wp-theme-toolkit' ),
+					'singular_name'     => __( 'Category', 'wp-theme-toolkit' ),
+					'search_items'      => __( 'Search Categories', 'wp-theme-toolkit' ),
+					'all_items'         => __( 'All Categories', 'wp-theme-toolkit' ),
+					'parent_item'       => __( 'Parent Category', 'wp-theme-toolkit' ),
+					'parent_item_colon' => __( 'Parent Category:', 'wp-theme-toolkit' ),
+					'edit_item'         => __( 'Edit Category', 'wp-theme-toolkit' ),
+					'update_item'       => __( 'Update Category', 'wp-theme-toolkit' ),
+					'add_new_item'      => __( 'Add New Category', 'wp-theme-toolkit' ),
+					'new_item_name'     => __( 'New Category Name', 'wp-theme-toolkit' ),
+					'menu_name'         => __( 'Categories', 'wp-theme-toolkit' ),
 				],
 			]
 		);
@@ -122,7 +122,7 @@ class MediaTaxonomy extends Taxonomy {
 			// Add the "All Categories" option
 			$('<option></option>')
 				.attr('value', '')
-				.text('<?php echo esc_js( __( 'Toutes les catégories', 'wordpress-toolkit-plugin' ) ); ?>')
+				.text('<?php echo esc_js( __( 'All Categories', 'wp-theme-toolkit' ) ); ?>')
 				.prop('selected', <?php echo empty( $current ) ? 'true' : 'false'; ?>)
 				.appendTo(categoryFilter);
 
@@ -162,7 +162,7 @@ class MediaTaxonomy extends Taxonomy {
 
 					// Add filter label
 					var filterLabel = $('<span></span>')
-						.text('<?php echo esc_js( __( 'Catégories:', 'wordpress-toolkit-plugin' ) ); ?>')
+						.text('<?php echo esc_js( __( 'Categories:', 'wp-theme-toolkit' ) ); ?>')
 						.css('margin-left', '12px')
 						.css('margin-right', '4px');
 
@@ -260,8 +260,8 @@ class MediaTaxonomy extends Taxonomy {
 			'categories' => $categories,
 			'taxonomy'   => self::TYPE,
 			'labels'     => [
-				'filterBy' => __( 'Catégories', 'wordpress-toolkit-plugin' ),
-				'all'      => __( 'Toutes les catégories', 'wordpress-toolkit-plugin' ),
+				'filterBy' => __( 'Categories', 'wp-theme-toolkit' ),
+				'all'      => __( 'All Categories', 'wp-theme-toolkit' ),
 			],
 		] );
 
@@ -393,11 +393,11 @@ class MediaTaxonomy extends Taxonomy {
 
 		// Create the default category
 		wp_insert_term(
-			__( self::DEFAULT_CATEGORY, 'wordpress-toolkit-plugin' ),
+			__( self::DEFAULT_CATEGORY, 'wp-theme-toolkit' ),
 			self::TYPE,
 			[
 				'slug'        => sanitize_title( self::DEFAULT_CATEGORY ),
-				'description' => __( 'Default category for media attachments', 'wordpress-toolkit-plugin' ),
+				'description' => __( 'Default category for media attachments', 'wp-theme-toolkit' ),
 			]
 		);
 	}
@@ -416,7 +416,7 @@ class MediaTaxonomy extends Taxonomy {
 		}
 
 		// Get default category
-		$default_term = get_term_by( 'name', __( self::DEFAULT_CATEGORY, 'wordpress-toolkit-plugin' ), self::TYPE );
+		$default_term = get_term_by( 'name', __( self::DEFAULT_CATEGORY, 'wp-theme-toolkit' ), self::TYPE );
 
 		// If default category exists, assign it to the attachment
 		if ( $default_term && ! is_wp_error( $default_term ) ) {
@@ -458,10 +458,10 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function change_media_filter_labels( $strings ) {
 		// Change the filter type label (the main dropdown that shows "Toutes")
-		$strings['filterByType'] = __( 'Catégories', 'wordpress-toolkit-plugin' );
+		$strings['filterByType'] = __( 'Categories', 'wp-theme-toolkit' );
 
 		// Change the "All" text in the dropdown
-		$strings['all'] = __( 'Toutes les catégories', 'wordpress-toolkit-plugin' );
+		$strings['all'] = __( 'All Categories', 'wp-theme-toolkit' );
 
 		return $strings;
 	}
@@ -496,9 +496,9 @@ class MediaTaxonomy extends Taxonomy {
 		$current = isset( $get_data[ self::TYPE ] ) ? sanitize_text_field( $get_data[ self::TYPE ] ) : '';
 
 		// Display dropdown
-		echo '<label for="media-category-filter" class="screen-reader-text">' . esc_html__( 'Filter by category', 'wordpress-toolkit-plugin' ) . '</label>';
+		echo '<label for="media-category-filter" class="screen-reader-text">' . esc_html__( 'Filter by category', 'wp-theme-toolkit' ) . '</label>';
 		echo '<select name="' . esc_attr( self::TYPE ) . '" id="media-category-filter" class="postform">';
-		echo '<option value="">' . esc_html__( 'Toutes les catégories', 'wordpress-toolkit-plugin' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'All Categories', 'wp-theme-toolkit' ) . '</option>';
 
 		foreach ( $media_categories as $category ) {
 			printf(

@@ -30,19 +30,19 @@ class CalendarEvent extends CustomPostType {
 	public static function type_settings() {
 		return [
 			'labels'                => [
-				'name'               => __( 'Événements', 'wordpress-toolkit-plugin' ),
-				'singular_name'      => __( 'Événement', 'wordpress-toolkit-plugin' ),
-				'menu_name'          => __( 'Événements', 'wordpress-toolkit-plugin' ),
-				'name_admin_bar'     => __( 'Événement', 'wordpress-toolkit-plugin' ),
-				'add_new'            => __( 'Ajouter', 'wordpress-toolkit-plugin' ),
-				'add_new_item'       => __( 'Ajouter un événement', 'wordpress-toolkit-plugin' ),
-				'new_item'           => __( 'Nouvel événement', 'wordpress-toolkit-plugin' ),
-				'edit_item'          => __( 'Modifier l\'événement', 'wordpress-toolkit-plugin' ),
-				'view_item'          => __( 'Voir l\'événement', 'wordpress-toolkit-plugin' ),
-				'all_items'          => __( 'Tous les événements', 'wordpress-toolkit-plugin' ),
-				'search_items'       => __( 'Rechercher des événements', 'wordpress-toolkit-plugin' ),
-				'not_found'          => __( 'Aucun événement trouvé', 'wordpress-toolkit-plugin' ),
-				'not_found_in_trash' => __( 'Aucun événement trouvé dans la corbeille', 'wordpress-toolkit-plugin' ),
+				'name'               => __( 'Events', 'wp-theme-toolkit' ),
+				'singular_name'      => __( 'Event', 'wp-theme-toolkit' ),
+				'menu_name'          => __( 'Events', 'wp-theme-toolkit' ),
+				'name_admin_bar'     => __( 'Event', 'wp-theme-toolkit' ),
+				'add_new'            => __( 'Add New', 'wp-theme-toolkit' ),
+				'add_new_item'       => __( 'Add New Event', 'wp-theme-toolkit' ),
+				'new_item'           => __( 'New Event', 'wp-theme-toolkit' ),
+				'edit_item'          => __( 'Edit Event', 'wp-theme-toolkit' ),
+				'view_item'          => __( 'View Event', 'wp-theme-toolkit' ),
+				'all_items'          => __( 'All Events', 'wp-theme-toolkit' ),
+				'search_items'       => __( 'Search Events', 'wp-theme-toolkit' ),
+				'not_found'          => __( 'No events found', 'wp-theme-toolkit' ),
+				'not_found_in_trash' => __( 'No events found in trash', 'wp-theme-toolkit' ),
 			],
 			'public'                => true,
 			'publicly_queryable'    => true,
@@ -86,13 +86,13 @@ class CalendarEvent extends CustomPostType {
 		}
 
 		// Title
-		$new_columns['title'] = __( 'Événement', 'wordpress-toolkit-plugin' );
+		$new_columns['title'] = __( 'Event', 'wp-theme-toolkit' );
 
 		// Custom columns
-		$new_columns['event_date']     = __( 'Date', 'wordpress-toolkit-plugin' );
-		$new_columns['event_location'] = __( 'Lieu', 'wordpress-toolkit-plugin' );
-		$new_columns['event_source']   = __( 'Source', 'wordpress-toolkit-plugin' );
-		$new_columns['event_sync']     = __( 'Dernière synchro', 'wordpress-toolkit-plugin' );
+		$new_columns['event_date']     = __( 'Date', 'wp-theme-toolkit' );
+		$new_columns['event_location'] = __( 'Location', 'wp-theme-toolkit' );
+		$new_columns['event_source']   = __( 'Source', 'wp-theme-toolkit' );
+		$new_columns['event_sync']     = __( 'Last Sync', 'wp-theme-toolkit' );
 
 		// Date (published date)
 		if ( isset( $columns['date'] ) ) {
@@ -125,7 +125,7 @@ class CalendarEvent extends CustomPostType {
 						if ( $end && date( 'Y-m-d', $start ) !== date( 'Y-m-d', $end ) ) {
 							echo ' → ' . esc_html( date_i18n( 'j M Y', $end ) );
 						}
-						echo '<br><small>' . esc_html__( 'Toute la journée', 'wordpress-toolkit-plugin' ) . '</small>';
+						echo '<br><small>' . esc_html__( 'All Day', 'wp-theme-toolkit' ) . '</small>';
 					} else {
 						echo '<strong>' . esc_html( date_i18n( 'j M Y', $start ) ) . '</strong>';
 						echo '<br><small>' . esc_html( date_i18n( 'H:i', $start ) );
@@ -155,14 +155,14 @@ class CalendarEvent extends CustomPostType {
 
 				if ( $google_id ) {
 					if ( $google_link ) {
-						echo '<a href="' . esc_url( $google_link ) . '" target="_blank" title="' . esc_attr__( 'Voir sur Google Calendar', 'wordpress-toolkit-plugin' ) . '">';
+						echo '<a href="' . esc_url( $google_link ) . '" target="_blank" title="' . esc_attr__( 'View on Google Calendar', 'wp-theme-toolkit' ) . '">';
 						echo '<span class="dashicons dashicons-google" style="color: #4285F4;"></span> Google Calendar';
 						echo '</a>';
 					} else {
 						echo '<span class="dashicons dashicons-google" style="color: #4285F4;"></span> Google Calendar';
 					}
 				} else {
-					echo '<span class="dashicons dashicons-admin-post" style="color: #999;"></span> ' . esc_html__( 'Manuel', 'wordpress-toolkit-plugin' );
+					echo '<span class="dashicons dashicons-admin-post" style="color: #999;"></span> ' . esc_html__( 'Manual', 'wp-theme-toolkit' );
 				}
 				break;
 
@@ -174,10 +174,10 @@ class CalendarEvent extends CustomPostType {
 
 					if ( $diff < 3600 ) { // Less than 1 hour
 						echo '<span style="color: #46b450;">●</span> ';
-						echo esc_html( sprintf( __( 'Il y a %d min', 'wordpress-toolkit-plugin' ), round( $diff / 60 ) ) );
+						echo esc_html( sprintf( __( '%d min ago', 'wp-theme-toolkit' ), round( $diff / 60 ) ) );
 					} elseif ( $diff < 86400 ) { // Less than 1 day
 						echo '<span style="color: #ffb900;">●</span> ';
-						echo esc_html( sprintf( __( 'Il y a %d h', 'wordpress-toolkit-plugin' ), round( $diff / 3600 ) ) );
+						echo esc_html( sprintf( __( '%d h ago', 'wp-theme-toolkit' ), round( $diff / 3600 ) ) );
 					} else {
 						echo '<span style="color: #999;">●</span> ';
 						echo esc_html( date_i18n( 'j M Y', $synced_time ) );

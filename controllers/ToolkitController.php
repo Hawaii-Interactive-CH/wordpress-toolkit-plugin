@@ -155,7 +155,7 @@ class ToolkitController {
 		if ( ! $post || 'calendar_event' !== $post->post_type ) {
 			return new WP_Error(
 				'event_not_found',
-				__( 'Événement non trouvé', 'wordpress-toolkit-plugin' ),
+				__( 'Event not found', 'wp-theme-toolkit' ),
 				[ 'status' => 404 ]
 			);
 		}
