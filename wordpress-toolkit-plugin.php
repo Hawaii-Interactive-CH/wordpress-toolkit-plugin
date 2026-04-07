@@ -1,16 +1,24 @@
 <?php
 
 /**
+ * Toolkit Plugin.
+ *
+ * @package   Toolkit
+ * @copyright Copyright (C) 2024-2026, Hawaii Interactive - hello@hawaii.do
+ * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (GPL-2.0)
+ *
+ * @wordpress-plugin
  * Plugin Name: Toolkit
  * Description: Hawaii Interactive Toolkit Theme Plugin
  * Plugin URI: https://git.hawai.li/hawai-li/wordpress-toolkit-plugin
  * Version: 2.1.5
- * Requires at least: 5.2
+ * Requires at least: 6.8
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
  * Author URI: https://hawaii.do
  * Text Domain: toolkit
  * Domain Path: /languages
+ * License: GPLv2 or later
  */
 
 namespace Toolkit;
