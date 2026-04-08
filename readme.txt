@@ -1,12 +1,12 @@
 === WP Theme Toolkit ===
-Contributors: hawaiiinteractive
+Contributors: Hawaii Interactive
 Tags: toolkit, theme, custom post type, gutenberg, acf, blocks, developer
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.0
 Stable tag: 3.0.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: GPLv3
+License URI: https://www.gnu.org/licenses/gpl-3.0.html#license-text
 
 A developer toolkit for building WordPress themes — base models, ACF block registration, custom post types, taxonomies, REST API helpers, and utility services.
 
@@ -28,6 +28,8 @@ WP Theme Toolkit gives developers a structured foundation for building robust, m
 * WPML compatibility helpers
 
 This plugin is designed to work alongside a custom theme, not replace it. It is intended for developers building bespoke WordPress themes.
+
+To start a new project, use the official boilerplate: [wordpress-toolkit-boilerplate](https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-boilerplate)
 
 == Installation ==
 

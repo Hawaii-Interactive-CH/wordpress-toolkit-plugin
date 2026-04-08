@@ -69,6 +69,12 @@ WordPress Toolkit is a professional development framework for building complex W
 Requires at least: 6.4
 Requires PHP: 8.0
 
+### Getting Started
+
+To start a new theme using this toolkit, use the official boilerplate:
+
+**[wordpress-toolkit-boilerplate](https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-boilerplate)** — A ready-to-use theme starter that integrates this plugin out of the box.
+
 ### Installation
 
 Download the [wordpress-toolkit-plugin](https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin) as a zip and install it via the WordPress admin.
