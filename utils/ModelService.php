@@ -20,7 +20,7 @@ class ModelService
         add_action("admin_menu", function () {
             // Add a submenu for settings
             add_submenu_page(
-                "toolkit", // Parent menu slug
+                "wp-theme-toolkit", // Parent menu slug
                 "Models", // Page title
                 "Models", // Menu title
                 "edit_theme_options",
