@@ -62,6 +62,294 @@ WordPress Toolkit is a professional development framework for building complex W
 - **Vite** — Frontend asset pipeline with HMR in development and hashed manifests in production.
 - **MainWP** — Auto-updates disabled for compatibility.
 
+## Code Examples
+
+### Custom Post Type
+
+```php
+// models/custom/Project.php
+namespace Toolkit\models\custom;
+
+use Toolkit\models\CustomPostType;
+
+class Project extends CustomPostType implements \JsonSerializable {
+    const TYPE = 'project';
+
+    public static function type_settings(): array {
+        return [
+            'labels'    => [
+                'name'          => __( 'Projects', 'your-theme' ),
+                'singular_name' => __( 'Project', 'your-theme' ),
+            ],
+            'supports'  => [ 'title', 'editor', 'thumbnail' ],
+            'menu_icon' => 'dashicons-portfolio',
+            'has_archive' => true,
+        ];
+    }
+
+    public function client(): string {
+        return $this->acf( 'client' ) ?? '';
+    }
+
+    public function cover( callable $callback ) {
+        return $this->acf_media( 'cover', $callback );
+    }
+
+    public function jsonSerialize(): mixed {
+        return [
+            'id'     => $this->id(),
+            'title'  => $this->title(),
+            'slug'   => $this->slug(),
+            'client' => $this->client(),
+            'link'   => $this->link(),
+        ];
+    }
+}
+```
+
+Register it in your theme's `functions.php`:
+
+```php
+add_action( 'init', function () {
+    \Toolkit\models\custom\Project::register();
+} );
+```
+
+---
+
+### Querying Posts
+
+```php
+// All projects
+$projects = Project::all();
+
+// Current post (inside The Loop or a single template)
+$project = Project::current();
+
+// Chainable QueryBuilder
+$results = Project::query()
+    ->where( 'client', 'Acme Corp' )
+    ->order( 'date', 'DESC' )
+    ->paginate( 12 )
+    ->find_all();
+
+// Single item
+$project = Project::query()->find_by_id( 42 );
+
+// Pagination HTML (uses WP's paginate_links)
+echo Project::query()->paginate( 12 )->pagination();
+```
+
+---
+
+### ACF Fields & Media
+
+```php
+// In a template
+$project = Project::current();
+
+echo $project->title();
+echo $project->acf( 'tagline' );
+
+// Render cover image at a registered size
+$project->cover( function ( $media ) {
+    echo $media->src( 'project-cover' );
+    // Or a responsive <picture> element
+    echo $media->picture( [
+        '(max-width: 768px)' => 'project-cover-sm',
+        '(max-width: 1280px)' => 'project-cover-md',
+    ], 'project-cover' );
+} );
+
+// Resolve a related post ACF field
+$project->acf_post( 'related_case_study', function ( $post ) {
+    echo $post->title();
+    echo $post->link();
+} );
+```
+
+---
+
+### Custom Taxonomy
+
+```php
+// models/custom/ProjectCategory.php
+namespace Toolkit\models\custom;
+
+use Toolkit\models\Taxonomy;
+
+class ProjectCategory extends Taxonomy {
+    const TYPE = 'project_category';
+
+    public static function type_settings(): array {
+        return [
+            'label'        => __( 'Categories', 'your-theme' ),
+            'hierarchical' => true,
+            'post_types'   => [ Project::TYPE ],
+        ];
+    }
+}
+```
+
+```php
+// Get all categories
+$categories = ProjectCategory::all();
+
+// Get categories for the current post
+$project->terms( ProjectCategory::TYPE, function ( $terms ) {
+    foreach ( $terms as $term ) {
+        echo $term->title();
+    }
+} );
+```
+
+---
+
+### ACF Block
+
+```php
+// models/blocks/HeroBlock.php
+namespace Toolkit\models\blocks;
+
+use Toolkit\models\Block;
+
+class HeroBlock extends Block {
+    const TYPE = 'hero';
+
+    public static function settings(): array {
+        return [
+            'title'       => __( 'Hero', 'your-theme' ),
+            'description' => __( 'Full-width hero section.', 'your-theme' ),
+            'icon'        => 'cover-image',
+            'keywords'    => [ 'hero', 'banner' ],
+        ];
+    }
+
+    public function heading(): string {
+        return $this->acf( 'heading' ) ?? '';
+    }
+
+    public function background( callable $callback ) {
+        return $this->acf_media( 'background', $callback );
+    }
+}
+```
+
+```php
+// partials/blocks/hero.php
+/** @var \Toolkit\models\blocks\HeroBlock $block */
+?>
+<section class="hero">
+    <h1><?php echo esc_html( $block->heading() ); ?></h1>
+    <?php $block->background( fn( $img ) => print $img->picture( [
+        '(max-width: 768px)' => 'hero-sm',
+    ], 'hero-lg' ) ); ?>
+</section>
+```
+
+Register in `functions.php`:
+
+```php
+add_action( 'acf/init', function () {
+    \Toolkit\models\blocks\HeroBlock::register();
+} );
+```
+
+---
+
+### ACF Option Page
+
+```php
+// models/options/ThemeOptions.php
+namespace Toolkit\models\options;
+
+use Toolkit\models\OptionPage;
+
+class ThemeOptions extends OptionPage {
+    const SLUG = 'theme-options';
+
+    public static function settings(): array {
+        return [
+            'page_title' => __( 'Theme Options', 'your-theme' ),
+            'menu_title' => __( 'Theme Options', 'your-theme' ),
+            'capability' => 'manage_options',
+        ];
+    }
+
+    public static function phone(): string {
+        return static::acf( 'contact_phone' ) ?? '';
+    }
+
+    public static function logo( callable $callback ) {
+        $id = static::acf( 'logo' );
+        if ( $id ) {
+            $callback( new \Toolkit\models\Media( $id ) );
+        }
+    }
+}
+```
+
+```php
+// In a template
+echo ThemeOptions::phone();
+ThemeOptions::logo( fn( $img ) => print $img->src( 'logo' ) );
+```
+
+---
+
+### Image Sizes (WebP)
+
+Register sizes in your theme's `functions.php`. The toolkit will automatically generate WebP versions via a background cron queue on upload.
+
+```php
+use Toolkit\utils\Size;
+
+add_action( 'init', function () {
+    Size::add( 'hero-lg',     1920, 1080, true );
+    Size::add( 'hero-sm',      768,  432, true );
+    Size::add( 'project-cover', 800, 600, true );
+    Size::add( 'thumb',         400, 300, true );
+} );
+```
+
+Use in templates:
+
+```php
+// URL of the WebP image (falls back to original if not yet converted)
+echo Size::src( $attachment_id, 'hero-lg' )[0];
+```
+
+---
+
+### Assets (Vite)
+
+```php
+use Toolkit\utils\AssetService;
+
+// Register a Vite-managed bundle
+AssetService::register( 'theme', get_template_directory_uri() . '/dist' );
+
+// Conditionally enqueue on the front end
+add_action( 'wp_enqueue_scripts', function () {
+    AssetService::enqueue( 'theme', 'main' ); // loads main.css + main.js
+} );
+```
+
+---
+
+### Navigation Menus
+
+```php
+use Toolkit\utils\MenuService;
+
+// Declare menu locations and create them if they don't exist
+MenuService::register( [
+    'primary'   => __( 'Primary Navigation', 'your-theme' ),
+    'footer'    => __( 'Footer Navigation', 'your-theme' ),
+    'languages' => __( 'Language Switcher', 'your-theme' ),
+] );
+```
+
 ## Technical Documentation
 
 ### WordPress Requirements
