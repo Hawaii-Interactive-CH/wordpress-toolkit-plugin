@@ -11,6 +11,9 @@ class Size
     private $_image_sizes = [];
     private $_fly_dir = "";
 
+    const LOG_OPTION = 'fly_images_webp_log';
+    const LOG_MAX_ENTRIES = 500;
+
     /**
      * Get current instance.
      *
@@ -34,6 +37,15 @@ class Size
         add_action('wp_generate_attachment_metadata', array($this, 'queue_image_for_processing'), 10, 2);
         add_action('fly_images_process_queue', array($this, 'process_image_queue'));
         add_filter('cron_schedules', array($this, 'add_cron_interval'));
+        add_filter('wp_image_editors', function($editors) {
+            // Move GD before Imagick so WebP is supported
+            usort($editors, function($a, $b) {
+                if ($a === 'WP_Image_Editor_GD') return -1;
+                if ($b === 'WP_Image_Editor_GD') return 1;
+                return 0;
+            });
+            return $editors;
+        });
         
         if (!wp_next_scheduled('fly_images_process_queue')) {
             wp_schedule_event(time(), 'every_minute', 'fly_images_process_queue');
@@ -71,6 +83,18 @@ class Size
             $size,
             $crop
         );
+    }
+
+    /**
+     * Get the registered width in pixels for a given size name.
+     *
+     * @param string $size_name A size name registered via Size::add().
+     * @return int The width in pixels, or 0 if the size is not registered.
+     */
+    public static function width(string $size_name): int
+    {
+        $size = self::get_instance()->get_image_size($size_name);
+        return $size ? (int) $size['size'][0] : 0;
     }
 
     /**
@@ -185,32 +209,52 @@ class Size
         $attachment_ids = get_posts($args);
         
         if (empty($attachment_ids)) {
+            $this->add_webp_log('warning', 'Rebuild started but no image attachments found');
             return 0;
         }
         
+        $this->add_webp_log('info', 'Rebuild started: ' . count($attachment_ids) . ' total attachments found (force=' . ($force_rebuild ? 'yes' : 'no') . ')');
+        
         $queued_count = 0;
+        $skipped_no_metadata = 0;
+        $skipped_format = 0;
+        $skipped_already_queued = 0;
         $queue = get_option('fly_images_queue', []);
         
         foreach ($attachment_ids as $attachment_id) {
             $metadata = wp_get_attachment_metadata($attachment_id);
-            if (empty($metadata)) continue;
+            if (empty($metadata)) {
+                $skipped_no_metadata++;
+                $this->add_webp_log('warning', 'Skipped: no metadata', $attachment_id);
+                continue;
+            }
             
             $extension = strtolower(pathinfo($metadata['file'], PATHINFO_EXTENSION));
-            if (in_array($extension, ["svg", "avif", "heic", "heif"])) continue;
+            if (in_array($extension, ["svg", "avif", "heic", "heif"])) {
+                $skipped_format++;
+                $this->add_webp_log('info', "Skipped: unsupported format ($extension)", $attachment_id);
+                continue;
+            }
             
             // Delete existing fly images if force rebuild
             if ($force_rebuild) {
                 $this->delete_attachment_fly_images($attachment_id);
+                $this->add_webp_log('info', 'Force rebuild: deleted existing fly images', $attachment_id);
             }
             
             // Add to queue if not already present
             if (!in_array($attachment_id, $queue)) {
                 $queue[] = $attachment_id;
                 $queued_count++;
+                $this->add_webp_log('info', 'Queued for WebP conversion: ' . basename($metadata['file']), $attachment_id);
+            } else {
+                $skipped_already_queued++;
             }
         }
         
         update_option('fly_images_queue', $queue, false);
+        
+        $this->add_webp_log('info', "Rebuild summary: $queued_count queued, $skipped_no_metadata skipped (no metadata), $skipped_format skipped (unsupported format), $skipped_already_queued already in queue");
         
         return $queued_count;
     }
@@ -239,23 +283,68 @@ class Size
         return update_option('fly_images_queue', [], false);
     }
 
+    /**
+     * Add a log entry for WebP conversion tracking
+     */
+    private function add_webp_log($level, $message, $attachment_id = 0, $size_name = '')
+    {
+        $logs = get_option(self::LOG_OPTION, []);
+        $logs[] = [
+            'time' => current_time('mysql'),
+            'level' => $level, // 'success', 'error', 'warning', 'info'
+            'message' => $message,
+            'attachment_id' => $attachment_id,
+            'size_name' => $size_name,
+        ];
+
+        // Keep only the last N entries
+        if (count($logs) > self::LOG_MAX_ENTRIES) {
+            $logs = array_slice($logs, -self::LOG_MAX_ENTRIES);
+        }
+
+        update_option(self::LOG_OPTION, $logs, false);
+    }
+
+    /**
+     * Get WebP conversion logs
+     * 
+     * @return array
+     */
+    public function get_webp_logs()
+    {
+        return get_option(self::LOG_OPTION, []);
+    }
+
+    /**
+     * Clear WebP conversion logs
+     * 
+     * @return bool
+     */
+    public function clear_webp_logs()
+    {
+        return update_option(self::LOG_OPTION, [], false);
+    }
+
     private function generate_fly_images_for_attachment($attachment_id)
     {
         $metadata = wp_get_attachment_metadata($attachment_id);
         if (empty($metadata)) {
             error_log("Fly Images: No metadata for attachment $attachment_id");
+            $this->add_webp_log('error', 'No metadata found', $attachment_id);
             return;
         }
 
         $image_path = get_attached_file($attachment_id);
         if (!file_exists($image_path)) {
             error_log("Fly Images: File not found for attachment $attachment_id: $image_path");
+            $this->add_webp_log('error', 'Source file not found: ' . basename($image_path), $attachment_id);
             return;
         }
 
         $extension = pathinfo($image_path, PATHINFO_EXTENSION);
         if (in_array($extension, ["svg", "avif", "heic", "heif"])) {
             error_log("Fly Images: Skipping unsupported format for attachment $attachment_id: $extension");
+            $this->add_webp_log('info', "Skipped unsupported format: $extension", $attachment_id);
             return;
         }
 
@@ -267,6 +356,7 @@ class Size
 
         if (empty($this->_image_sizes)) {
             error_log("Fly Images: No image sizes registered for attachment $attachment_id");
+            $this->add_webp_log('error', 'No image sizes registered', $attachment_id);
             return;
         }
 
@@ -287,12 +377,14 @@ class Size
 
             if (file_exists($fly_webp_path)) {
                 error_log("Fly Images: WebP already exists for attachment $attachment_id size $size_name: " . basename($fly_webp_path));
+                $this->add_webp_log('info', 'WebP already exists: ' . basename($fly_webp_path), $attachment_id, $size_name);
                 continue;
             }
 
             $editor = wp_get_image_editor($image_path);
             if (is_wp_error($editor)) {
                 error_log("Fly Images: Error getting image editor for attachment $attachment_id: " . $editor->get_error_message());
+                $this->add_webp_log('error', 'Image editor error: ' . $editor->get_error_message(), $attachment_id, $size_name);
                 continue;
             }
 
@@ -300,6 +392,7 @@ class Size
             $resize_result = $editor->resize($width, $height, $crop);
             if (is_wp_error($resize_result)) {
                 error_log("Fly Images: Error resizing attachment $attachment_id to {$width}x{$height}: " . $resize_result->get_error_message());
+                $this->add_webp_log('error', "Resize error ({$width}x{$height}): " . $resize_result->get_error_message(), $attachment_id, $size_name);
                 continue;
             }
 
@@ -316,10 +409,23 @@ class Size
             // Essai WebP d'abord
             if (function_exists('imagewebp') && $editor->supports_mime_type('image/webp')) {
                 // Créer directement le WebP sans PNG temporaire
-                $editor->save($fly_webp_path, 'image/webp', ['quality' => $webp_quality]);
+                $save_result = $editor->save($fly_webp_path, 'image/webp', ['quality' => $webp_quality]);
+                if (is_wp_error($save_result)) {
+                    error_log("Fly Images: WebP save error for attachment $attachment_id size $size_name: " . $save_result->get_error_message());
+                    $this->add_webp_log('error', 'WebP save failed: ' . $save_result->get_error_message(), $attachment_id, $size_name);
+                } else {
+                    $file_size = file_exists($fly_webp_path) ? size_format(filesize($fly_webp_path)) : '?';
+                    $this->add_webp_log('success', "Converted to WebP ({$width}x{$height}, q{$webp_quality}, {$file_size}): " . basename($fly_webp_path), $attachment_id, $size_name);
+                }
             } else {
                 // Fallback PNG si WebP non supporté
-                $editor->save($fly_file_path);
+                $save_result = $editor->save($fly_file_path);
+                if (is_wp_error($save_result)) {
+                    error_log("Fly Images: Fallback save error for attachment $attachment_id size $size_name: " . $save_result->get_error_message());
+                    $this->add_webp_log('error', 'Fallback save failed: ' . $save_result->get_error_message(), $attachment_id, $size_name);
+                } else {
+                    $this->add_webp_log('warning', "WebP not supported, saved as fallback: " . basename($fly_file_path), $attachment_id, $size_name);
+                }
             }
         }
     }

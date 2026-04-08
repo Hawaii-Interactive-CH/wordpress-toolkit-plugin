@@ -645,4 +645,54 @@ class MainService
         </div>
 <?php
     }
+
+    /**
+     * Customize the wp-login.php page.
+     *
+     * @param array $options {
+     *   @type string $logo          URL of the logo image to replace the WordPress logo.
+     *   @type string $background    CSS background color of the login page (e.g. '#f0f0f0').
+     *   @type string $button_color  CSS color for the submit button background and border.
+     *   @type string $button_hover  CSS color for the submit button on hover/focus (defaults to $button_color).
+     * }
+     *
+     * Example:
+     *   MainService::customize_login([
+     *       'logo'         => get_template_directory_uri() . '/assets/images/logo.svg',
+     *       'background'   => '#f5f5f5',
+     *       'button_color' => '#e63946',
+     *       'button_hover' => '#c1121f',
+     *   ]);
+     */
+    public static function customize_login(array $options = []): void
+    {
+        add_action('login_head', function () use ($options): void {
+            $css = '';
+
+            if (!empty($options['logo'])) {
+                $logo = esc_url($options['logo']);
+                $css .= ".login h1 a { background-image: url('{$logo}') !important; background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%; }";
+            }
+
+            if (!empty($options['background'])) {
+                $bg   = esc_attr($options['background']);
+                $css .= "body.login { background-color: {$bg}; }";
+            }
+
+            if (!empty($options['button_color'])) {
+                $color = esc_attr($options['button_color']);
+                $hover = esc_attr($options['button_hover'] ?? $options['button_color']);
+                $css .= "body.login .button-primary, #wp-submit { background: {$color}; border-color: {$color}; box-shadow: none; }";
+                $css .= "body.login .button-primary:hover, body.login .button-primary:focus, #wp-submit:hover, #wp-submit:focus { background: {$hover}; border-color: {$hover}; box-shadow: none; }";
+            }
+
+            if ($css) {
+                echo '<style>' . $css . '</style>';
+            }
+        });
+
+        if (!empty($options['logo'])) {
+            add_filter('login_headerurl', fn() => home_url('/'));
+        }
+    }
 }
