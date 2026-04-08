@@ -21,6 +21,17 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 
 == Changelog ==
 
+= 2.1.6 =
+- Add calendar CPT handling
+- Add WPML support for calendar events and upcoming period sorting
+- Add ACF helper functions for blocks
+
+= 2.1.5 =
+- Remove logs
+- Update for toolkit version 2.1
+- Update ACF JSON configuration and modified timestamp
+- Remove FASL theme setting from SettingsManager and settings page
+
 = 2.1.4 =
 - Feat: Add add_columns() helper to CustomPostType for admin list columns with sorting support
 - Feat: Add remove_columns() helper to CustomPostType to hide admin list columns
