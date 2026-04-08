@@ -68,7 +68,11 @@ This plugin includes the following third-party libraries:
 
 == Screenshots ==
 
-1. No admin UI screenshots currently available. This is a developer toolkit plugin.
+1. Documentation viewer — browse Markdown docs from the plugin's `/docs` folder, organized by section with collapsible categories.
+2. Toolkit dashboard — theme details, maintenance mode toggle, cookie consent, Google Calendar, and file upload size settings.
+3. Hide menu items — clean up the WordPress admin sidebar for clients by toggling off unused menu entries.
+4. Model manager — enable/disable registered custom post types and scaffold new CPT model files directly from the admin.
+5. API Authentication — generate an encryption key, create a master token, manage transient token expiry, and configure IP whitelisting.
 
 == Changelog ==
 
