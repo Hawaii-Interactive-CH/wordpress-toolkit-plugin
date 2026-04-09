@@ -1,4 +1,4 @@
-=== WP Theme Toolkit ===
+=== Theme Toolkit ===
 Contributors: Hawaii Interactive
 Tags: toolkit, theme, custom post type, acf, developer
 Requires at least: 6.8
@@ -12,7 +12,7 @@ A developer toolkit for WordPress themes — ACF blocks, custom post types, taxo
 
 == Description ==
 
-WP Theme Toolkit gives developers a structured foundation for building robust, maintainable WordPress themes. Rather than reinventing common patterns on every project, WP Theme Toolkit provides a consistent architecture out of the box.
+Theme Toolkit gives developers a structured foundation for building robust, maintainable WordPress themes. Rather than reinventing common patterns on every project, WP Theme Toolkit provides a consistent architecture out of the box.
 
 **Features:**
 
@@ -46,7 +46,7 @@ Some features (block registration, option pages) require Advanced Custom Fields 
 
 = Does this plugin work without a custom theme? =
 
-WP Theme Toolkit is designed to complement a custom theme. It will activate on any theme but most features are only useful when your theme extends the provided base models.
+Theme Toolkit is designed to complement a custom theme. It will activate on any theme but most features are only useful when your theme extends the provided base models.
 
 = Is WooCommerce support enabled by default? =
 

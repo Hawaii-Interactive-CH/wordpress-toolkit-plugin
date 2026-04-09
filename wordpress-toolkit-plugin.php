@@ -3,12 +3,12 @@
 /**
  * Toolkit Plugin.
  *
- * @package   WP Theme Toolkit
+ * @package   Theme Toolkit
  * @copyright Copyright (C) 2024-2026, Hawaii Interactive - hello@hawaii.do
  * @license   http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (GPL-2.0)
  *
  * @wordpress-plugin
- * Plugin Name: WP Theme Toolkit
+ * Plugin Name: Theme Toolkit
  * Description: A developer toolkit for building WordPress themes — provides base models, ACF block registration, custom post types, taxonomies, REST API helpers, and utility services.
  * Plugin URI: https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin
  * Version: 3.0.0
