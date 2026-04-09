@@ -1,25 +1,102 @@
-=== Wordpress Toolkit Plugin ===
+=== WP Theme Toolkit ===
 Contributors: Hawaii Interactive
-Tags: toolkit
-Requires at least: 5.0
-Tested up to: 6.4.3
+Tags: toolkit, theme, custom post type, gutenberg, acf, blocks, developer
+Requires at least: 6.8
+Tested up to: 6.8
 Requires PHP: 8.0
-License: GPL v2 or later
+Stable tag: 3.0.0
+License: GPLv3
+License URI: https://www.gnu.org/licenses/gpl-3.0.html#license-text
 
-Wordpress Toolkit est un plugin qui fournit des fonctions utiles pour le développement de thèmes Wordpress.
+A developer toolkit for building WordPress themes — base models, ACF block registration, custom post types, taxonomies, REST API helpers, and utility services.
 
 == Description ==
-Ce plugin permet de charger les fonctionnalités de base du thème.
 
-- Activation du mode maintenance
-- Creation de custom post type (CPT) et activation/désactivation de ceux-ci
-- Creation de block gutenberg et activation/désactivation de ceux-ci
-- Gestion des menus wordpress
+WP Theme Toolkit gives developers a structured foundation for building robust, maintainable WordPress themes. Rather than reinventing common patterns on every project, WP Theme Toolkit provides a consistent architecture out of the box.
+
+**Features:**
+
+* Abstract base models for posts, pages, media, galleries, and custom post types
+* ACF-powered block and option page registration
+* Custom post type and taxonomy scaffolding
+* REST API routing with token-based authentication
+* Utility services: asset loading (Vite), menus, navigation, image resizing (WebP), cookie consent
+* Google Calendar integration with admin dashboard, configurable sync settings (API key, Calendar ID, interval, date range, max events), and live connection testing
+* WordPress CPT-to-calendar mapping: link any public custom post type with an ACF date field (including dates inside repeaters) to calendar events
+* WooCommerce optional support
+* Maintenance mode view
+* Gravity Forms integration helpers
+* WPML compatibility helpers
+
+This plugin is designed to work alongside a custom theme, not replace it. It is intended for developers building bespoke WordPress themes.
+
+To start a new project, use the official boilerplate: [wordpress-toolkit-boilerplate](https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-boilerplate)
 
 == Installation ==
-Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li/wordpress-toolkit-plugin) en tant que zip et l'installer via l'administration de Wordpress.
+
+1. Upload the `wp-theme-toolkit` folder to the `/wp-content/plugins/` directory, or install the plugin through the WordPress plugin screen directly.
+2. Activate the plugin through the **Plugins** screen in WordPress.
+3. The toolkit registers its services automatically on `init`. Configure your theme to extend the base models and register your blocks, CPTs, and taxonomies.
+
+== Frequently Asked Questions ==
+
+= Does this plugin work without ACF? =
+
+Some features (block registration, option pages) require Advanced Custom Fields (ACF) or ACF Pro. The plugin will not throw fatal errors if ACF is absent, but those features will be unavailable.
+
+= Does this plugin work without a custom theme? =
+
+WP Theme Toolkit is designed to complement a custom theme. It will activate on any theme but most features are only useful when your theme extends the provided base models.
+
+= Is WooCommerce support enabled by default? =
+
+No. WooCommerce support is disabled by default and can be enabled via the plugin configuration file.
+
+== External Services ==
+
+This plugin may connect to the following external services depending on your configuration:
+
+* **Google Calendar API** — used by `GoogleCalendarSource` to fetch calendar events. This connection is only made when the Google Calendar integration is configured and active. See [Google's Privacy Policy](https://policies.google.com/privacy).
+* **Highlight.js (cdnjs.cloudflare.com)** — used in the admin Docs page to syntax-highlight code blocks. Loaded from `https://cdnjs.cloudflare.com` only when the Docs admin page is visited. See [Cloudflare's Privacy Policy](https://www.cloudflare.com/privacypolicy/).
+
+No data is sent to any external service by default. External connections are opt-in and initiated by your theme code.
+
+== Third-Party Libraries ==
+
+This plugin includes the following third-party libraries:
+
+* **Parsedown** and **ParsedownExtra** — Markdown parser by Emanuil Rusev. Licensed under the MIT License. [Source](https://github.com/erusev/parsedown).
+
+== Screenshots ==
+
+1. Documentation viewer — browse Markdown docs from the plugin's `/docs` folder, organized by section with collapsible categories.
+2. Toolkit dashboard — theme details, maintenance mode toggle, cookie consent, Google Calendar, and file upload size settings.
+3. Hide menu items — clean up the WordPress admin sidebar for clients by toggling off unused menu entries.
+4. Model manager — enable/disable registered custom post types and scaffold new CPT model files directly from the admin.
+5. API Authentication — generate an encryption key, create a master token, manage transient token expiry, and configure IP whitelisting.
+6. WebP optimization — test results showing files created and space saved, with a bulk rebuild tool that queues all images for background cron processing.
+7. Link WordPress Events — map any public custom post type and its ACF date field (including repeater sub-fields) to calendar events, with a count of all available fields.
+8. Calendar dashboard — at-a-glance status of Google Calendar and WordPress Events sync, published event count, last sync time, and quick-action buttons.
+9. Calendar Settings — Google Calendar configuration: API key, Calendar ID, sync interval, maximum events, and past/future date-range offsets.
 
 == Changelog ==
+
+= 3.0.0 =
+* Security: Encryption key is now stored in wp_options — no longer writes to wp-config.php
+* Security: Fixed bug where get_encryption_key() returned a boolean instead of the actual key value
+* Security: All inline &lt;script&gt; and &lt;style&gt; tags replaced with wp_add_inline_script() and wp_add_inline_style()
+* Security: Nonce protection added across admin form submissions
+* Security: Improved data sanitization and output escaping throughout
+* Security: Removed third-party update checker
+* Feat: Block model — new ACF helpers: acf_media(), acf_file(), acf_post(), acf_page(), acf_publication()
+* Compatibility: Full WordPress coding standards compliance across all models, controllers, and services
+* Compatibility: Removed unused vendor/jb-fly library
+* Compatibility: Added if(!defined()) guards for all plugin constants
+* Compatibility: Plugin name and text domain unified to wp-theme-toolkit
+* Compatibility: Disclosed Highlight.js external CDN usage in readme.txt
+* Docs: English translation of internal documentation and file names
+* Docs: GPL license file added
+* Docs: Code conventions documented
 
 = 2.1.6 =
 - Add calendar CPT handling
@@ -27,176 +104,108 @@ Télécharger le plugin [wordpress-toolkit-plugin](https://git.hawai.li/hawai-li
 - Add ACF helper functions for blocks
 
 = 2.1.5 =
-- Remove logs
-- Update for toolkit version 2.1
-- Update ACF JSON configuration and modified timestamp
-- Remove FASL theme setting from SettingsManager and settings page
+* Security: Added nonce protection
+* Security: Improved data sanitization
 
 = 2.1.4 =
-- Feat: Add add_columns() helper to CustomPostType for admin list columns with sorting support
-- Feat: Add remove_columns() helper to CustomPostType to hide admin list columns
-- Feat: Add MainService::customize_login() to customize wp-login.php logo, background and button color
+* Feat: Add `add_columns()` helper to CustomPostType for admin list columns with sorting support
+* Feat: Add `remove_columns()` helper to CustomPostType to hide admin list columns
+* Feat: Add `MainService::customize_login()` to customize wp-login.php logo, background and button color
 
 = 2.1.3 =
-- Better WebP conversion
+* Fix: Better WebP conversion
 
 = 2.0.0 =
-- Feat: Add Google calendar integration
-- Feat: Convert png to webp using wp cron
+* Feat: Add Google Calendar integration
+* Feat: Convert PNG to WebP using WP cron
 
 = 1.9.2 =
-- Fix: Remove duplicate cookie register by default
+* Fix: Remove duplicate cookie register by default
 
 = 1.9.1 =
-- Fix: Correct asset paths for fonts
+* Fix: Correct asset paths for fonts
 
 = 1.9.0 =
-- Feat: Rewrite assets loading to use vite
+* Feat: Rewrite assets loading to use Vite
 
 = 1.8.4 =
-- Fix: Block css @elenagoto
+* Fix: Block CSS
 
 = 1.8.3 =
-- Fix: Typo in import
+* Fix: Typo in import
 
 = 1.8.2 =
-- Fix: Corretly load block themes in editor
+* Fix: Correctly load block themes in editor
 
 = 1.8.1 =
-- Exclude "svg", "avif", "heic", "heif" from image resize
+* Fix: Exclude SVG, AVIF, HEIC, HEIF from image resize
 
 = 1.8.0 =
-- Add support of wp-i18n in js script
+* Feat: Add support for wp-i18n in JS scripts
 
 = 1.7.3 =
-- Fix cpt creation
+* Fix: CPT creation
 
 = 1.7.2 =
-- Fix url assets path for block.css
+* Fix: Asset URL path for block.css
 
 = 1.7.1 =
-- Add blocks.css to see custom block style in admin
+* Fix: Add blocks.css to display custom block styles in admin
 
 = 1.7.0 =
-- Add category to media files
+* Feat: Add category support for media files
 
 = 1.6.6 =
-- Remove default custom CPT to keep only the one defined in the theme
+* Fix: Remove default custom CPT, keep only those defined in the theme
 
 = 1.6.5 =
-- Fix typo
-
-= 1.6.4 =
-- Change privacy to make plugin public on github
+* Fix: Typo
 
 = 1.6.3 =
-- Fix svg size processing
-
-= 1.6.2 =
-- Fix svg size processing
-
-= 1.6.1 =
-- Fix svg size processing
-- Remove deprectaed null log
+* Fix: SVG size processing
 
 = 1.6.0 =
-- Feat Add webp support for image upload
-- Feat Add menu service to manage menus programmatically
+* Feat: Add WebP support for image upload
+* Feat: Add menu service to manage menus programmatically
 
 = 1.5.1 =
-- Fix get template
+* Fix: Get template
 
 = 1.5.0 =
-- Feat Add authAPI
+* Feat: Add REST API authentication
 
 = 1.4.1 =
-- Fix GFroms notifications builder
+* Fix: Gravity Forms notifications builder
 
 = 1.4.0 =
-- Feat  Allow max upload size update from admin
+* Feat: Allow max upload size update from admin
 
 = 1.3.5 =
-- Update GForms fields, added select, radio, checkbox format
-
-= 1.3.4 =
-- Update GForms api url
-
-= 1.3.2 =
-- Update Gforms api key register
+* Update: Gravity Forms fields — added select, radio, checkbox format
 
 = 1.3.0 =
-- Update cookie consent banner message
+* Update: Cookie consent banner message
 
 = 1.2.10 =
-- Fix missing class import check && return value of jsonSerialize
-
-= 1.2.9 =
-- Update GForms: allow null value for forms selection
-
-= 1.2.8 =
-- Enable title tag support
-
-= 1.2.7 =
-- Update GForms class & fix register class
-
-= 1.2.6 =
-- Rename script avoid conflict with other plugin
-
-= 1.2.5 =
-- Fix block acf fields if not installed
-
-= 1.2.4 =
-- Fix block generator title format
-
-= 1.2.3 =
-- Fix conflict
-
-= 1.2.2 =
-- Fix conflict
-
-= 1.2.1 =
-- Fix archive templates rendering
+* Fix: Missing class import check and return value of jsonSerialize
 
 = 1.2.0 =
-- Add Cookie Consent & banner
+* Feat: Add cookie consent banner
 
 = 1.1.0 =
-- Event model update
-- Default ACF fields for event model
-
-= 1.0.8 =
-- Feat: Update plugin update checker to 5.4
-
-= 1.0.7 =
-- Fix: Gallery model instance musnt be AbstractModel
+* Feat: Event model update with default ACF fields
 
 = 1.0.6 =
-- Add local documentation genrated from local markdown files inside docs folder
-- Better local vite detectection, avoid to use vite in production && staging environment
-- Fix typo on custom post type generator file name
-
-= 1.0.5 =
-- Update vite assets compilation to match staging and production environment
-- New way to load fonts from static folder
-
-= 1.0.4 =
-- Dev host update to 0.0.0.0
-
-= 1.0.3 =
-- Test with Wordpress 6.4.3
-- Ajout du generateur de categorie et de block
-
-= 1.0.2 =
-- Update API key for plugin-update-checker
-- Better readme.txt
-
-= 1.0.1 =
-- Fixed some bugs about namespace.
+* Feat: Add local documentation generated from local markdown files
+* Fix: Better local Vite detection, avoid using Vite in production and staging environments
 
 = 1.0.0 =
-- Initial release.
+* Initial release
 
 == Upgrade Notice ==
-Le plugin integere un système de mise à jour basé sur [plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) et est lié au dépôt git du plugin sur https://git.hawai.li/hawai-li/wordpress-toolkit-plugin.
 
-Pour mettre à jour le plugin, il faut changer la version `readme.txt` et `wordpress-toolkit-plugin.php` et pousser les changements sur le dépôt git. Le plugin detectera automatiquement les mis à jour sur les sites utilisant le plugin et proposera la mise à jour.
+= 3.0.0 =
+Major release. Full WordPress coding standards compliance, security overhaul (encryption key no longer modifies wp-config.php), and new ACF helpers for the Block model. Review your theme's Block subclasses after upgrading.
+
+= 2.1.5 =
+Security improvements: nonce protection and data sanitization added. Update recommended for all users.

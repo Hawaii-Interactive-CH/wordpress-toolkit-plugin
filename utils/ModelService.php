@@ -20,7 +20,7 @@ class ModelService
         add_action("admin_menu", function () {
             // Add a submenu for settings
             add_submenu_page(
-                "toolkit", // Parent menu slug
+                "wp-theme-toolkit", // Parent menu slug
                 "Models", // Page title
                 "Models", // Menu title
                 "edit_theme_options",
@@ -69,12 +69,27 @@ class ModelService
 
         $options = get_option("toolkit_enabled_models", []);
 
-        if (isset($_POST["submit"])) {
+        $post_data = wp_unslash($_POST);
+        if (isset($post_data["submit"])) {
+            if (!current_user_can("edit_theme_options")) {
+                wp_die(
+                    esc_html__(
+                        "You are not allowed to update model settings.",
+                        "wp-theme-toolkit",
+                    ),
+                );
+            }
+
+            check_admin_referer(
+                "toolkit_model_settings_save",
+                "toolkit_model_settings_nonce",
+            );
+
             // Process form submission
             $options = [];
             foreach ($models as $model) {
                 $model_key = basename($model, ".php");
-                $options[$model_key] = isset($_POST[$model_key]) ? 1 : 0;
+                $options[$model_key] = isset($post_data[$model_key]) ? 1 : 0;
             }
             update_option("toolkit_enabled_models", $options);
         }
@@ -84,9 +99,13 @@ class ModelService
             <h2>Model Settings</h2>
             <p><?= __(
                 "Check the boxes below to enable the corresponding post type.",
-                "toolkit",
+                "wp-theme-toolkit",
             ) ?></p>
             <form method="post">
+                <?php wp_nonce_field(
+                    "toolkit_model_settings_save",
+                    "toolkit_model_settings_nonce",
+                ); ?>
                 <?php foreach ($models as $model):
                     $model_key = basename($model, ".php"); ?>
                     <label>

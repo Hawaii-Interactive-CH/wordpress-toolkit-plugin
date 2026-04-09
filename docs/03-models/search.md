@@ -2,6 +2,6 @@
 
 ## Introduction
 
-Le model `Search` est un modèle de base pour les recherches. Il est utilisé pour recuperer des informations sur une recherche.
+The `Search` model is a base model for search results. It is used to retrieve information about a search query.
 
-Il est nécessaire d'ajouter dans la constante `TYPE` le type de recherche que l'on veut effectuer. (ex: `Post::TYPE`, `Page::TYPE`)
+You must set the `TYPE` constant to the post type you want to search (e.g. `Post::TYPE`, `Page::TYPE`).

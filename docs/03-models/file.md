@@ -1,19 +1,19 @@
-# Fichier
+# File
 
 ## Introduction
 
-Le model `File` est un modèle de base pour les fichiers. Il est utilisé pour recuperer des informations sur un fichier.
+The `File` model is a base model for file attachments. It is used to retrieve information about a file.
 
-## Utilisation
+## Usage
 
 ### url()
 
-Avoir l'url du fichier.
+Get the file URL.
 
 ```php
 <?php
 
-namspace Toolkit;
+namespace Toolkit;
 
 use Toolkit\models\File;
 

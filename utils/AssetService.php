@@ -392,17 +392,21 @@ class AssetService
      */
     private static function output_vite_dev()
     {
+        $vite_dev_server = untrailingslashit(self::$viteDevServer);
+        $refresh_runtime = $vite_dev_server . "/@react-refresh";
+        $vite_client = $vite_dev_server . "/@vite/client";
+        $vite_entry = $vite_dev_server . "/src/javascript/app.js";
         ?>
         <!-- Toolkit Vite Dev Server -->
         <script type="module">
-            import RefreshRuntime from '<?php echo self::$viteDevServer; ?>/@react-refresh';
+            import RefreshRuntime from <?php echo wp_json_encode($refresh_runtime); ?>;
             RefreshRuntime.injectIntoGlobalHook(window);
             window.$RefreshReg$ = () => {};
             window.$RefreshSig$ = () => (type) => type;
             window.__vite_plugin_react_preamble_installed__ = true;
         </script>
-        <script type="module" src="<?php echo self::$viteDevServer; ?>/@vite/client"></script>
-        <script type="module" src="<?php echo self::$viteDevServer; ?>/src/javascript/app.js"></script>
+        <script type="module" src="<?php echo esc_url($vite_client); ?>"></script>
+        <script type="module" src="<?php echo esc_url($vite_entry); ?>"></script>
         <!-- End Toolkit Vite Dev Server -->
         <?php
     }
@@ -445,9 +449,8 @@ class AssetService
 
         // Add configuration for JavaScript
         echo "<script>window.toolkitConfig = " .
-            json_encode([
+            wp_json_encode([
                 "ajaxUrl" => admin_url("admin-ajax.php"),
-                "nonce" => wp_create_nonce("toolkit-nonce"),
                 "debug" => defined("WP_DEBUG") && WP_DEBUG,
             ]) .
             ";</script>" .

@@ -2,11 +2,11 @@
 
 ## Introduction
 
-Le model `Page` est un modèle de base pour les pages. Il est utilisé pour recuperer des informations sur une page.
+The `Page` model is a base model for pages. It is used to retrieve information about a page.
 
-En général, il est utilisé pour les pages statiques en y ajoutant des constantes avec les ID des pages.
+It is generally used for static pages by adding constants with the page IDs.
 
-Le fichier se trouve dans le thème dans le dossier `models`.
+The file is located in the theme's `models` folder.
 
 ```php
 const HOME = 1;
@@ -14,7 +14,7 @@ const ABOUT = 2;
 const CONTACT = 3;
 ```
 
-Il suffit de faire un use du model `Page` pour avoir accès à ces constantes.
+Simply use the `Page` model to access these constants.
 
 ```php
 <?php

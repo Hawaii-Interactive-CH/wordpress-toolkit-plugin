@@ -33,12 +33,40 @@ $app_name = sanitize_title(get_bloginfo('name'));
         'callback' => array($authController, 'generate_transient_token'),
     ));
 
+    $sanitize_int = function ($value) {
+        return absint($value);
+    };
+    $validate_positive_int = function ($value) {
+        return is_numeric($value) && (int) $value >= 1;
+    };
+    $sanitize_datetime = function ($value) {
+        return sanitize_text_field(wp_unslash((string) $value));
+    };
+    $validate_datetime = function ($value) {
+        $sanitized = sanitize_text_field(wp_unslash((string) $value));
+        return false !== strtotime($sanitized);
+    };
+
     // Calendar routes
     // GET /wp-json/toolkit/v1/events
     register_rest_route($toolkit_namespace, '/events', array(
         'methods' => 'GET',
         'permission_callback' => array($toolkitController, 'permission_callback'),
         'callback' => array($toolkitController, 'get_events'),
+        'args' => array(
+            'per_page' => array(
+                'sanitize_callback' => $sanitize_int,
+                'validate_callback' => $validate_positive_int,
+            ),
+            'start_date' => array(
+                'sanitize_callback' => $sanitize_datetime,
+                'validate_callback' => $validate_datetime,
+            ),
+            'end_date' => array(
+                'sanitize_callback' => $sanitize_datetime,
+                'validate_callback' => $validate_datetime,
+            ),
+        ),
     ));
 
     // GET /wp-json/toolkit/v1/events/upcoming
@@ -46,6 +74,12 @@ $app_name = sanitize_title(get_bloginfo('name'));
         'methods' => 'GET',
         'permission_callback' => array($toolkitController, 'permission_callback'),
         'callback' => array($toolkitController, 'get_upcoming'),
+        'args' => array(
+            'limit' => array(
+                'sanitize_callback' => $sanitize_int,
+                'validate_callback' => $validate_positive_int,
+            ),
+        ),
     ));
 
     // GET /wp-json/toolkit/v1/events/upcoming-period
@@ -60,5 +94,11 @@ $app_name = sanitize_title(get_bloginfo('name'));
         'methods' => 'GET',
         'permission_callback' => array($toolkitController, 'permission_callback'),
         'callback' => array($toolkitController, 'get_event'),
+        'args' => array(
+            'id' => array(
+                'sanitize_callback' => $sanitize_int,
+                'validate_callback' => $validate_positive_int,
+            ),
+        ),
     ));
  });

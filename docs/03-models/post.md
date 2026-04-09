@@ -2,15 +2,15 @@
 
 ## Introduction
 
-Le model `Post` est un modèle de base pour les articles. Il est utilisé pour recuperer des informations sur un article.
+The `Post` model is a base model for blog posts. It is used to retrieve information about a post.
 
-Il a la même structure que le model `Page` mais avec des méthodes spécifiques pour les articles.
+It has the same structure as the `Page` model but with methods specific to posts.
 
-## Utilisation
+## Usage
 
 ### categories()
 
-Pour avoir les catégories de l'article il suffit d'utiliser la méthode `categories()`.
+To get the post's categories, use the `categories()` method.
 
 ```php
 <?php
@@ -31,7 +31,7 @@ $model = new Post(<post_id>);
 
 ### categories_name()
 
-Pour avoir les noms des catégories de l'article séparé par une `,` il suffit d'utiliser la méthode `categories_name()`.
+To get the post's category names separated by `,`, use the `categories_name()` method.
 
 ```php
 <?php
@@ -49,7 +49,7 @@ $model = new Post(<post_id>);
 
 ### tags()
 
-Pour avoir les tags de l'article il suffit d'utiliser la méthode `tags()`.
+To get the post's tags, use the `tags()` method.
 
 ```php
 <?php
@@ -71,7 +71,7 @@ $model = new Post(<post_id>);
 
 ### tags_name()
 
-Pour avoir les noms des tags séparé par une `,` de l'article il suffit d'utiliser la méthode `tags_name()`.
+To get the post's tag names separated by `,`, use the `tags_name()` method.
 
 ```php
 <?php

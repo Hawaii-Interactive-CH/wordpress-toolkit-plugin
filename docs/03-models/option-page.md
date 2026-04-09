@@ -1,21 +1,21 @@
-# Page à Option
+# Option Page
 
 ## Introduction
 
-Le model `OptionPage` est un modèle de base pour les pages d'options. Il est utilisé pour recuperer des informations sur une page d'options. En regle générale, il est utilisé pour les pages d'options de thèmes.
+The `OptionPage` model is a base model for options pages. It is used to retrieve information from an options page. It is typically used for theme options pages.
 
-Ce type de page nécessite l'extension ACF Pro et doit linké dans l'administration de WordPress `ACF > Ajouter > Paramètres > Clicker sur Règle et choisir "option page" > Séléctionner la page à option`.
+This type of page requires the ACF Pro extension and must be linked in the WordPress admin under `ACF > Add > Settings > Click on Rule and choose "option page" > Select the option page`.
 
-## Utilisation
+## Usage
 
 ### acf()
 
-Pour avoir les informations de la page d'options il suffit d'utiliser la méthode `acf()`.
+To retrieve information from the options page, use the `acf()` method.
 
 ```php
 <?php
 
-namspace Toolkit;
+namespace Toolkit;
 
 use Toolkit\models\Config;
 
@@ -26,12 +26,12 @@ use Toolkit\models\Config;
 
 ### have_rows()
 
-Retourne `true` si il y a des lignes dans le repeater avec le nom `<field_name>` comme clé.
+Returns `true` if there are rows in the repeater with `<field_name>` as the key.
 
 ```php
 <?php
 
-namspace Toolkit;
+namespace Toolkit;
 
 use Toolkit\models\Config;
 

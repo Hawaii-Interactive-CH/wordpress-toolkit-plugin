@@ -1,24 +1,24 @@
-# Galerie de photos
+# Photo Gallery
 
 ## Introduction
 
-Le model `Gallery` est un modèle de base pour les galeries de photos. Il est utilisé pour recuperer des informations sur une galerie de photos.
+The `Gallery` model is a base model for photo galleries. It is used to retrieve information about a photo gallery.
 
-## Utilisation
+## Usage
 
 ### pictures()
 
-Pour avoir les photos de la galerie il suffit d'utiliser la méthode `pictures()`.
+To get the gallery photos, use the `pictures()` method.
 
 ```php
 <?php
 
-namspace Toolkit;
+namespace Toolkit;
 
 use Toolkit\models\Gallery;
 use Toolkit\models\Media;
 
-// Ids des photos (un tableau de ids acf fonctionne aussi)
+// Image IDs (an array of ACF IDs also works)
 $images_ids = [1, 2, 3];
 
 $gallery = new Gallery($images_ids);

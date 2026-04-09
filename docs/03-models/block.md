@@ -1,10 +1,10 @@
 # Custom Block
 
-## Créer un Custom Block
+## Creating a Custom Block
 
-Pour créer un `Block`, il suffit d'ajouter un fichier dans le dossier `models/custom` du thème et de créer son partial dans le dossier `partials/blocks` avec le même nom que le `TYPE`.
+To create a `Block`, add a file in the theme's `models/custom` folder and create its partial in the `partials/blocks` folder with the same name as the `TYPE`.
 
-Il est possible d'en générer un via l'onglet `Toolkit > models` et click sur le tab `Block` dans l'administration de WordPress ou en copiant et modifiant le code suivant:
+You can generate one via the `Toolkit > Models` tab in the WordPress admin by clicking the `Block` tab, or by copying and modifying the following code:
 
 ```php
 <?php
@@ -34,6 +34,6 @@ class BlockDemo extends Block
 }
 ```
 
-## Utilisation
+## Usage
 
-Les `Blocks` sont des éléments de contenu qui peuvent être ajoutés dans les `Posts` et les `Pages` depuis l'éditeur de WordPress. Ils aggissent comme des `Gutenberg Blocks` et peuvent être ajoutés, modifiés et supprimés dans le contenu du `Post` ou de la `Page`.
+`Blocks` are content elements that can be added to `Posts` and `Pages` from the WordPress editor. They behave like `Gutenberg Blocks` and can be added, edited, and removed from the `Post` or `Page` content.
