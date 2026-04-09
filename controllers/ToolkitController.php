@@ -64,15 +64,24 @@ class ToolkitController {
 				$query->the_post();
 				$post_id = get_the_ID();
 
+				$source_post_id   = get_post_meta( $post_id, '_wp_event_source_post_id', true );
+				$source_post_type = get_post_meta( $post_id, '_wp_event_source_post_type', true );
+
 				$events[] = [
-					'id'                    => $post_id,
-					'title'                 => get_the_title(),
-					'content'               => get_the_content(),
-					'excerpt'               => get_the_excerpt(),
-					'start_date'            => get_post_meta( $post_id, '_event_start_date', true ),
-					'end_date'              => get_post_meta( $post_id, '_event_end_date', true ),
-					'location'              => get_post_meta( $post_id, '_event_location', true ),
-					'is_all_day'            => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
+					'id'                   => $post_id,
+					'title'                => get_the_title(),
+					'content'              => get_the_content(),
+					'excerpt'              => get_the_excerpt(),
+					'start_date'           => get_post_meta( $post_id, '_event_start_date', true ),
+					'end_date'             => get_post_meta( $post_id, '_event_end_date', true ),
+					'location'             => get_post_meta( $post_id, '_event_location', true ),
+					'is_all_day'           => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
+					'google_event_id'      => get_post_meta( $post_id, '_google_event_id', true ),
+					'google_calendar_link' => get_post_meta( $post_id, '_google_calendar_link', true ),
+					'last_synced'          => get_post_meta( $post_id, '_last_synced', true ),
+					'source_post_id'       => $source_post_id ?: null,
+					'source_post_type'     => $source_post_type ?: null,
+					'source_link'          => $source_post_id ? get_permalink( $source_post_id ) : null,
 				];
 			}
 			wp_reset_postdata();
@@ -82,6 +91,93 @@ class ToolkitController {
 			'success' => true,
 			'data'    => $events,
 			'total'   => $query->found_posts,
+		], 200 );
+	}
+
+	/**
+	 * Get upcoming events with a period before today
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_upcoming_with_period( WP_REST_Request $request ) {
+		$limit  = intval( $request->get_param( 'limit' ) );
+		$limit  = $limit !== 0 ? $limit : 10;
+		$before = intval( $request->get_param( 'before' ) );
+		$before = $before >= 0 ? $before : 0;
+		$lang   = sanitize_text_field( $request->get_param( 'lang' ) ?: 'fr' );
+
+		$now        = current_time( 'mysql' );
+		$start_date = date( 'Y-m-d H:i:s', strtotime( "-{$before} days", strtotime( $now ) ) );
+
+		$args = [
+			'post_type'        => 'calendar_event',
+			'post_status'      => 'publish',
+			'posts_per_page'   => $limit,
+			'orderby'          => 'meta_value',
+			'meta_key'         => '_event_start_date',
+			'order'            => 'ASC',
+			'meta_query'       => [
+				[
+					'key'     => '_event_start_date',
+					'value'   => $start_date,
+					'compare' => '>=',
+					'type'    => 'DATETIME',
+				],
+			],
+			'suppress_filters' => false,
+		];
+
+		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
+			$args['lang'] = $lang;
+		}
+
+		$query  = new \WP_Query( $args );
+		$events = [];
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$post_id = get_the_ID();
+
+				$source_post_id   = get_post_meta( $post_id, '_wp_event_source_post_id', true );
+				$source_post_type = get_post_meta( $post_id, '_wp_event_source_post_type', true );
+
+				$source_lang = null;
+				if ( function_exists( 'wpml_get_language_information' ) ) {
+					$lang_info   = wpml_get_language_information( null, $post_id );
+					$source_lang = $lang_info['locale'] ?? null;
+				}
+
+				$events[] = [
+					'id'                   => $post_id,
+					'title'                => get_the_title(),
+					'content'              => get_the_content(),
+					'excerpt'              => get_the_excerpt(),
+					'start_date'           => get_post_meta( $post_id, '_event_start_date', true ),
+					'end_date'             => get_post_meta( $post_id, '_event_end_date', true ),
+					'location'             => get_post_meta( $post_id, '_event_location', true ),
+					'is_all_day'           => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
+					'google_event_id'      => get_post_meta( $post_id, '_google_event_id', true ),
+					'google_calendar_link' => get_post_meta( $post_id, '_google_calendar_link', true ),
+					'source_post_id'       => $source_post_id ?: null,
+					'source_post_type'     => $source_post_type ?: null,
+					'source_link'          => $source_post_id ? get_permalink( $source_post_id ) : null,
+					'lang'                 => $source_lang,
+				];
+			}
+			wp_reset_postdata();
+		}
+
+		return new WP_REST_Response( [
+			'success' => true,
+			'data'    => $events,
+			'total'   => $query->found_posts,
+			'period'  => [
+				'before_days'  => $before,
+				'start_date'   => $start_date,
+				'current_date' => $now,
+			],
 		], 200 );
 	}
 
@@ -122,14 +218,14 @@ class ToolkitController {
 				$post_id = get_the_ID();
 
 				$events[] = [
-					'id'                   => $post_id,
-					'title'                => get_the_title(),
-					'content'              => get_the_content(),
-					'excerpt'              => get_the_excerpt(),
-					'start_date'           => get_post_meta( $post_id, '_event_start_date', true ),
-					'end_date'             => get_post_meta( $post_id, '_event_end_date', true ),
-					'location'             => get_post_meta( $post_id, '_event_location', true ),
-					'is_all_day'           => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
+					'id'         => $post_id,
+					'title'      => get_the_title(),
+					'content'    => get_the_content(),
+					'excerpt'    => get_the_excerpt(),
+					'start_date' => get_post_meta( $post_id, '_event_start_date', true ),
+					'end_date'   => get_post_meta( $post_id, '_event_end_date', true ),
+					'location'   => get_post_meta( $post_id, '_event_location', true ),
+					'is_all_day' => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
 				];
 			}
 			wp_reset_postdata();
@@ -160,6 +256,9 @@ class ToolkitController {
 			);
 		}
 
+		$source_post_id   = get_post_meta( $post->ID, '_wp_event_source_post_id', true );
+		$source_post_type = get_post_meta( $post->ID, '_wp_event_source_post_type', true );
+
 		return new WP_REST_Response( [
 			'success' => true,
 			'data'    => [
@@ -171,6 +270,12 @@ class ToolkitController {
 				'end_date'             => get_post_meta( $post->ID, '_event_end_date', true ),
 				'location'             => get_post_meta( $post->ID, '_event_location', true ),
 				'is_all_day'           => get_post_meta( $post->ID, '_event_is_all_day', true ) === '1',
+				'google_event_id'      => get_post_meta( $post->ID, '_google_event_id', true ),
+				'google_calendar_link' => get_post_meta( $post->ID, '_google_calendar_link', true ),
+				'last_synced'          => get_post_meta( $post->ID, '_last_synced', true ),
+				'source_post_id'       => $source_post_id ?: null,
+				'source_post_type'     => $source_post_type ?: null,
+				'source_link'          => $source_post_id ? get_permalink( $source_post_id ) : null,
 			],
 		], 200 );
 	}
