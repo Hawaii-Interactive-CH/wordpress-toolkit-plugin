@@ -21,7 +21,8 @@ WP Theme Toolkit gives developers a structured foundation for building robust, m
 * Custom post type and taxonomy scaffolding
 * REST API routing with token-based authentication
 * Utility services: asset loading (Vite), menus, navigation, PDF generation, image resizing (WebP), cookie consent
-* Google Calendar integration
+* Google Calendar integration with admin dashboard, configurable sync settings (API key, Calendar ID, interval, date range, max events), and live connection testing
+* WordPress CPT-to-calendar mapping: link any public custom post type with an ACF date field (including dates inside repeaters) to calendar events
 * WooCommerce optional support
 * Maintenance mode view
 * Gravity Forms integration helpers

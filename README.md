@@ -24,7 +24,7 @@ WordPress Toolkit is a professional development framework for building complex W
 - **RegisterService** — Admin UI to scaffold new CPT model files and ACF block files with AJAX generation.
 - **MenuService** — Register and auto-create default navigation menu locations.
 - **CalendarService** — Google Calendar synchronization: fetch, create, update, and clean up events on a configurable cron schedule.
-- **CalendarAdminService** — Admin UI for Google Calendar settings, manual sync trigger, and connection testing.
+- **CalendarAdminService** — Calendar admin UI with four areas: (1) a **dashboard** showing Google Calendar and WordPress Events sync status, published event count, last sync time, and quick-action buttons; (2) a **Google Calendar settings** page (enable/disable, API key, Calendar ID, sync interval hourly/twice-daily/daily/weekly, max events up to 2500, past and future date-range offsets in days); (3) a **live connection test** that calls the Google Calendar API and reports the calendar name and event count; (4) a **WordPress Events** page to map any public CPT with an ACF date field — including date fields nested inside repeaters — to `calendar_event` posts. All pages include a nonce-protected manual sync trigger.
 - **ApiAuthService** — AES-256-CBC master token + transient token authentication, IP whitelist management, admin UI, and hourly cron cleanup of expired tokens.
 - **CookieService** — Configurable cookie consent banner with accept/refuse actions and localStorage persistence.
 - **DocService** — In-admin Markdown documentation viewer with table of contents and syntax highlighting.

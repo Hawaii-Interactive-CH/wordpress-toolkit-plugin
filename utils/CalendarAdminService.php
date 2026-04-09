@@ -106,8 +106,8 @@ class CalendarAdminService {
 		// Submenu: Paramètres (settings)
 		add_submenu_page(
 			self::MENU_SLUG,
-			__( 'Google Calendar Settings', 'toolkit' ),
-			__( 'Link Google Calendar', 'toolkit' ),
+			__( 'Google Calendar Settings', 'wp-theme-toolkit' ),
+			__( 'Link Google Calendar', 'wp-theme-toolkit' ),
 			'manage_options',
 			self::MENU_SLUG . '-google-calendar',
 			[ self::class, 'render_settings_page' ]
@@ -116,8 +116,8 @@ class CalendarAdminService {
 		// Submenu: Configuration Événements WordPress
 		add_submenu_page(
 			self::MENU_SLUG,
-			__( 'WordPress Events Configuration', 'toolkit' ),
-			__( 'Link WordPress Events', 'toolkit' ),
+			__( 'WordPress Events Configuration', 'wp-theme-toolkit' ),
+			__( 'Link WordPress Events', 'wp-theme-toolkit' ),
 			'manage_options',
 			self::MENU_SLUG . '-wordpress-events',
 			[ self::class, 'render_wordpress_events_page' ]
@@ -239,26 +239,26 @@ class CalendarAdminService {
 						</tr>
 						<tr style="background: #f9f9f9;">
 							<td style="padding: 15px;">
-								<strong><?php esc_html_e( 'WordPress Events', 'toolkit' ); ?>:</strong>
+								<strong><?php esc_html_e( 'WordPress Events', 'wp-theme-toolkit' ); ?>:</strong>
 							</td>
 							<td style="padding: 15px;">
 								<?php if ( $wp_events_enabled && ! empty( $wp_events_cpt ) ) : ?>
 									<span style="color: #46b450; font-weight: bold;">
-										✓ <?php esc_html_e( 'Enabled', 'toolkit' ); ?>
+										✓ <?php esc_html_e( 'Enabled', 'wp-theme-toolkit' ); ?>
 									</span>
 									<span style="color: #666; font-size: 0.9em;">
 										(<?php echo esc_html( $wp_events_cpt ); ?>)
 									</span>
 								<?php else : ?>
 									<span style="color: #dc3232; font-weight: bold;">
-										✗ <?php esc_html_e( 'Disabled', 'toolkit' ); ?>
+										✗ <?php esc_html_e( 'Disabled', 'wp-theme-toolkit' ); ?>
 									</span>
 								<?php endif; ?>
 							</td>
 						</tr>
 						<tr>
 							<td style="padding: 15px;">
-								<strong><?php esc_html_e( 'Published Events', 'toolkit' ); ?>:</strong>
+								<strong><?php esc_html_e( 'Published Events', 'wp-theme-toolkit' ); ?>:</strong>
 							</td>
 							<td style="padding: 15px;">
 								<?php echo esc_html( $published_events ); ?>
@@ -287,7 +287,7 @@ class CalendarAdminService {
 					<p>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . self::MENU_SLUG . '-wordpress-events' ) ); ?>" class="button">
 							<span class="dashicons dashicons-calendar" style="margin-top: 3px;"></span>
-							<?php esc_html_e( 'Configure WordPress Events', 'toolkit' ); ?>
+							<?php esc_html_e( 'Configure WordPress Events', 'wp-theme-toolkit' ); ?>
 						</a>
 
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . self::MENU_SLUG . '-google-calendar' ) ); ?>" class="button">
@@ -555,18 +555,18 @@ class CalendarAdminService {
 			// Check Google Calendar results
 			if ( ! empty( $results['google'] ) ) {
 				if ( ! empty( $results['google']['success'] ) ) {
-					$success_messages[] = $results['google']['message'] ?? __( 'Google Calendar synchronized', 'toolkit' );
+					$success_messages[] = $results['google']['message'] ?? __( 'Google Calendar synchronized', 'wp-theme-toolkit' );
 				} else {
-					$error_messages[] = $results['google']['message'] ?? __( 'Erreur Google Calendar', 'toolkit' );
+					$error_messages[] = $results['google']['message'] ?? __( 'Erreur Google Calendar', 'wp-theme-toolkit' );
 				}
 			}
 
 			// Check WordPress Events results
 			if ( ! empty( $results['wordpress_events'] ) ) {
 				if ( ! empty( $results['wordpress_events']['success'] ) ) {
-					$success_messages[] = $results['wordpress_events']['message'] ?? __( 'WordPress Events synchronized', 'toolkit' );
+					$success_messages[] = $results['wordpress_events']['message'] ?? __( 'WordPress Events synchronized', 'wp-theme-toolkit' );
 				} else {
-					$error_messages[] = $results['wordpress_events']['message'] ?? __( 'WordPress Events error', 'toolkit' );
+					$error_messages[] = $results['wordpress_events']['message'] ?? __( 'WordPress Events error', 'wp-theme-toolkit' );
 				}
 			}
 
@@ -595,7 +595,7 @@ class CalendarAdminService {
 				add_settings_error(
 					'toolkit_calendar_messages',
 					'toolkit_calendar_sync_error',
-					__( 'No calendar source is enabled.', 'toolkit' ),
+					__( 'No calendar source is enabled.', 'wp-theme-toolkit' ),
 					'error'
 				);
 			}
@@ -686,7 +686,7 @@ class CalendarAdminService {
 		<div class="wrap">
 			<h1>
 				<span class="dashicons dashicons-calendar" style="font-size: 32px; margin-right: 10px;"></span>
-				<?php esc_html_e( 'Link WordPress Events', 'toolkit' ); ?>
+				<?php esc_html_e( 'Link WordPress Events', 'wp-theme-toolkit' ); ?>
 			</h1>
 
 			<form method="post" action="options.php">
@@ -694,13 +694,13 @@ class CalendarAdminService {
 
 				<!-- WordPress Events Settings -->
 				<div class="card" style="max-width: 100%; margin-top: 20px;">
-					<h2><?php esc_html_e( 'WordPress Events Configuration', 'toolkit' ); ?></h2>
+					<h2><?php esc_html_e( 'WordPress Events Configuration', 'wp-theme-toolkit' ); ?></h2>
 
 					<table class="form-table" role="presentation">
 						<tr>
 							<th scope="row">
 								<label for="wordpress_events_enabled">
-									<?php esc_html_e( 'Enable WordPress Events', 'toolkit' ); ?>
+									<?php esc_html_e( 'Enable WordPress Events', 'wp-theme-toolkit' ); ?>
 								</label>
 							</th>
 							<td>
@@ -712,10 +712,10 @@ class CalendarAdminService {
 										value="1"
 										<?php checked( $wp_events['enabled'], true ); ?>
 									>
-									<?php esc_html_e( 'Enable WordPress events management', 'toolkit' ); ?>
+									<?php esc_html_e( 'Enable WordPress events management', 'wp-theme-toolkit' ); ?>
 								</label>
 								<p class="description">
-									<?php esc_html_e( 'Enables a custom link for WordPress events.', 'toolkit' ); ?>
+									<?php esc_html_e( 'Enables a custom link for WordPress events.', 'wp-theme-toolkit' ); ?>
 								</p>
 							</td>
 						</tr>
@@ -723,7 +723,7 @@ class CalendarAdminService {
 						<tr>
 							<th scope="row">
 								<label for="wordpress_events_custom_post_type">
-									<?php esc_html_e( 'Custom Post Type', 'toolkit' ); ?> <span style="color: red;">*</span>
+									<?php esc_html_e( 'Custom Post Type', 'wp-theme-toolkit' ); ?> <span style="color: red;">*</span>
 								</label>
 							</th>
 							<td>
@@ -732,7 +732,7 @@ class CalendarAdminService {
 									id="wordpress_events_custom_post_type"
 									class="regular-text"
 								>
-									<option value=""><?php esc_html_e( 'Select a Custom Post Type', 'toolkit' ); ?></option>
+									<option value=""><?php esc_html_e( 'Select a Custom Post Type', 'wp-theme-toolkit' ); ?></option>
 									<?php foreach ( $post_types as $post_type ) : ?>
 										<option value="<?php echo esc_attr( $post_type->name ); ?>" <?php selected( $wp_events['custom_post_type'], $post_type->name ); ?>>
 											<?php echo esc_html( $post_type->label . ' (' . $post_type->name . ')' ); ?>
@@ -740,7 +740,7 @@ class CalendarAdminService {
 									<?php endforeach; ?>
 								</select>
 								<p class="description">
-									<?php esc_html_e( 'Select the Custom Post Type to use for WordPress events.', 'toolkit' ); ?>
+									<?php esc_html_e( 'Select the Custom Post Type to use for WordPress events.', 'wp-theme-toolkit' ); ?>
 								</p>
 							</td>
 						</tr>
@@ -748,7 +748,7 @@ class CalendarAdminService {
 						<tr>
 							<th scope="row">
 								<label for="wordpress_events_acf_field_group">
-									<?php esc_html_e( 'Champs ACF', 'toolkit' ); ?>
+									<?php esc_html_e( 'Champs ACF', 'wp-theme-toolkit' ); ?>
 								</label>
 							</th>
 							<td>
@@ -759,7 +759,7 @@ class CalendarAdminService {
 										class="regular-text"
 										style="width: 100%; max-width: 600px;"
 									>
-										<option value=""><?php esc_html_e( 'No ACF field selected', 'toolkit' ); ?></option>
+										<option value=""><?php esc_html_e( 'No ACF field selected', 'wp-theme-toolkit' ); ?></option>
 										<?php foreach ( $all_acf_fields as $field ) : ?>
 											<option value="<?php echo esc_attr( $field['key'] ); ?>" <?php selected( $wp_events['acf_field_group'], $field['key'] ); ?>>
 												<?php echo esc_html( $field['display_label'] ); ?>
@@ -767,17 +767,17 @@ class CalendarAdminService {
 										<?php endforeach; ?>
 									</select>
 									<p class="description">
-										<?php esc_html_e( 'Select the ACF field (including sub-fields and repeated fields) related to a date for this Custom Post Type. (Only DATE type fields are supported, works with dates inside a repeater)', 'toolkit' ); ?>
+										<?php esc_html_e( 'Select the ACF field (including sub-fields and repeated fields) related to a date for this Custom Post Type. (Only DATE type fields are supported, works with dates inside a repeater)', 'wp-theme-toolkit' ); ?>
 										<br>
-										<strong><?php printf( esc_html__( '%d fields available', 'toolkit' ), count( $all_acf_fields ) ); ?></strong>
+										<strong><?php printf( esc_html__( '%d fields available', 'wp-theme-toolkit' ), count( $all_acf_fields ) ); ?></strong>
 									</p>
 								<?php else : ?>
 									<p class="description">
 										<strong style="color: #dc3232;">
-											<?php esc_html_e( 'ACF is not installed or no fields have been created.', 'toolkit' ); ?>
+											<?php esc_html_e( 'ACF is not installed or no fields have been created.', 'wp-theme-toolkit' ); ?>
 										</strong>
 										<br>
-										<?php esc_html_e( 'Install and activate Advanced Custom Fields to use this feature.', 'toolkit' ); ?>
+										<?php esc_html_e( 'Install and activate Advanced Custom Fields to use this feature.', 'wp-theme-toolkit' ); ?>
 									</p>
 									<input type="hidden" name="<?php echo esc_attr( self::OPTION_NAME ); ?>[wordpress_events][acf_field_group]" value="<?php echo esc_attr( $wp_events['acf_field_group'] ); ?>">
 								<?php endif; ?>
@@ -786,7 +786,7 @@ class CalendarAdminService {
 					</table>
 				</div>
 
-				<?php submit_button( __( 'Save Settings', 'toolkit' ), 'primary', 'submit', true ); ?>
+				<?php submit_button( __( 'Save Settings', 'wp-theme-toolkit' ), 'primary', 'submit', true ); ?>
 			</form>
 		</div>
 		<?php
