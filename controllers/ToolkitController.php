@@ -115,9 +115,9 @@ class ToolkitController {
 			'post_status'      => 'publish',
 			'posts_per_page'   => $limit,
 			'orderby'          => 'meta_value',
-			'meta_key'         => // phpcs:ignore WordPress.DB.SlowDBQuery '_event_start_date',
+			'meta_key'         => '_event_start_date', // phpcs:ignore WordPress.DB.SlowDBQuery
 			'order'            => 'ASC',
-			'meta_query'       => // phpcs:ignore WordPress.DB.SlowDBQuery [
+			'meta_query'       => [ // phpcs:ignore WordPress.DB.SlowDBQuery
 				[
 					'key'     => '_event_start_date',
 					'value'   => $start_date,
@@ -197,9 +197,9 @@ class ToolkitController {
 			'post_status'    => 'publish',
 			'posts_per_page' => $limit,
 			'orderby'        => 'meta_value',
-			'meta_key'       => // phpcs:ignore WordPress.DB.SlowDBQuery '_event_start_date',
+			'meta_key'       => '_event_start_date', // phpcs:ignore WordPress.DB.SlowDBQuery
 			'order'          => 'ASC',
-			'meta_query'     => // phpcs:ignore WordPress.DB.SlowDBQuery [
+			'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery
 				[
 					'key'     => '_event_start_date',
 					'value'   => $now,

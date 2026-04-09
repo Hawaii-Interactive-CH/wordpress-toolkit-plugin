@@ -26,3 +26,6 @@
 
 # Claude folder
 .claude/
+
+# zip files
+*.zip

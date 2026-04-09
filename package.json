@@ -1,0 +1,7 @@
+{
+  "name": "wordpress-toolkit-plugin",
+  "private": true,
+  "scripts": {
+    "prepare-zip": "rm -f hi-theme-toolkit.zip && rm -rf .zip-staging && mkdir .zip-staging && rsync -a --exclude='.git' --exclude='.gitignore' --exclude='.DS_Store' --exclude='hi-theme-toolkit.zip' --exclude='.zip-staging' --exclude='node_modules' ./ .zip-staging/ && (cd .zip-staging && zip -qr ../hi-theme-toolkit.zip .) && rm -rf .zip-staging"
+  }
+}
