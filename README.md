@@ -401,46 +401,6 @@ Documentation is available in the WordPress admin under the `Toolkit` > `Docs` m
 
 To update it, simply edit the markdown files in the plugin's `docs` folder and update the table of contents.
 
-## Claude Code Skills
-
-This project includes [Claude Code](https://claude.ai/claude-code) skills to speed up development. Skills are slash commands (`/skill-name`) that guide Claude in generating code following the project's conventions.
-
-### Available skills
-
-| Command | Description |
-|---|---|
-| `/create-cpt` | Generates a `CustomPostType` class with `JsonSerializable` and optionally a category taxonomy |
-| `/create-taxonomy` | Generates a standalone `Taxonomy` class with `register()` and `jsonSerialize()` |
-| `/create-block` | Generates an ACF `Block` class and its PHP template in `partials/blocks/` |
-| `/create-service` | Generates a static service in `utils/` with `register()` and WordPress hooks |
-| `/create-option-page` | Generates an ACF `OptionPage` class with static field accessors |
-
-### Usage
-
-In Claude Code, invoke the command directly:
-
-```
-/create-cpt
-```
-
-Claude will ask the necessary questions (class name, slug, labels, icon, supports, etc.) and generate the files **in the current directory** (the theme or project from which the command is invoked).
-
-You can also pass arguments directly:
-
-```
-/create-cpt Product "Products" "Product"
-```
-
-### Installing skills globally
-
-A script is provided to copy all skills into `~/.claude/commands/toolkit/`, making them available in all your projects via `/toolkit:create-cpt`, `/toolkit:create-block`, etc.
-
-```bash
-bash bin/install-skills.sh
-```
-
-Re-run this script after each plugin update to sync the skills.
-
 ## Contributing
 
 Contributions are welcome! Fork the project, make your changes, and open a pull request. Make sure to follow the code conventions and update the documentation if necessary.
