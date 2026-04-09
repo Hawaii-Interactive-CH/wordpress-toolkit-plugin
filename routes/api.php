@@ -12,13 +12,13 @@ use \WP_REST_Response;
 use \WP_Error;
 
 
-$base_url = get_home_url();
-$app_name = sanitize_title(get_bloginfo('name'));
+$toolkit_base_url = get_home_url();
+$toolkit_app_name = sanitize_title(get_bloginfo('name'));
 
 /**
  * Register API routes
  */
- add_action('rest_api_init', function() use ($app_name, $base_url) {
+ add_action('rest_api_init', function() use ($toolkit_app_name, $toolkit_base_url) {
     $namespace = 'api/v1';
     $toolkit_namespace = 'toolkit/v1';
 

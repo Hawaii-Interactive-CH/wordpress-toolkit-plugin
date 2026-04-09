@@ -38,6 +38,7 @@ abstract class PostType {
 			$model = '\\Toolkit\\models\\custom\\' . ucfirst( $type );
 
 			if ( ! class_exists( $model ) ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 				trigger_error( esc_html( "Post type $type does not exist." ), E_USER_WARNING );
 			}
 		}
@@ -71,7 +72,7 @@ abstract class PostType {
 	 * @return mixed
 	 */
 	public static function current( ?callable $callback = null ) {
-		wp_reset_query();
+		wp_reset_postdata();
 		$id = get_queried_object_id();
 
 		if ( ! $id ) {
@@ -113,6 +114,7 @@ abstract class PostType {
 		if ( function_exists( 'get_field' ) ) {
 			return get_field( $key, $this->id() );
 		} else {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 			trigger_error( 'Plug-in ACF is not installed.', E_USER_WARNING );
 		}
 	}
@@ -232,6 +234,7 @@ abstract class PostType {
 	 * @return string
 	 */
 	public function content(): string {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- applying WP core filter, not defining a custom hook
 		return apply_filters(
 			'the_content',
 			get_post_field( 'post_content', $this->id() )

@@ -36,6 +36,7 @@ abstract class Block
 
 	public static function register() {
 		if ( ! function_exists( 'acf_register_block' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 			trigger_error( 'Plug-in ACF is not installed.', E_USER_WARNING );
 		} else {
 			$setting                    = static::settings();
@@ -85,6 +86,7 @@ abstract class Block
 		if ( function_exists( 'get_field' ) ) {
 			return get_field( $key, $this->id() );
 		} else {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 			trigger_error( 'Plug-in ACF is not installed.', E_USER_WARNING );
 		}
 	}

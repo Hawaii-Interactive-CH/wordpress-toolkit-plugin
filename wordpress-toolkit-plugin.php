@@ -60,7 +60,7 @@ include WP_TOOLKIT_DIR . '/routes/api.php';
 
 
 // Register other classes on init
-$to_register = [
+$toolkit_to_register = [
 	// Utils
 	'\\Toolkit\\utils\\MainService',
 	'\\Toolkit\\utils\\ModelService',
@@ -76,8 +76,8 @@ $to_register = [
 // Load WebP test admin page
 require_once WP_TOOLKIT_DIR . 'utils/admin-webp-test-page.php';
 
-add_action( 'init', function () use ( $to_register ) {
-	foreach ( $to_register as $class ) {
+add_action( 'init', function () use ( $toolkit_to_register ) {
+	foreach ( $toolkit_to_register as $class ) {
 		$class::register();
 	}
 } );

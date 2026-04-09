@@ -23,3 +23,6 @@
 # Editor settings
 /.vscode/settings.json
 .DS_Store
+
+# Claude folder
+.claude/

@@ -70,7 +70,10 @@ class GravityForm
 
         if (is_wp_error($response)) {
             // Log error or handle it accordingly
-            error_log($response->get_error_message());
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log($response->get_error_message());
+            }
             return 0;
         }
 
@@ -123,7 +126,10 @@ class GravityForm
 
         if (is_wp_error($response)) {
             // Log error or handle it accordingly
-            error_log($response->get_error_message());
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log($response->get_error_message());
+            }
             return 0;
         }
 
@@ -178,7 +184,10 @@ class GravityForm
 
         if (is_wp_error($response)) {
             // Log error or handle it accordingly
-            error_log($response->get_error_message());
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log($response->get_error_message());
+            }
             return 0;
         }
 
@@ -228,7 +237,10 @@ class GravityForm
         }
 
         // log the formatted fields
-        error_log(json_encode($formattedFields));
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            error_log(json_encode($formattedFields));
+        }
 
         return $formattedFields['fields'];
     }
@@ -313,7 +325,10 @@ class GravityForm
         $total_count = \GFAPI::count_entries($target_form_id, $search_criteria);
 
         // Use the count
-        error_log("Total Entries with '{$value_to_match}' in field {$target_field_id} for form {$target_form_id}: {$total_count}");
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            error_log("Total Entries with '{$value_to_match}' in field {$target_field_id} for form {$target_form_id}: {$total_count}");
+        }
     }
 
     public static function all_active()

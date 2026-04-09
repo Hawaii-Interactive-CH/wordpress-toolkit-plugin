@@ -334,21 +334,30 @@ class Size
     {
         $metadata = wp_get_attachment_metadata($attachment_id);
         if (empty($metadata)) {
-            error_log("Fly Images: No metadata for attachment $attachment_id");
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log("Fly Images: No metadata for attachment $attachment_id");
+            }
             $this->add_webp_log('error', 'No metadata found', $attachment_id);
             return;
         }
 
         $image_path = get_attached_file($attachment_id);
         if (!file_exists($image_path)) {
-            error_log("Fly Images: File not found for attachment $attachment_id: $image_path");
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log("Fly Images: File not found for attachment $attachment_id: $image_path");
+            }
             $this->add_webp_log('error', 'Source file not found: ' . basename($image_path), $attachment_id);
             return;
         }
 
         $extension = pathinfo($image_path, PATHINFO_EXTENSION);
         if (in_array($extension, ["svg", "avif", "heic", "heif"])) {
-            error_log("Fly Images: Skipping unsupported format for attachment $attachment_id: $extension");
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log("Fly Images: Skipping unsupported format for attachment $attachment_id: $extension");
+            }
             $this->add_webp_log('info', "Skipped unsupported format: $extension", $attachment_id);
             return;
         }
@@ -356,11 +365,17 @@ class Size
         $fly_dir = $this->get_fly_dir($attachment_id);
         if (!is_dir($fly_dir)) {
             wp_mkdir_p($fly_dir);
-            error_log("Fly Images: Created directory for attachment $attachment_id: $fly_dir");
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log("Fly Images: Created directory for attachment $attachment_id: $fly_dir");
+            }
         }
 
         if (empty($this->_image_sizes)) {
-            error_log("Fly Images: No image sizes registered for attachment $attachment_id");
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log("Fly Images: No image sizes registered for attachment $attachment_id");
+            }
             $this->add_webp_log('error', 'No image sizes registered', $attachment_id);
             return;
         }
@@ -381,14 +396,20 @@ class Size
             $fly_webp_path = $fly_dir . DIRECTORY_SEPARATOR . $this->get_fly_file_name(basename($metadata["file"]), $width, $height, $crop, true);
 
             if (file_exists($fly_webp_path)) {
-                error_log("Fly Images: WebP already exists for attachment $attachment_id size $size_name: " . basename($fly_webp_path));
+                if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log("Fly Images: WebP already exists for attachment $attachment_id size $size_name: " . basename($fly_webp_path));
+                }
                 $this->add_webp_log('info', 'WebP already exists: ' . basename($fly_webp_path), $attachment_id, $size_name);
                 continue;
             }
 
             $editor = wp_get_image_editor($image_path);
             if (is_wp_error($editor)) {
-                error_log("Fly Images: Error getting image editor for attachment $attachment_id: " . $editor->get_error_message());
+                if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log("Fly Images: Error getting image editor for attachment $attachment_id: " . $editor->get_error_message());
+                }
                 $this->add_webp_log('error', 'Image editor error: ' . $editor->get_error_message(), $attachment_id, $size_name);
                 continue;
             }
@@ -396,7 +417,10 @@ class Size
             $editor->set_quality(70);
             $resize_result = $editor->resize($width, $height, $crop);
             if (is_wp_error($resize_result)) {
-                error_log("Fly Images: Error resizing attachment $attachment_id to {$width}x{$height}: " . $resize_result->get_error_message());
+                if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log("Fly Images: Error resizing attachment $attachment_id to {$width}x{$height}: " . $resize_result->get_error_message());
+                }
                 $this->add_webp_log('error', "Resize error ({$width}x{$height}): " . $resize_result->get_error_message(), $attachment_id, $size_name);
                 continue;
             }
@@ -416,7 +440,10 @@ class Size
                 // Créer directement le WebP sans PNG temporaire
                 $save_result = $editor->save($fly_webp_path, 'image/webp', ['quality' => $webp_quality]);
                 if (is_wp_error($save_result)) {
-                    error_log("Fly Images: WebP save error for attachment $attachment_id size $size_name: " . $save_result->get_error_message());
+                    if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                        error_log("Fly Images: WebP save error for attachment $attachment_id size $size_name: " . $save_result->get_error_message());
+                    }
                     $this->add_webp_log('error', 'WebP save failed: ' . $save_result->get_error_message(), $attachment_id, $size_name);
                 } else {
                     $file_size = file_exists($fly_webp_path) ? size_format(filesize($fly_webp_path)) : '?';
@@ -426,7 +453,10 @@ class Size
                 // Fallback PNG si WebP non supporté
                 $save_result = $editor->save($fly_file_path);
                 if (is_wp_error($save_result)) {
-                    error_log("Fly Images: Fallback save error for attachment $attachment_id size $size_name: " . $save_result->get_error_message());
+                    if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                        error_log("Fly Images: Fallback save error for attachment $attachment_id size $size_name: " . $save_result->get_error_message());
+                    }
                     $this->add_webp_log('error', 'Fallback save failed: ' . $save_result->get_error_message(), $attachment_id, $size_name);
                 } else {
                     $this->add_webp_log('warning', "WebP not supported, saved as fallback: " . basename($fly_file_path), $attachment_id, $size_name);
@@ -448,7 +478,10 @@ class Size
 
         $image = wp_get_attachment_metadata($attachment_id);
         if (empty($image)) {
-            error_log("Fly Images: No metadata for attachment $attachment_id in get_attachment_image_src");
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log("Fly Images: No metadata for attachment $attachment_id in get_attachment_image_src");
+            }
             return wp_get_attachment_image_src($attachment_id, "full");
         }
 
@@ -456,7 +489,10 @@ class Size
         if (is_string($size)) {
             $image_size = $this->get_image_size($size);
             if (empty($image_size)) {
-                error_log("Fly Images: Size '$size' not registered for attachment $attachment_id");
+                if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log("Fly Images: Size '$size' not registered for attachment $attachment_id");
+                }
                 return wp_get_attachment_image_src($attachment_id, "full");
             }
             $width = $image_size["size"][0];

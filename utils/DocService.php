@@ -56,7 +56,8 @@ class DocService {
     }
 
     public static function display_markdown_docs() {
-        $requested_file = isset($_GET['file']) ? sanitize_text_field($_GET['file']) : 'index.html';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only file display; nonce not appropriate for bookmarkable URLs
+        $requested_file = isset($_GET['file']) ? sanitize_text_field( wp_unslash( $_GET['file'] ) ) : 'index.html';
         $base_dir = WP_TOOLKIT_DIR . 'docs/';
         $file_path = realpath($base_dir . $requested_file);
         $is_index_request = ('index.html' === $requested_file);
@@ -114,7 +115,7 @@ class DocService {
         $base_dir = WP_TOOLKIT_DIR . 'docs/';
         self::generate_index($base_dir);
 
-        wp_redirect(menu_page_url('toolkit-docs', false));
+        wp_safe_redirect(menu_page_url('toolkit-docs', false));
         exit;
     }
 

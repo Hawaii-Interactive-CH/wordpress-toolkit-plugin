@@ -115,9 +115,9 @@ class ToolkitController {
 			'post_status'      => 'publish',
 			'posts_per_page'   => $limit,
 			'orderby'          => 'meta_value',
-			'meta_key'         => '_event_start_date',
+			'meta_key'         => // phpcs:ignore WordPress.DB.SlowDBQuery '_event_start_date',
 			'order'            => 'ASC',
-			'meta_query'       => [
+			'meta_query'       => // phpcs:ignore WordPress.DB.SlowDBQuery [
 				[
 					'key'     => '_event_start_date',
 					'value'   => $start_date,
@@ -197,9 +197,9 @@ class ToolkitController {
 			'post_status'    => 'publish',
 			'posts_per_page' => $limit,
 			'orderby'        => 'meta_value',
-			'meta_key'       => '_event_start_date',
+			'meta_key'       => // phpcs:ignore WordPress.DB.SlowDBQuery '_event_start_date',
 			'order'          => 'ASC',
-			'meta_query'     => [
+			'meta_query'     => // phpcs:ignore WordPress.DB.SlowDBQuery [
 				[
 					'key'     => '_event_start_date',
 					'value'   => $now,
@@ -264,6 +264,7 @@ class ToolkitController {
 			'data'    => [
 				'id'                   => $post->ID,
 				'title'                => $post->post_title,
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- applying WP core filter
 				'content'              => apply_filters( 'the_content', $post->post_content ),
 				'excerpt'              => $post->post_excerpt,
 				'start_date'           => get_post_meta( $post->ID, '_event_start_date', true ),

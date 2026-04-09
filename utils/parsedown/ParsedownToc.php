@@ -316,6 +316,7 @@ class ParsedownToc extends \ParsedownTocParentAlias
             case 'array':
                 return $this->contentsListArray;
             default:
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- needed for error message context
                 $backtrace = debug_backtrace();
                 $caller = $backtrace[0];
                 $errorMessage = "Unknown return type '{$type_return}' given while parsing ToC. Called in " . $caller['file'] . " on line " . $caller['line'];

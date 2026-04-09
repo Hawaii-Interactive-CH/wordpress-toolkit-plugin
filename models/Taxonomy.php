@@ -39,7 +39,7 @@ abstract class Taxonomy implements \JsonSerializable
 
     public static function current(?callable $callback = null)
     {
-        wp_reset_query();
+        wp_reset_postdata();
         $term = get_queried_object();
 
         if (!$term or !isset($term->taxonomy)) {
@@ -97,6 +97,7 @@ abstract class Taxonomy implements \JsonSerializable
         if (function_exists("get_field")) {
             return get_field($name, $this->term);
         } else {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
             trigger_error("Plug-in ACF is not installed.", E_USER_WARNING);
         }
     }

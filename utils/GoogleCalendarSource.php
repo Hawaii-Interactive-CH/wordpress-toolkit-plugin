@@ -132,8 +132,11 @@ class GoogleCalendarSource
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
         
-        // Debug: log raw API response
-        error_log('Google Calendar API Response: ' . print_r($data, true));
+        // Debug logging (only in debug mode).
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
+            error_log( 'Google Calendar API Response: ' . print_r( $data, true ) );
+        }
         
         return $data['items'] ?? [];
     }
@@ -155,8 +158,8 @@ class GoogleCalendarSource
         // Check if event already exists
         $existing_posts = get_posts([
             'post_type' => 'calendar_event',
-            'meta_key' => '_google_event_id',
-            'meta_value' => $google_event_id,
+            'meta_key' => '_google_event_id', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+            'meta_value' => $google_event_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
             'posts_per_page' => 1,
             'post_status' => 'any'
         ]);
@@ -168,13 +171,16 @@ class GoogleCalendarSource
         $description = !empty($google_event['description']) ? $google_event['description'] : '';
         $location = !empty($google_event['location']) ? $google_event['location'] : '';
         
-        // Debug: log event data
-        error_log('Google Event: ' . print_r([
-            'id' => $google_event['id'] ?? 'no-id',
-            'summary' => $google_event['summary'] ?? 'no-summary',
-            'description' => $google_event['description'] ?? 'no-description',
-            'location' => $google_event['location'] ?? 'no-location',
-        ], true));
+        // Debug logging (only in debug mode).
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
+            error_log( 'Google Event: ' . print_r( [
+                'id'          => $google_event['id'] ?? 'no-id',
+                'summary'     => $google_event['summary'] ?? 'no-summary',
+                'description' => $google_event['description'] ?? 'no-description',
+                'location'    => $google_event['location'] ?? 'no-location',
+            ], true ) );
+        }
         
         // Parse dates
         $is_all_day = !empty($google_event['start']['date']); // All-day events use 'date' instead of 'dateTime'

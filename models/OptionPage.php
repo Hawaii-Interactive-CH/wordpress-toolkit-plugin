@@ -23,6 +23,7 @@ abstract class OptionPage {
 
 			acf_add_options_page( $params );
 		} else {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 			trigger_error( 'Plug-in ACF is not installed.', E_USER_WARNING );
 		}
 	}
@@ -37,6 +38,7 @@ abstract class OptionPage {
 		if ( function_exists( 'get_field' ) ) {
 			return get_field( $name, static::ID . WPML::current_language() );
 		} else {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 			trigger_error( 'Plug-in ACF is not installed.', E_USER_WARNING );
 		}
 	}
@@ -51,6 +53,7 @@ abstract class OptionPage {
 		if ( function_exists( 'have_rows' ) ) {
 			return have_rows( $key, static::ID . WPML::current_language() );
 		} else {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 			trigger_error( 'Plug-in ACF is not installed.', E_USER_WARNING );
 		}
 	}

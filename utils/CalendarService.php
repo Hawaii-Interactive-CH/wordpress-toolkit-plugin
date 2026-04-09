@@ -174,6 +174,7 @@ class CalendarService
             'posts_per_page' => -1,
             'orderby' => 'meta_value',
             'order' => 'ASC',
+            // phpcs:ignore WordPress.DB.SlowDBQuery
             'meta_key' => '_event_date',
         ];
         
@@ -194,6 +195,7 @@ class CalendarService
     {
         return self::get_all_events([
             'posts_per_page' => $limit,
+            // phpcs:ignore WordPress.DB.SlowDBQuery
             'meta_query' => [
                 [
                     'key' => '_event_date',
@@ -215,6 +217,7 @@ class CalendarService
     public static function get_events_by_range($from, $to)
     {
         return self::get_all_events([
+            // phpcs:ignore WordPress.DB.SlowDBQuery
             'meta_query' => [
                 'relation' => 'AND',
                 [
@@ -244,6 +247,7 @@ class CalendarService
         $args = [
             'post_type' => 'calendar_event',
             'posts_per_page' => 1,
+            // phpcs:ignore WordPress.DB.SlowDBQuery
             'meta_query' => [
                 [
                     'key' => '_google_event_id',
@@ -269,6 +273,7 @@ class CalendarService
         $args = [
             'post_type' => 'calendar_event',
             'posts_per_page' => -1,
+            // phpcs:ignore WordPress.DB.SlowDBQuery
             'meta_query' => [
                 [
                     'key' => '_google_event_id',

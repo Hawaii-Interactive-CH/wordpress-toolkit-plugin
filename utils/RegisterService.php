@@ -21,7 +21,7 @@ class RegisterService
     public static function register()
     {
         add_action('admin_enqueue_scripts', function () {
-            wp_enqueue_script('toolkit-admin-scripts', WP_TOOLKIT_URL . '/admin/assets/js/toolkit-admin-scripts.js', array('jquery'), null, true);
+            wp_enqueue_script('toolkit-admin-scripts', WP_TOOLKIT_URL . '/admin/assets/js/toolkit-admin-scripts.js', array('jquery'), WP_TOOLKIT_VERSION, true);
         });
         // Register AJAX actions.
         add_action("wp_ajax_create_cpt_models", [self::class, "create_model_action"]);
@@ -42,7 +42,7 @@ class RegisterService
 
             <?php
             // Enqueue scripts
-            wp_enqueue_script('toolkit-ajax-scripts', WP_TOOLKIT_URL . '/admin/assets/js/toolkit-admin-ajax.js', array('jquery'), null, true);
+            wp_enqueue_script('toolkit-ajax-scripts', WP_TOOLKIT_URL . '/admin/assets/js/toolkit-admin-ajax.js', array('jquery'), WP_TOOLKIT_VERSION, true);
 
             wp_localize_script('toolkit-ajax-scripts', 'cptwp_admin_vars', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
@@ -175,7 +175,7 @@ class RegisterService
             wp_send_json_error(__('Unauthorized request.', 'wordpress-toolkit-plugin'), 403);
         }
 
-        $formData = self::sanitize_model_form_data($_POST['formData'] ?? []);
+        $formData = self::sanitize_model_form_data( wp_unslash( $_POST['formData'] ?? [] ) );
         if (empty($formData['model_name']) || empty($formData['model_slug'])) {
             wp_send_json_error(__('Invalid model payload.', 'wordpress-toolkit-plugin'), 400);
         }
@@ -229,7 +229,7 @@ class RegisterService
         $phpContent .= '            "rewrite" => ["slug" => self::SLUG, "with_front" => false],' . PHP_EOL;
         $phpContent .= '            "query_var" => true,' . PHP_EOL;
         $phpContent .= '            "menu_icon" => "dashicons-icon-' . $formData['model_icon'] . '",' . PHP_EOL;
-        $phpContent .= '            "supports" => ' . var_export(explode(", ", $formData['model_supports']), true) . ',' . PHP_EOL;
+        $phpContent .= '            "supports" => ' . var_export(explode(", ", $formData['model_supports']), true) . ',' . PHP_EOL; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
         $phpContent .= '        ];' . PHP_EOL;
         $phpContent .= '    }' . PHP_EOL . PHP_EOL;
         // Add the jsonSerialize method
@@ -273,7 +273,7 @@ class RegisterService
         $phpCategoryContent .= '    const TYPE = \'' . strtolower($formData['model_name']) . '_category\';' . PHP_EOL;
         $phpCategoryContent .= '    public static function register()' . PHP_EOL;
         $phpCategoryContent .= '    {' . PHP_EOL;
-        $phpCategoryContent .= '        register_taxonomy(self::TYPE, ' . $className . '::TYPE, ' . var_export(self::prepare_category(), true) . ');' . PHP_EOL;
+        $phpCategoryContent .= '        register_taxonomy(self::TYPE, ' . $className . '::TYPE, ' . var_export(self::prepare_category(), true) . ');' . PHP_EOL; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
         $phpCategoryContent .= '    }' . PHP_EOL;
         $phpCategoryContent .= '}' . PHP_EOL;
 
@@ -295,7 +295,7 @@ class RegisterService
             wp_send_json_error(__('Unauthorized request.', 'wordpress-toolkit-plugin'), 403);
         }
 
-        $formData = self::sanitize_block_form_data($_POST['formData'] ?? []);
+        $formData = self::sanitize_block_form_data( wp_unslash( $_POST['formData'] ?? [] ) );
         if (empty($formData['block_title'])) {
             wp_send_json_error(__('Invalid block payload.', 'wordpress-toolkit-plugin'), 400);
         }
@@ -319,7 +319,7 @@ class RegisterService
         $phpContent .= '    const TYPE = \''. 'block-' . $slugTitle . '\';' . PHP_EOL . PHP_EOL;
         $phpContent .= '    public static function settings()' . PHP_EOL;
         $phpContent .= '    {' . PHP_EOL;
-        $phpContent .= '        return ' . var_export(self::prepare_block_settings($formData), true) . ';' . PHP_EOL;
+        $phpContent .= '        return ' . var_export(self::prepare_block_settings($formData), true) . ';' . PHP_EOL; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
         $phpContent .= '    }' . PHP_EOL . PHP_EOL;
         $phpContent .= '}' . PHP_EOL;
 

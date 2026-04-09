@@ -420,6 +420,7 @@ class MainService
         // disable auto-updates if mainwp is installed
         $plugins = get_option("active_plugins", []);
         if (in_array("mainwp-child/mainwp-child.php", $plugins)) {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- intentionally disabling auto-updates when MainWP is active
             add_filter("auto_update_plugin", "__return_false");
             add_filter("gform_disable_auto_update", "__return_true", 50000);
             add_filter(

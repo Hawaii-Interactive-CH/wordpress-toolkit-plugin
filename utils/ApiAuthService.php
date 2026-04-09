@@ -75,7 +75,7 @@ class ApiAuthService
             .api-auth-section input[type="number"], .api-auth-section input[type="text"] { width: 100%; padding: 5px; margin: 5px 0; }
             .api-auth-section .button-primary { margin-right: 10px; }
         ';
-        wp_register_style('api-auth-admin', false);
+        wp_register_style('api-auth-admin', false, [], WP_TOOLKIT_VERSION);
         wp_enqueue_style('api-auth-admin');
         wp_add_inline_style('api-auth-admin', $css);
     }
@@ -204,7 +204,7 @@ class ApiAuthService
             $token = wp_generate_password(64, false);
             $encrypted_token = self::encrypt_token($token);
             update_option(self::$master_token_option_name, $encrypted_token);
-            wp_redirect(admin_url('admin.php?page=api-authentication'));
+            wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
             exit;
         }
     }
@@ -233,7 +233,7 @@ class ApiAuthService
         if (isset($_POST['set_transient_expiry']) && check_admin_referer('set_transient_expiry_action', 'set_transient_expiry_nonce')) {
             $expiry = isset($_POST['transient_expiry']) ? intval($_POST['transient_expiry']) : 10;
             update_option('api_transient_expiry', $expiry);
-            wp_redirect(admin_url('admin.php?page=api-authentication'));
+            wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
             exit;
         }
     }
@@ -248,6 +248,7 @@ class ApiAuthService
         $token = wp_generate_password(64, false);
         $expiry = get_option('api_transient_expiry', 10);
         $encrypted_token = self::encrypt_token($token);
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token_name'] is set by this plugin, not user input
         set_transient(self::$transient_token_name . '_' . $_SESSION['transient_token_name'], $encrypted_token, $expiry * MINUTE_IN_SECONDS);
         return $token;
     }
@@ -262,6 +263,7 @@ class ApiAuthService
     /** Récupère le token stocké dans un transient et le déchiffre */
     public static function get_token()
     {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token_name'] is set by this plugin, not user input
         $encrypted_token = get_transient(self::$transient_token_name . '_' . $_SESSION['transient_token_name']);
         if ($encrypted_token !== false) {
             return self::decrypt_token($encrypted_token);
@@ -272,6 +274,7 @@ class ApiAuthService
     /** Récupère le temps restant avant l'expiration du token transient. */
     public static function get_transient_remaining_time()
     {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token_name'] is set by this plugin, not user input
         $transient_timeout = get_option('_transient_timeout_' . self::$transient_token_name . '_' . $_SESSION['transient_token_name']);
         if ($transient_timeout !== false) {
             $current_time = time();
@@ -285,7 +288,7 @@ class ApiAuthService
     {
         self::ensure_manage_options_capability();
         if (isset($_POST['add_whitelist']) && check_admin_referer('add_whitelist_action', 'add_whitelist_nonce')) {
-            $ip_or_domain = sanitize_text_field($_POST['whitelist']);
+            $ip_or_domain = sanitize_text_field( wp_unslash( $_POST['whitelist'] ) );
     
             // Vérifie si c'est une adresse IP valide (IPv4 ou IPv6)
             if (filter_var($ip_or_domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) === false) {
@@ -302,7 +305,7 @@ class ApiAuthService
                 }
             }
     
-            wp_redirect(admin_url('admin.php?page=api-authentication'));
+            wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
             exit;
         }
     }
@@ -313,13 +316,13 @@ class ApiAuthService
         self::ensure_manage_options_capability();
         if (isset($_POST['action']) && $_POST['action'] === 'remove_whitelist' && check_admin_referer('remove_whitelist_action', 'remove_whitelist_nonce')) {
 
-            $ip_or_domain = sanitize_text_field($_POST['whitelist_item']);
+            $ip_or_domain = sanitize_text_field( wp_unslash( $_POST['whitelist_item'] ) );
             $whitelist = get_option(self::$whitelist_option_name, []);
             if (($key = array_search($ip_or_domain, $whitelist)) !== false) {
                 unset($whitelist[$key]);
                 update_option(self::$whitelist_option_name, array_values($whitelist));
             }
-            wp_redirect(admin_url('admin.php?page=api-authentication'));
+            wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
             exit;
         }
     }
@@ -334,14 +337,14 @@ class ApiAuthService
     {
         self::ensure_manage_options_capability();
 
-        if ('POST' !== strtoupper($_SERVER['REQUEST_METHOD'] ?? '')) {
+        if ('POST' !== strtoupper( sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ) ) {
             wp_die(esc_html__('Invalid request method.', 'wordpress-toolkit-plugin'));
         }
 
         if (isset($_POST['generate_encryption_key']) && check_admin_referer('generate_encryption_key_action', 'generate_encryption_key_nonce')) {
             if (self::get_encryption_key()) {
                 set_transient('api_auth_error', 'Encryption key is already defined.', 30);
-                wp_redirect(admin_url('admin.php?page=api-authentication'));
+                wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
                 exit;
             }
 
@@ -349,7 +352,7 @@ class ApiAuthService
             update_option('api_encryption_key', $key, false);
             set_transient('api_auth_message', 'Encryption key has been generated and stored securely.', 30);
 
-            wp_redirect(admin_url('admin.php?page=api-authentication'));
+            wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
             exit;
         }
     }
@@ -360,6 +363,7 @@ class ApiAuthService
         global $wpdb;
 
         // Rechercher tous les transients ayant "api_auth_token" dans leur nom
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- transient cleanup requires direct query; caching would defeat the purpose
         $transients = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT option_name AS name FROM $wpdb->options WHERE option_name LIKE %s",

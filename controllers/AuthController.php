@@ -47,6 +47,7 @@ class AuthController {
 			session_start();
 		}
 
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token'] is set by this plugin's ApiAuthService, not user input
 		$transient_token = isset( $_SESSION['transient_token'] ) ? $_SESSION['transient_token'] : '';
 		if ( ! ApiAuthService::verify_token( $transient_token ) ) {
 			return new WP_Error( 'invalid_transient_token', 'Token expired or invalid, please provide master token to generate a new transient token', array( 'status' => 403 ) );
@@ -87,6 +88,7 @@ class AuthController {
 		$ipaddress = '';
 
 		// Vérifie les différentes variables de serveur pour trouver l'adresse IP du client
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput -- IP headers are validated via filter_var(FILTER_VALIDATE_IP) in is_valid_ip(); wp_unslash() is not meaningful for IP addresses
 		if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) && $this->is_valid_ip( $_SERVER['HTTP_CLIENT_IP'] ) ) {
 			$ipaddress = $_SERVER['HTTP_CLIENT_IP'];
 		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) && $this->is_valid_ip( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
@@ -104,6 +106,7 @@ class AuthController {
 		} else {
 			$ipaddress = 'UNKNOWN';
 		}
+		// phpcs:enable WordPress.Security.ValidatedSanitizedInput
 
 		return $ipaddress;
 	}

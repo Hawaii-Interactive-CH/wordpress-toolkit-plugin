@@ -70,7 +70,7 @@ class CookieService
         });
         add_action('wp_enqueue_scripts', function () {
             wp_enqueue_script('aloha-cookie-consent-script', WP_TOOLKIT_URL . 'admin/assets/js/toolkit-cookie-consent.js', array('jquery'), WP_TOOLKIT_VERSION, true);
-            wp_enqueue_style('aloha-cookie-consent-style', WP_TOOLKIT_URL . 'admin/assets/css/toolkit-cookie-consent.css');
+            wp_enqueue_style('aloha-cookie-consent-style', WP_TOOLKIT_URL . 'admin/assets/css/toolkit-cookie-consent.css', [], WP_TOOLKIT_VERSION);
             $inline = 'localStorage.setItem("cookieConsentAdditionalData", ' . wp_json_encode(get_option('cookie_consent_additional_data', '')) . ');'
                 . 'localStorage.setItem("cookieConsentAllowedScriptHosts", ' . wp_json_encode(self::get_allowed_script_hosts()) . ');';
             wp_add_inline_script('aloha-cookie-consent-script', $inline, 'before');

@@ -79,6 +79,7 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function add_media_grid_category_filter() {
 		global $pagenow;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only media library filter; nonce not appropriate for bookmarkable filter URLs
 		$get_data = wp_unslash( $_GET );
 		$mode     = isset( $get_data['mode'] ) ? sanitize_key( $get_data['mode'] ) : '';
 
@@ -251,7 +252,7 @@ class MediaTaxonomy extends Taxonomy {
 			'media-category-filter',
 			WP_TOOLKIT_URL . 'admin/assets/js/media-category-filter.js',
 			[ 'media-views' ],
-			null,
+			WP_TOOLKIT_VERSION,
 			true
 		);
 
@@ -473,6 +474,7 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function add_media_category_filter() {
 		global $pagenow;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only media library filter; nonce not appropriate for bookmarkable filter URLs
 		$get_data = wp_unslash( $_GET );
 		$mode     = isset( $get_data['mode'] ) ? sanitize_key( $get_data['mode'] ) : '';
 
@@ -521,6 +523,7 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function filter_media_by_category( $query ) {
 		global $pagenow;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only media library filter; nonce not appropriate for bookmarkable filter URLs
 		$get_data = wp_unslash( $_GET );
 
 		// Only filter on the media library page
