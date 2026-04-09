@@ -28,7 +28,6 @@ WordPress Toolkit is a professional development framework for building complex W
 - **ApiAuthService** — AES-256-CBC master token + transient token authentication, IP whitelist management, admin UI, and hourly cron cleanup of expired tokens.
 - **CookieService** — Configurable cookie consent banner with accept/refuse actions and localStorage persistence.
 - **DocService** — In-admin Markdown documentation viewer with table of contents and syntax highlighting.
-- **PDFService** — External PDF generation link builder.
 - **Size** — WebP image conversion and on-the-fly resizing with cron-based queue, adaptive quality, and fallback for SVG/AVIF/HEIC.
 - **GravityForm** — Gravity Forms REST API wrapper: list forms, create, update, and format fields and notifications programmatically.
 - **ShareLinks** — Social sharing URLs for Facebook, Twitter, and LinkedIn.

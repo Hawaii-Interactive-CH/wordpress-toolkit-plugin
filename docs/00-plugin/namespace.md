@@ -53,7 +53,6 @@ Here is the base structure of the plugin and theme:
 - Toolkit\utils\MainService
 - Toolkit\utils\ModelService
 - Toolkit\utils\Navigation
-- Toolkit\utils\PDFService
 - Toolkit\utils\RegisterService
 - Toolkit\utils\ShareLinks
 - Toolkit\utils\Size
