@@ -34,7 +34,7 @@ To start a new project, use the official boilerplate: [wordpress-toolkit-boilerp
 
 == Installation ==
 
-1. Upload the `wp-theme-toolkit` folder to the `/wp-content/plugins/` directory, or install the plugin through the WordPress plugin screen directly.
+1. Upload the `wordpress-toolkit-plugin` folder to the `/wp-content/plugins/` directory, or install the plugin through the WordPress plugin screen directly.
 2. Activate the plugin through the **Plugins** screen in WordPress.
 3. The toolkit registers its services automatically on `init`. Configure your theme to extend the base models and register your blocks, CPTs, and taxonomies.
 
@@ -92,7 +92,7 @@ This plugin includes the following third-party libraries:
 * Compatibility: Full WordPress coding standards compliance across all models, controllers, and services
 * Compatibility: Removed unused vendor/jb-fly library
 * Compatibility: Added if(!defined()) guards for all plugin constants
-* Compatibility: Plugin name and text domain unified to wp-theme-toolkit
+* Compatibility: Plugin name and text domain unified to wordpress-toolkit-plugin
 * Compatibility: Disclosed Highlight.js external CDN usage in readme.txt
 * Docs: English translation of internal documentation and file names
 * Docs: GPL license file added

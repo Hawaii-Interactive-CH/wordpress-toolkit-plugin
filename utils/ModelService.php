@@ -20,7 +20,7 @@ class ModelService
         add_action("admin_menu", function () {
             // Add a submenu for settings
             add_submenu_page(
-                "wp-theme-toolkit", // Parent menu slug
+                "wordpress-toolkit-plugin", // Parent menu slug
                 "Models", // Page title
                 "Models", // Menu title
                 "edit_theme_options",
@@ -75,7 +75,7 @@ class ModelService
                 wp_die(
                     esc_html__(
                         "You are not allowed to update model settings.",
-                        "wp-theme-toolkit",
+                        "wordpress-toolkit-plugin",
                     ),
                 );
             }
@@ -99,7 +99,7 @@ class ModelService
             <h2>Model Settings</h2>
             <p><?= __(
                 "Check the boxes below to enable the corresponding post type.",
-                "wp-theme-toolkit",
+                "wordpress-toolkit-plugin",
             ) ?></p>
             <form method="post">
                 <?php wp_nonce_field(

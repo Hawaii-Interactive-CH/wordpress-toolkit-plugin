@@ -11,7 +11,7 @@ class ApiAuthService
     private static function ensure_manage_options_capability()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to perform this action.', 'wp-theme-toolkit'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'wordpress-toolkit-plugin'));
         }
     }
 
@@ -38,7 +38,7 @@ class ApiAuthService
     public static function admin_menu()
     {
         add_submenu_page(
-            'wp-theme-toolkit',
+            'wordpress-toolkit-plugin',
             'API Authentication',
             'API Authentication',
             'manage_options',
@@ -61,7 +61,7 @@ class ApiAuthService
 
     public static function enqueue_styles($hook)
     {
-        if ('wp-theme-toolkit_page_api-authentication' !== $hook) {
+        if ('wordpress-toolkit-plugin_page_api-authentication' !== $hook) {
             return;
         }
         $css = '
@@ -99,7 +99,7 @@ class ApiAuthService
                     <?php if ($encryption_key_defined) : ?>
                         <p>Encryption key is already defined.</p>
                     <?php else : ?>
-                        <p class="description"><?php esc_html_e('Generates and stores a secure encryption key. You may also define ENCRYPTION_KEY manually in wp-config.php.', 'wp-theme-toolkit'); ?></p>
+                        <p class="description"><?php esc_html_e('Generates and stores a secure encryption key. You may also define ENCRYPTION_KEY manually in wp-config.php.', 'wordpress-toolkit-plugin'); ?></p>
                     <?php endif; ?>
                 </form>
             </div>
@@ -332,7 +332,7 @@ class ApiAuthService
         self::ensure_manage_options_capability();
 
         if ('POST' !== strtoupper($_SERVER['REQUEST_METHOD'] ?? '')) {
-            wp_die(esc_html__('Invalid request method.', 'wp-theme-toolkit'));
+            wp_die(esc_html__('Invalid request method.', 'wordpress-toolkit-plugin'));
         }
 
         if (isset($_POST['generate_encryption_key']) && check_admin_referer('generate_encryption_key_action', 'generate_encryption_key_nonce')) {
