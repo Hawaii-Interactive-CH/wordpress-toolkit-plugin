@@ -83,6 +83,7 @@ class EventWPCalendar
         if (empty($posts)) {
             return [
                 'success' => true,
+                // translators: %s is the custom post type slug.
                 'message' => sprintf(__('No post found for type %s.', 'wordpress-toolkit-plugin'), $custom_post_type),
                 'count' => 0
             ];
@@ -126,7 +127,8 @@ class EventWPCalendar
         
         return [
             'success' => true,
-            'message' => sprintf(__('%d event(s) synchronized from %s.', 'wordpress-toolkit-plugin'), $event_count, $custom_post_type),
+            // translators: %1$d is the number of events synchronized, %2$s is the custom post type slug.
+            'message' => sprintf(__('%1$d event(s) synchronized from %2$s.', 'wordpress-toolkit-plugin'), $event_count, $custom_post_type),
             'count' => $event_count
         ];
     }
@@ -262,19 +264,19 @@ class EventWPCalendar
                 
                 // Unix timestamp (numeric)
                 if (is_numeric($field_value)) {
-                    return date('Y-m-d H:i:s', intval($field_value));
+                    return gmdate('Y-m-d H:i:s', intval($field_value));
                 }
                 
                 // Ymd format (20240127)
                 if (is_string($field_value) && strlen($field_value) === 8) {
-                    return date('Y-m-d H:i:s', strtotime($field_value));
+                    return gmdate('Y-m-d H:i:s', strtotime($field_value));
                 }
                 
                 // Y-m-d or other string format
                 if (is_string($field_value)) {
                     $timestamp = strtotime($field_value);
                     if ($timestamp) {
-                        return date('Y-m-d H:i:s', $timestamp);
+                        return gmdate('Y-m-d H:i:s', $timestamp);
                     }
                 }
                 break;
@@ -284,14 +286,14 @@ class EventWPCalendar
                 
                 // Unix timestamp (numeric)
                 if (is_numeric($field_value)) {
-                    return date('Y-m-d H:i:s', intval($field_value));
+                    return gmdate('Y-m-d H:i:s', intval($field_value));
                 }
                 
                 // Y-m-d H:i:s or other string format
                 if (is_string($field_value)) {
                     $timestamp = strtotime($field_value);
                     if ($timestamp) {
-                        return date('Y-m-d H:i:s', $timestamp);
+                        return gmdate('Y-m-d H:i:s', $timestamp);
                     }
                 }
                 break;

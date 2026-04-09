@@ -2,6 +2,9 @@
 
 namespace Toolkit\utils;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 class ApiAuthService
 {
     private static $master_token_option_name = 'api_master_token';

@@ -1,3 +1,4 @@
+<?php defined( 'ABSPATH' ) || exit; ?>
 <div id="cookieConsent" class="cookie-banner">
     <div class="cookie-banner-wrapper">
 

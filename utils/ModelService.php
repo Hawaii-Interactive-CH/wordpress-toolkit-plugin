@@ -15,6 +15,14 @@ class ModelService
             register_setting(
                 "wordpress-toolkit-plugin",
                 "toolkit_enabled_models",
+                [
+                    'sanitize_callback' => function ( $value ) {
+                        if ( ! is_array( $value ) ) {
+                            return [];
+                        }
+                        return array_map( 'sanitize_text_field', $value );
+                    },
+                ]
             );
         });
         add_action("admin_menu", function () {
@@ -97,10 +105,7 @@ class ModelService
         ?>
         <div class="wrap">
             <h2>Model Settings</h2>
-            <p><?= __(
-                "Check the boxes below to enable the corresponding post type.",
-                "wordpress-toolkit-plugin",
-            ) ?></p>
+            <p><?php esc_html_e( "Check the boxes below to enable the corresponding post type.", "wordpress-toolkit-plugin" ); ?></p>
             <form method="post">
                 <?php wp_nonce_field(
                     "toolkit_model_settings_save",

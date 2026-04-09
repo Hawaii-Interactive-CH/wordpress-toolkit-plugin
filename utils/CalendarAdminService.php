@@ -769,7 +769,10 @@ class CalendarAdminService {
 									<p class="description">
 										<?php esc_html_e( 'Select the ACF field (including sub-fields and repeated fields) related to a date for this Custom Post Type. (Only DATE type fields are supported, works with dates inside a repeater)', 'wordpress-toolkit-plugin' ); ?>
 										<br>
-										<strong><?php printf( esc_html__( '%d fields available', 'wordpress-toolkit-plugin' ), count( $all_acf_fields ) ); ?></strong>
+										<strong><?php
+											// translators: %d is the number of ACF fields available.
+											printf( esc_html__( '%d fields available', 'wordpress-toolkit-plugin' ), count( $all_acf_fields ) );
+										?></strong>
 									</p>
 								<?php else : ?>
 									<p class="description">

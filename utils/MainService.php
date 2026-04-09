@@ -166,10 +166,17 @@ class MainService
     public static function admin_menu()
     {
         add_action('admin_init', function () {
-            register_setting('wordpress-toolkit-plugin', 'custom_menu_settings');
-            register_setting('wordpress-toolkit-plugin', 'maintenance_mode');
-            register_setting('wordpress-toolkit-plugin', 'cookie_consent');
-            register_setting('wordpress-toolkit-plugin', 'file_size');
+            register_setting('wordpress-toolkit-plugin', 'custom_menu_settings', [
+                'sanitize_callback' => function ( $value ) {
+                    if ( ! is_array( $value ) ) {
+                        return [];
+                    }
+                    return array_map( 'absint', $value );
+                },
+            ]);
+            register_setting('wordpress-toolkit-plugin', 'maintenance_mode', [ 'sanitize_callback' => 'absint' ]);
+            register_setting('wordpress-toolkit-plugin', 'cookie_consent', [ 'sanitize_callback' => 'absint' ]);
+            register_setting('wordpress-toolkit-plugin', 'file_size', [ 'sanitize_callback' => 'absint' ]);
         });
 
         add_action('admin_menu', function () {
@@ -245,7 +252,7 @@ class MainService
             global $pagenow;
 
             if ($pagenow === "edit-comments.php") {
-                wp_redirect(admin_url());
+                wp_safe_redirect(admin_url());
                 exit();
             }
 
@@ -470,7 +477,7 @@ class MainService
 ?>
         <div class="wrap">
             <h2>Toolkit Settings</h2>
-            <p><?= __('Check the boxes below to hide the corresponding menu items.', 'wordpress-toolkit-plugin') ?></p>
+            <p><?php esc_html_e( 'Check the boxes below to hide the corresponding menu items.', 'wordpress-toolkit-plugin' ); ?></p>
             <form method="post">
                 <?php wp_nonce_field('custom_menu_settings_action', 'custom_menu_settings_nonce'); ?>
 
@@ -600,7 +607,7 @@ class MainService
                     <p>
                         <label for="maintenance_mode">
                             <input type="checkbox" name="maintenance_mode" id="maintenance_mode" value="1" <?php checked(get_option('maintenance_mode', 0), 1); ?>>
-                            <?= __('Enable maintenance mode', 'wordpress-toolkit-plugin') ?>
+                            <?php esc_html_e( 'Enable maintenance mode', 'wordpress-toolkit-plugin' ); ?>
                         </label>
                     </p>
                     <p class="submit">
@@ -615,7 +622,7 @@ class MainService
                     <p>
                         <label for="cookie_consent">
                             <input type="checkbox" name="cookie_consent" id="cookie_consent" value="1" <?php checked(get_option('cookie_consent', 0), 1); ?>>
-                            <?= __('Enable cookie consent', 'wordpress-toolkit-plugin') ?>
+                            <?php esc_html_e( 'Enable cookie consent', 'wordpress-toolkit-plugin' ); ?>
                         </label>
                     </p>
                     <p class="submit">
@@ -631,7 +638,7 @@ class MainService
                     <p>
                         <label for="calendar_action">
                             <input type="checkbox" name="calendar" id="calendar" value="1" <?php checked(get_option('calendar', 0), 1); ?>>
-                            <?= __('Enable calendar', 'wordpress-toolkit-plugin') ?>
+                            <?php esc_html_e( 'Enable calendar', 'wordpress-toolkit-plugin' ); ?>
                         </label>
                     </p>
                     <p class="submit">
@@ -646,11 +653,11 @@ class MainService
                     <?php wp_nonce_field('admin_footer_action', 'admin_footer_nonce'); ?>
                     <table class="form-table">
                         <tr>
-                            <th scope="row"><label for="admin_footer_name"><?= __('Agency name', 'wordpress-toolkit-plugin') ?></label></th>
+                            <th scope="row"><label for="admin_footer_name"><?php esc_html_e( 'Agency name', 'wordpress-toolkit-plugin' ); ?></label></th>
                             <td><input type="text" id="admin_footer_name" name="admin_footer_name" class="regular-text" value="<?php echo esc_attr(get_option('toolkit_admin_footer_name', '')); ?>"></td>
                         </tr>
                         <tr>
-                            <th scope="row"><label for="admin_footer_url"><?= __('Agency URL', 'wordpress-toolkit-plugin') ?></label></th>
+                            <th scope="row"><label for="admin_footer_url"><?php esc_html_e( 'Agency URL', 'wordpress-toolkit-plugin' ); ?></label></th>
                             <td><input type="url" id="admin_footer_url" name="admin_footer_url" class="regular-text" value="<?php echo esc_attr(get_option('toolkit_admin_footer_url', '')); ?>"></td>
                         </tr>
                     </table>
@@ -668,7 +675,7 @@ class MainService
                     <?php wp_nonce_field('file_size_action', 'file_size_nonce'); ?>
                     <p>
                         <label for="file_size">
-                            <?= __('Maximum file size (in MB):', 'wordpress-toolkit-plugin') ?>
+                            <?php esc_html_e( 'Maximum file size (in MB):', 'wordpress-toolkit-plugin' ); ?>
                             <input type="number" id="file_size" name="file_size" min="1" max="100" step="1" value="<?php echo esc_attr(get_option('file_size', 1) / (1024 * 1024)); ?>" required>
                         </label>
                     </p>

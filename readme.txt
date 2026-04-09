@@ -1,14 +1,14 @@
 === WP Theme Toolkit ===
 Contributors: Hawaii Interactive
-Tags: toolkit, theme, custom post type, gutenberg, acf, blocks, developer
+Tags: toolkit, theme, custom post type, acf, developer
 Requires at least: 6.8
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 8.0
 Stable tag: 3.0.0
-License: GPLv3
-License URI: https://www.gnu.org/licenses/gpl-3.0.html#license-text
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A developer toolkit for building WordPress themes — base models, ACF block registration, custom post types, taxonomies, REST API helpers, and utility services.
+A developer toolkit for WordPress themes — ACF blocks, custom post types, taxonomies, REST API, and utility services.
 
 == Description ==
 

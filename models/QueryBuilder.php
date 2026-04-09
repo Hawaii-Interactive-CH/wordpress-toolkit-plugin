@@ -222,8 +222,8 @@ class QueryBuilder
             "total" => $this->page_number(),
             "current" => $this->_queryParams["paged"],
             "type" => "plain",
-            "prev_text" => __("«"),
-            "next_text" => __("»"),
+            "prev_text" => __("«", "wordpress-toolkit-plugin"),
+            "next_text" => __("»", "wordpress-toolkit-plugin"),
         ]);
     }
 }

@@ -122,7 +122,7 @@ class CalendarEvent extends CustomPostType {
 
 					if ( $is_all_day ) {
 						echo '<strong>' . esc_html( date_i18n( 'j M Y', $start ) ) . '</strong>';
-						if ( $end && date( 'Y-m-d', $start ) !== date( 'Y-m-d', $end ) ) {
+						if ( $end && gmdate( 'Y-m-d', $start ) !== gmdate( 'Y-m-d', $end ) ) {
 							echo ' → ' . esc_html( date_i18n( 'j M Y', $end ) );
 						}
 						echo '<br><small>' . esc_html__( 'All Day', 'wordpress-toolkit-plugin' ) . '</small>';
@@ -174,10 +174,12 @@ class CalendarEvent extends CustomPostType {
 
 					if ( $diff < 3600 ) { // Less than 1 hour
 						echo '<span style="color: #46b450;">●</span> ';
-						echo esc_html( sprintf( __( '%d min ago', 'wordpress-toolkit-plugin' ), round( $diff / 60 ) ) );
+						// translators: %d is the number of minutes elapsed since the last sync.
+			echo esc_html( sprintf( __( '%d min ago', 'wordpress-toolkit-plugin' ), round( $diff / 60 ) ) );
 					} elseif ( $diff < 86400 ) { // Less than 1 day
 						echo '<span style="color: #ffb900;">●</span> ';
-						echo esc_html( sprintf( __( '%d h ago', 'wordpress-toolkit-plugin' ), round( $diff / 3600 ) ) );
+						// translators: %d is the number of hours elapsed since the last sync.
+			echo esc_html( sprintf( __( '%d h ago', 'wordpress-toolkit-plugin' ), round( $diff / 3600 ) ) );
 					} else {
 						echo '<span style="color: #999;">●</span> ';
 						echo esc_html( date_i18n( 'j M Y', $synced_time ) );
