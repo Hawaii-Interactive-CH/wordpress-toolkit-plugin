@@ -279,7 +279,15 @@ class MainService
             add_filter(
                 "admin_footer_text",
                 function () {
-                    echo 'Propulsé par <a href="https://hawaii.do/" target="_blank">Hawaii Interactive</a>';
+                    $footer_name = get_option( 'toolkit_admin_footer_name', '' );
+                    $footer_url  = get_option( 'toolkit_admin_footer_url', '' );
+                    if ( $footer_name ) {
+                        if ( $footer_url ) {
+                            echo 'Powered by <a href="' . esc_url( $footer_url ) . '" target="_blank">' . esc_html( $footer_name ) . '</a>';
+                        } else {
+                            echo 'Powered by ' . esc_html( $footer_name );
+                        }
+                    }
                 },
                 11
             );
@@ -524,6 +532,11 @@ class MainService
             update_option('calendar', $options['calendar']);
         }
 
+        if (isset($post_data['submit']) && isset($post_data['admin_footer_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['admin_footer_nonce']), 'admin_footer_action')) {
+            update_option( 'toolkit_admin_footer_name', sanitize_text_field( $post_data['admin_footer_name'] ?? '' ) );
+            update_option( 'toolkit_admin_footer_url', esc_url_raw( $post_data['admin_footer_url'] ?? '' ) );
+        }
+
         if (isset($post_data['submit']) && isset($post_data['file_size_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['file_size_nonce']), 'file_size_action')) {
             // Save the user's choices to options
             $options = [];
@@ -621,6 +634,26 @@ class MainService
                             <?= __('Enable calendar', 'wp-theme-toolkit') ?>
                         </label>
                     </p>
+                    <p class="submit">
+                        <input type="submit" name="submit" class="button-primary" value="Save Changes">
+                    </p>
+                </form>
+            </div>
+
+            <div class="admin-footer">
+                <h2>Admin footer</h2>
+                <form method="post">
+                    <?php wp_nonce_field('admin_footer_action', 'admin_footer_nonce'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="admin_footer_name"><?= __('Agency name', 'wp-theme-toolkit') ?></label></th>
+                            <td><input type="text" id="admin_footer_name" name="admin_footer_name" class="regular-text" value="<?php echo esc_attr(get_option('toolkit_admin_footer_name', '')); ?>"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="admin_footer_url"><?= __('Agency URL', 'wp-theme-toolkit') ?></label></th>
+                            <td><input type="url" id="admin_footer_url" name="admin_footer_url" class="regular-text" value="<?php echo esc_attr(get_option('toolkit_admin_footer_url', '')); ?>"></td>
+                        </tr>
+                    </table>
                     <p class="submit">
                         <input type="submit" name="submit" class="button-primary" value="Save Changes">
                     </p>
