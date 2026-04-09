@@ -74,6 +74,10 @@ This plugin includes the following third-party libraries:
 3. Hide menu items — clean up the WordPress admin sidebar for clients by toggling off unused menu entries.
 4. Model manager — enable/disable registered custom post types and scaffold new CPT model files directly from the admin.
 5. API Authentication — generate an encryption key, create a master token, manage transient token expiry, and configure IP whitelisting.
+6. WebP optimization — test results showing files created and space saved, with a bulk rebuild tool that queues all images for background cron processing.
+7. Link WordPress Events — map any public custom post type and its ACF date field (including repeater sub-fields) to calendar events, with a count of all available fields.
+8. Calendar dashboard — at-a-glance status of Google Calendar and WordPress Events sync, published event count, last sync time, and quick-action buttons.
+9. Calendar Settings — Google Calendar configuration: API key, Calendar ID, sync interval, maximum events, and past/future date-range offsets.
 
 == Changelog ==
 
