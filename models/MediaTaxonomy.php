@@ -29,17 +29,17 @@ class MediaTaxonomy extends Taxonomy {
 				'show_tagcloud'           => false,
 				'update_count_callback'   => '_update_generic_term_count',
 				'labels'                  => [
-					'name'              => __( 'Categories', 'wordpress-toolkit-plugin' ),
-					'singular_name'     => __( 'Category', 'wordpress-toolkit-plugin' ),
-					'search_items'      => __( 'Search Categories', 'wordpress-toolkit-plugin' ),
-					'all_items'         => __( 'All Categories', 'wordpress-toolkit-plugin' ),
-					'parent_item'       => __( 'Parent Category', 'wordpress-toolkit-plugin' ),
-					'parent_item_colon' => __( 'Parent Category:', 'wordpress-toolkit-plugin' ),
-					'edit_item'         => __( 'Edit Category', 'wordpress-toolkit-plugin' ),
-					'update_item'       => __( 'Update Category', 'wordpress-toolkit-plugin' ),
-					'add_new_item'      => __( 'Add New Category', 'wordpress-toolkit-plugin' ),
-					'new_item_name'     => __( 'New Category Name', 'wordpress-toolkit-plugin' ),
-					'menu_name'         => __( 'Categories', 'wordpress-toolkit-plugin' ),
+					'name'              => __( 'Categories', 'hi-theme-toolkit' ),
+					'singular_name'     => __( 'Category', 'hi-theme-toolkit' ),
+					'search_items'      => __( 'Search Categories', 'hi-theme-toolkit' ),
+					'all_items'         => __( 'All Categories', 'hi-theme-toolkit' ),
+					'parent_item'       => __( 'Parent Category', 'hi-theme-toolkit' ),
+					'parent_item_colon' => __( 'Parent Category:', 'hi-theme-toolkit' ),
+					'edit_item'         => __( 'Edit Category', 'hi-theme-toolkit' ),
+					'update_item'       => __( 'Update Category', 'hi-theme-toolkit' ),
+					'add_new_item'      => __( 'Add New Category', 'hi-theme-toolkit' ),
+					'new_item_name'     => __( 'New Category Name', 'hi-theme-toolkit' ),
+					'menu_name'         => __( 'Categories', 'hi-theme-toolkit' ),
 				],
 			]
 		);
@@ -123,7 +123,7 @@ class MediaTaxonomy extends Taxonomy {
 			// Add the "All Categories" option
 			$('<option></option>')
 				.attr('value', '')
-				.text('<?php echo esc_js( __( 'All Categories', 'wordpress-toolkit-plugin' ) ); ?>')
+				.text('<?php echo esc_js( __( 'All Categories', 'hi-theme-toolkit' ) ); ?>')
 				.prop('selected', <?php echo empty( $current ) ? 'true' : 'false'; ?>)
 				.appendTo(categoryFilter);
 
@@ -163,7 +163,7 @@ class MediaTaxonomy extends Taxonomy {
 
 					// Add filter label
 					var filterLabel = $('<span></span>')
-						.text('<?php echo esc_js( __( 'Categories:', 'wordpress-toolkit-plugin' ) ); ?>')
+						.text('<?php echo esc_js( __( 'Categories:', 'hi-theme-toolkit' ) ); ?>')
 						.css('margin-left', '12px')
 						.css('margin-right', '4px');
 
@@ -261,8 +261,8 @@ class MediaTaxonomy extends Taxonomy {
 			'categories' => $categories,
 			'taxonomy'   => self::TYPE,
 			'labels'     => [
-				'filterBy' => __( 'Categories', 'wordpress-toolkit-plugin' ),
-				'all'      => __( 'All Categories', 'wordpress-toolkit-plugin' ),
+				'filterBy' => __( 'Categories', 'hi-theme-toolkit' ),
+				'all'      => __( 'All Categories', 'hi-theme-toolkit' ),
 			],
 		] );
 
@@ -398,7 +398,7 @@ class MediaTaxonomy extends Taxonomy {
 			self::TYPE,
 			[
 				'slug'        => sanitize_title( self::DEFAULT_CATEGORY ),
-				'description' => __( 'Default category for media attachments', 'wordpress-toolkit-plugin' ),
+				'description' => __( 'Default category for media attachments', 'hi-theme-toolkit' ),
 			]
 		);
 	}
@@ -459,10 +459,10 @@ class MediaTaxonomy extends Taxonomy {
 	 */
 	public static function change_media_filter_labels( $strings ) {
 		// Change the filter type label (the main dropdown that shows "Toutes")
-		$strings['filterByType'] = __( 'Categories', 'wordpress-toolkit-plugin' );
+		$strings['filterByType'] = __( 'Categories', 'hi-theme-toolkit' );
 
 		// Change the "All" text in the dropdown
-		$strings['all'] = __( 'All Categories', 'wordpress-toolkit-plugin' );
+		$strings['all'] = __( 'All Categories', 'hi-theme-toolkit' );
 
 		return $strings;
 	}
@@ -498,9 +498,9 @@ class MediaTaxonomy extends Taxonomy {
 		$current = isset( $get_data[ self::TYPE ] ) ? sanitize_text_field( $get_data[ self::TYPE ] ) : '';
 
 		// Display dropdown
-		echo '<label for="media-category-filter" class="screen-reader-text">' . esc_html__( 'Filter by category', 'wordpress-toolkit-plugin' ) . '</label>';
+		echo '<label for="media-category-filter" class="screen-reader-text">' . esc_html__( 'Filter by category', 'hi-theme-toolkit' ) . '</label>';
 		echo '<select name="' . esc_attr( self::TYPE ) . '" id="media-category-filter" class="postform">';
-		echo '<option value="">' . esc_html__( 'All Categories', 'wordpress-toolkit-plugin' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'All Categories', 'hi-theme-toolkit' ) . '</option>';
 
 		foreach ( $media_categories as $category ) {
 			printf(

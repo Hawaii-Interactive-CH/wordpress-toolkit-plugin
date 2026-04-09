@@ -14,7 +14,7 @@ class ApiAuthService
     private static function ensure_manage_options_capability()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to perform this action.', 'wordpress-toolkit-plugin'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'hi-theme-toolkit'));
         }
     }
 
@@ -102,7 +102,7 @@ class ApiAuthService
                     <?php if ($encryption_key_defined) : ?>
                         <p>Encryption key is already defined.</p>
                     <?php else : ?>
-                        <p class="description"><?php esc_html_e('Generates and stores a secure encryption key. You may also define ENCRYPTION_KEY manually in wp-config.php.', 'wordpress-toolkit-plugin'); ?></p>
+                        <p class="description"><?php esc_html_e('Generates and stores a secure encryption key. You may also define ENCRYPTION_KEY manually in wp-config.php.', 'hi-theme-toolkit'); ?></p>
                     <?php endif; ?>
                 </form>
             </div>
@@ -338,7 +338,7 @@ class ApiAuthService
         self::ensure_manage_options_capability();
 
         if ('POST' !== strtoupper( sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ) ) {
-            wp_die(esc_html__('Invalid request method.', 'wordpress-toolkit-plugin'));
+            wp_die(esc_html__('Invalid request method.', 'hi-theme-toolkit'));
         }
 
         if (isset($_POST['generate_encryption_key']) && check_admin_referer('generate_encryption_key_action', 'generate_encryption_key_nonce')) {

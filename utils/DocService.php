@@ -47,8 +47,8 @@ class DocService {
     public static function add_plugin_menu() {
         add_submenu_page(
             'wordpress-toolkit-plugin',
-            __('Docs', 'wordpress-toolkit-plugin'),
-            __('Docs', 'wordpress-toolkit-plugin'),
+            __('Docs', 'hi-theme-toolkit'),
+            __('Docs', 'hi-theme-toolkit'),
             'edit_theme_options',
             'toolkit-docs',
             [self::class, 'display_markdown_docs']
@@ -68,7 +68,7 @@ class DocService {
             (false !== $file_path && strpos($file_path, realpath($base_dir)) !== 0) ||
             (false !== $file_path && !file_exists($file_path))
         ) {
-            echo '<p>' . esc_html__('File not found or access denied.', 'wordpress-toolkit-plugin') . '</p>';
+            echo '<p>' . esc_html__('File not found or access denied.', 'hi-theme-toolkit') . '</p>';
             return;
         }
 
@@ -93,7 +93,7 @@ class DocService {
         $index_url = menu_page_url('toolkit-docs', false);
         
         if ($requested_file !== 'index.html') {
-            echo '<p><a href="' . esc_url( $index_url ) . '">' . esc_html__('Back to table of contents', 'wordpress-toolkit-plugin') . '</a></p>';
+            echo '<p><a href="' . esc_url( $index_url ) . '">' . esc_html__('Back to table of contents', 'hi-theme-toolkit') . '</a></p>';
         }
     }
 
@@ -101,13 +101,13 @@ class DocService {
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="margin: 12px 0 20px;">';
         wp_nonce_field('toolkit_docs_regenerate_index_action', 'toolkit_docs_regenerate_index_nonce');
         echo '<input type="hidden" name="action" value="toolkit_docs_regenerate_index">';
-        echo '<button type="submit" class="button button-secondary">' . esc_html__('Regenerate index', 'wordpress-toolkit-plugin') . '</button>';
+        echo '<button type="submit" class="button button-secondary">' . esc_html__('Regenerate index', 'hi-theme-toolkit') . '</button>';
         echo '</form>';
     }
 
     public static function handle_regenerate_index() {
         if (!current_user_can('edit_theme_options')) {
-            wp_die(esc_html__('You do not have permission to perform this action.', 'wordpress-toolkit-plugin'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'hi-theme-toolkit'));
         }
 
         check_admin_referer('toolkit_docs_regenerate_index_action', 'toolkit_docs_regenerate_index_nonce');

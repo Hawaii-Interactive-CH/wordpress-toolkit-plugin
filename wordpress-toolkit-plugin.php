@@ -16,7 +16,7 @@
  * Requires PHP: 8.0
  * Author: Hawaii Interactive
  * Author URI: https://hawaii.do
- * Text Domain: wordpress-toolkit-plugin
+ * Text Domain: hi-theme-toolkit
  * Domain Path: /languages
  * License: GPLv2 or later
  */

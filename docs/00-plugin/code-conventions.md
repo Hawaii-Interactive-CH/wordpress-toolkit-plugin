@@ -262,8 +262,8 @@ All user-facing strings must be wrapped in a translation function with the plugi
 
 ```php
 // correct
-__( 'Add new item', 'wordpress-toolkit-plugin' );
-esc_html__( 'Category', 'wordpress-toolkit-plugin' );
+__( 'Add new item', 'hi-theme-toolkit' );
+esc_html__( 'Category', 'hi-theme-toolkit' );
 
 // incorrect
 __( 'Add new item' );

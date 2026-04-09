@@ -83,7 +83,7 @@ class ModelService
                 wp_die(
                     esc_html__(
                         "You are not allowed to update model settings.",
-                        "wordpress-toolkit-plugin",
+                        "hi-theme-toolkit",
                     ),
                 );
             }
@@ -105,7 +105,7 @@ class ModelService
         ?>
         <div class="wrap">
             <h2>Model Settings</h2>
-            <p><?php esc_html_e( "Check the boxes below to enable the corresponding post type.", "wordpress-toolkit-plugin" ); ?></p>
+            <p><?php esc_html_e( "Check the boxes below to enable the corresponding post type.", "hi-theme-toolkit" ); ?></p>
             <form method="post">
                 <?php wp_nonce_field(
                     "toolkit_model_settings_save",

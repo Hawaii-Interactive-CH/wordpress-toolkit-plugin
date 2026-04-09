@@ -46,7 +46,7 @@ class CalendarService
         if (!isset($schedules['weekly'])) {
             $schedules['weekly'] = [
                 'interval' => 604800,
-                'display' => __('Once Weekly', 'wordpress-toolkit-plugin')
+                'display' => __('Once Weekly', 'hi-theme-toolkit')
             ];
         }
         

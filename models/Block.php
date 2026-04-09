@@ -18,8 +18,8 @@ abstract class Block
 
 		public static function settings() {
 			return [
-				'title'       => __( 'Key Numbers', 'wordpress-toolkit-plugin' ),
-				'description' => __( 'A custom number block.', 'wordpress-toolkit-plugin' ),
+				'title'       => __( 'Key Numbers', 'hi-theme-toolkit' ),
+				'description' => __( 'A custom number block.', 'hi-theme-toolkit' ),
 				'mode'        => 'auto',
 				'align'       => 'full',
 				'icon'        => 'admin-comments',

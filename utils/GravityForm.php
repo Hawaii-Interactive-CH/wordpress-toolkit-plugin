@@ -108,7 +108,7 @@ class GravityForm
             'notifications' => self::format_notifications($notifications),
             'button' => [
                 'type' => 'text',
-                'text' => __('Submit', 'wordpress-toolkit-plugin'),
+                'text' => __('Submit', 'hi-theme-toolkit'),
             ],
             'is_active' => $is_active ? '1' : '0',
             'date_created' => gmdate('Y-m-d H:i:s'),
@@ -165,7 +165,7 @@ class GravityForm
             'notifications' => self::format_notifications($notifications),
             'button' => [
                 'type' => 'text',
-                'text' => __('Submit', 'wordpress-toolkit-plugin'),
+                'text' => __('Submit', 'hi-theme-toolkit'),
             ],
             'is_active' => $is_active ? '1' : '0',
             'date_created' => gmdate('Y-m-d H:i:s'),

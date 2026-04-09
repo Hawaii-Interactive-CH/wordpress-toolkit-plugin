@@ -75,7 +75,7 @@ class AuthController {
 		if ( in_array( $client_ip, $whitelist, true ) ) {
 			return true;
 		} else {
-			return new WP_Error( 'rest_forbidden', esc_html__( 'Your IP address is not allowed to access this endpoint.', 'wordpress-toolkit-plugin' ), array( 'status' => 403 ) );
+			return new WP_Error( 'rest_forbidden', esc_html__( 'Your IP address is not allowed to access this endpoint.', 'hi-theme-toolkit' ), array( 'status' => 403 ) );
 		}
 	}
 

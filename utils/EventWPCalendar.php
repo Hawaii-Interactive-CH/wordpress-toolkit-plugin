@@ -26,7 +26,7 @@ class EventWPCalendar
         if (empty($wp_events['enabled'])) {
             return [
                 'success' => false,
-                'message' => __('WordPress events are not enabled.', 'wordpress-toolkit-plugin'),
+                'message' => __('WordPress events are not enabled.', 'hi-theme-toolkit'),
                 'count' => 0
             ];
         }
@@ -35,7 +35,7 @@ class EventWPCalendar
         if (empty($wp_events['custom_post_type'])) {
             return [
                 'success' => false,
-                'message' => __('No Custom Post Type has been selected.', 'wordpress-toolkit-plugin'),
+                'message' => __('No Custom Post Type has been selected.', 'hi-theme-toolkit'),
                 'count' => 0
             ];
         }
@@ -44,7 +44,7 @@ class EventWPCalendar
         if (empty($wp_events['acf_field_group'])) {
             return [
                 'success' => false,
-                'message' => __('No ACF field has been selected.', 'wordpress-toolkit-plugin'),
+                'message' => __('No ACF field has been selected.', 'hi-theme-toolkit'),
                 'count' => 0
             ];
         }
@@ -53,7 +53,7 @@ class EventWPCalendar
         if (!function_exists('get_field') || !function_exists('acf_get_field')) {
             return [
                 'success' => false,
-                'message' => __('ACF is not installed or activated.', 'wordpress-toolkit-plugin'),
+                'message' => __('ACF is not installed or activated.', 'hi-theme-toolkit'),
                 'count' => 0
             ];
         }
@@ -66,7 +66,7 @@ class EventWPCalendar
         if (!$acf_field) {
             return [
                 'success' => false,
-                'message' => __('The selected ACF field does not exist.', 'wordpress-toolkit-plugin'),
+                'message' => __('The selected ACF field does not exist.', 'hi-theme-toolkit'),
                 'count' => 0
             ];
         }
@@ -84,7 +84,7 @@ class EventWPCalendar
             return [
                 'success' => true,
                 // translators: %s is the custom post type slug.
-                'message' => sprintf(__('No post found for type %s.', 'wordpress-toolkit-plugin'), $custom_post_type),
+                'message' => sprintf(__('No post found for type %s.', 'hi-theme-toolkit'), $custom_post_type),
                 'count' => 0
             ];
         }
@@ -128,7 +128,7 @@ class EventWPCalendar
         return [
             'success' => true,
             // translators: %1$d is the number of events synchronized, %2$s is the custom post type slug.
-            'message' => sprintf(__('%1$d event(s) synchronized from %2$s.', 'wordpress-toolkit-plugin'), $event_count, $custom_post_type),
+            'message' => sprintf(__('%1$d event(s) synchronized from %2$s.', 'hi-theme-toolkit'), $event_count, $custom_post_type),
             'count' => $event_count
         ];
     }
