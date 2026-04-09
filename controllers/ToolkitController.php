@@ -3,7 +3,7 @@
 namespace Toolkit\controllers;
 
 // Prevent direct access.
-defined( 'ABSPATH' ) or exit;
+defined( 'ABSPATH' ) || exit;
 
 use \WP_REST_Request;
 use \WP_REST_Response;
@@ -101,14 +101,14 @@ class ToolkitController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_upcoming_with_period( WP_REST_Request $request ) {
-		$limit  = intval( $request->get_param( 'limit' ) );
+		$limit  = absint( $request->get_param( 'limit' ) );
 		$limit  = $limit !== 0 ? $limit : 10;
-		$before = intval( $request->get_param( 'before' ) );
+		$before = absint( $request->get_param( 'before' ) );
 		$before = $before >= 0 ? $before : 0;
 		$lang   = sanitize_text_field( $request->get_param( 'lang' ) ?: 'fr' );
 
 		$now        = current_time( 'mysql' );
-		$start_date = date( 'Y-m-d H:i:s', strtotime( "-{$before} days", strtotime( $now ) ) );
+		$start_date = gmdate( 'Y-m-d H:i:s', strtotime( "-{$before} days", strtotime( $now ) ) );
 
 		$args = [
 			'post_type'        => 'calendar_event',
