@@ -27,7 +27,7 @@ class CalendarAdminService {
 			return;
 		}
 
-		wp_enqueue_script( 'toolkit-calendar-test', false, [ 'jquery' ], false, true );
+		wp_enqueue_script( 'toolkit-calendar-test', false, [ 'jquery' ], WP_TOOLKIT_VERSION, true );
 		wp_localize_script(
 			'toolkit-calendar-test',
 			'toolkitCalendarTest',

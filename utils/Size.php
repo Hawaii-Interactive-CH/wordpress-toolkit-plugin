@@ -131,8 +131,13 @@ class Size
     {
         $fly_dir = $this->get_fly_dir($attachment_id);
         if (is_dir($fly_dir)) {
+            global $wp_filesystem;
+            if (empty($wp_filesystem)) {
+                require_once ABSPATH . '/wp-admin/includes/file.php';
+                WP_Filesystem();
+            }
             array_map('unlink', glob($fly_dir . DIRECTORY_SEPARATOR . '*'));
-            @rmdir($fly_dir);
+            $wp_filesystem->rmdir($fly_dir);
         }
     }
 

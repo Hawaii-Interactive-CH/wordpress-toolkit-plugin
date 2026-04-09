@@ -435,15 +435,15 @@ class WebPTestPage
                         </div>
                         <div class="stat-box">
                             <div class="stat-label">Total Saved</div>
-                            <div class="stat-value"><?php echo size_format($total_savings); ?></div>
+                            <div class="stat-value"><?php echo esc_html( size_format( $total_savings ) ); ?></div>
                         </div>
                     </div>
 
                     <?php if ($avg_webp_size > 0 && $avg_png_size > 0): ?>
                     <p>
                         <strong>Average file size:</strong><br>
-                        WebP: <?php echo size_format($avg_webp_size); ?> |
-                        PNG/JPG: <?php echo size_format($avg_png_size); ?> |
+                        WebP: <?php echo esc_html( size_format( $avg_webp_size ) ); ?> |
+                        PNG/JPG: <?php echo esc_html( size_format( $avg_png_size ) ); ?> |
                         <span style="color: #00a32a; font-weight: 600;">
                             Difference: <?php echo number_format((1 - $avg_webp_size / $avg_png_size) * 100, 1); ?>% smaller
                         </span>

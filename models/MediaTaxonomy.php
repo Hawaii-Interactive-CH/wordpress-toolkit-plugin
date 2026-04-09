@@ -108,14 +108,14 @@ class MediaTaxonomy extends Taxonomy {
 			// Create a hidden form that will be submitted
 			var filterForm = $('<form></form>')
 				.attr('method', 'get')
-				.attr('action', '<?php echo admin_url( 'upload.php' ); ?>')
+				.attr('action', '<?php echo esc_url( admin_url( 'upload.php' ) ); ?>')
 				.css('display', 'inline')
 				.css('margin', '0')
 				.css('padding', '0');
 
 			// Create filter dropdown
 			var categoryFilter = $('<select></select>')
-				.attr('name', '<?php echo self::TYPE; ?>')
+				.attr('name', '<?php echo esc_js( self::TYPE ); ?>')
 				.addClass('attachment-filters')
 				.css('margin-left', '8px');
 
@@ -284,7 +284,7 @@ class MediaTaxonomy extends Taxonomy {
 		// Only run once WordPress media is loaded
 		if (typeof wp === 'undefined' || typeof wp.media === 'undefined') return;
 
-		var taxonomy = '<?php echo self::TYPE; ?>';
+		var taxonomy = '<?php echo esc_js( self::TYPE ); ?>';
 
 		// Filter attachments in media grid
 		var originalFilterAttachments = wp.media.view.AttachmentFilters.All.prototype.filterAttachments;
@@ -393,7 +393,7 @@ class MediaTaxonomy extends Taxonomy {
 
 		// Create the default category
 		wp_insert_term(
-			__( self::DEFAULT_CATEGORY, 'wordpress-toolkit-plugin' ),
+			self::DEFAULT_CATEGORY,
 			self::TYPE,
 			[
 				'slug'        => sanitize_title( self::DEFAULT_CATEGORY ),
@@ -416,7 +416,7 @@ class MediaTaxonomy extends Taxonomy {
 		}
 
 		// Get default category
-		$default_term = get_term_by( 'name', __( self::DEFAULT_CATEGORY, 'wordpress-toolkit-plugin' ), self::TYPE );
+		$default_term = get_term_by( 'name', self::DEFAULT_CATEGORY, self::TYPE );
 
 		// If default category exists, assign it to the attachment
 		if ( $default_term && ! is_wp_error( $default_term ) ) {

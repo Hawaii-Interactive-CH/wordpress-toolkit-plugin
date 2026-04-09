@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) or exit;
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title><?= __('Site Under Maintenance', 'wordpress-toolkit-plugin') ?></title>
+    <title><?php esc_html_e( 'Site Under Maintenance', 'wordpress-toolkit-plugin' ); ?></title>
 
     <?php wp_head(); ?>
 </head>
@@ -22,8 +22,8 @@ defined( 'ABSPATH' ) or exit;
 <body <?php body_class(); ?>>
     <main id="maintenance">
         <div class="row">
-            <h1><?= __('Site Under Maintenance', 'wordpress-toolkit-plugin') ?></h1>
-            <p><?= __('We are currently updating the site and will be back very soon!', 'wordpress-toolkit-plugin') ?></p>
+            <h1><?php esc_html_e( 'Site Under Maintenance', 'wordpress-toolkit-plugin' ); ?></h1>
+            <p><?php esc_html_e( 'We are currently updating the site and will be back very soon!', 'wordpress-toolkit-plugin' ); ?></p>
         </div>
     </main>
     <?php wp_footer(); ?>

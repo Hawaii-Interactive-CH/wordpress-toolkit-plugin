@@ -2,6 +2,9 @@
 
 namespace Toolkit\utils;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Google Calendar Source
  * 
@@ -115,15 +118,15 @@ class GoogleCalendarSource
         ]);
         
         if (is_wp_error($response)) {
-            throw new \Exception('API request failed: ' . $response->get_error_message());
+            throw new \Exception(esc_html('API request failed: ' . $response->get_error_message()));
         }
-        
+
         $status_code = wp_remote_retrieve_response_code($response);
         if ($status_code !== 200) {
             $body = wp_remote_retrieve_body($response);
             $error = json_decode($body, true);
             $error_message = $error['error']['message'] ?? 'Unknown error';
-            throw new \Exception("API returned status {$status_code}: {$error_message}");
+            throw new \Exception(esc_html("API returned status {$status_code}: {$error_message}"));
         }
         
         $body = wp_remote_retrieve_body($response);
@@ -235,7 +238,7 @@ class GoogleCalendarSource
         
         // Timed events use 'dateTime' field (RFC3339)
         if (!empty($date_data['dateTime'])) {
-            return date('Y-m-d H:i:s', strtotime($date_data['dateTime']));
+            return gmdate('Y-m-d H:i:s', strtotime($date_data['dateTime']));
         }
         
         return '';

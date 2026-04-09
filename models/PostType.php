@@ -38,7 +38,7 @@ abstract class PostType {
 			$model = '\\Toolkit\\models\\custom\\' . ucfirst( $type );
 
 			if ( ! class_exists( $model ) ) {
-				trigger_error( "Post type $type does not exist.", E_USER_WARNING );
+				trigger_error( esc_html( "Post type $type does not exist." ), E_USER_WARNING );
 			}
 		}
 		return new $model( $id );

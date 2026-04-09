@@ -405,7 +405,9 @@ class AssetService
             window.$RefreshSig$ = () => (type) => type;
             window.__vite_plugin_react_preamble_installed__ = true;
         </script>
+        <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Vite HMR client cannot use wp_enqueue_script ?>
         <script type="module" src="<?php echo esc_url($vite_client); ?>"></script>
+        <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Vite entry point cannot use wp_enqueue_script ?>
         <script type="module" src="<?php echo esc_url($vite_entry); ?>"></script>
         <!-- End Toolkit Vite Dev Server -->
         <?php
@@ -426,6 +428,7 @@ class AssetService
         // Enqueue CSS if exists
         if (isset($entry["css"])) {
             foreach ($entry["css"] as $cssFile) {
+                // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Vite manifest CSS cannot use wp_enqueue_style at this point
                 echo '<link rel="stylesheet" href="' .
                     esc_url($baseUrl . $cssFile) .
                     '">' .
@@ -440,7 +443,7 @@ class AssetService
                     echo '<link rel="preload" href="' .
                         esc_url($baseUrl . $assetFile) .
                         '" as="font" type="font/' .
-                        pathinfo($assetFile, PATHINFO_EXTENSION) .
+                        esc_attr( pathinfo($assetFile, PATHINFO_EXTENSION) ) .
                         '" crossorigin>' .
                         "\n";
                 }
@@ -458,6 +461,7 @@ class AssetService
 
         // Enqueue JS
         if (isset($entry["file"])) {
+            // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Vite manifest JS cannot use wp_enqueue_script at this point
             echo '<script type="module" src="' .
                 esc_url($baseUrl . $entry["file"]) .
                 '"></script>' .

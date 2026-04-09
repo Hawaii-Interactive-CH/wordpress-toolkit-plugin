@@ -108,7 +108,7 @@ class GravityForm
                 'text' => __('Submit', 'wordpress-toolkit-plugin'),
             ],
             'is_active' => $is_active ? '1' : '0',
-            'date_created' => date('Y-m-d H:i:s'),
+            'date_created' => gmdate('Y-m-d H:i:s'),
         ];
 
         // error_log(json_encode($body));
@@ -162,7 +162,7 @@ class GravityForm
                 'text' => __('Submit', 'wordpress-toolkit-plugin'),
             ],
             'is_active' => $is_active ? '1' : '0',
-            'date_created' => date('Y-m-d H:i:s'),
+            'date_created' => gmdate('Y-m-d H:i:s'),
         ];
 
         // error_log(json_encode($body));

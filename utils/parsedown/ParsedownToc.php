@@ -56,7 +56,7 @@ class ParsedownToc extends \ParsedownTocParentAlias
             $msg_error .= '  ParsedownToc requires PHP version ' . self::MIN_PHP_VERSION . ' or later.' . PHP_EOL;
             $msg_error .= '  - Current version : ' . PHP_VERSION . PHP_EOL;
             $msg_error .= '  - Required version: ' . self::MIN_PHP_VERSION . PHP_EOL;
-            throw new \Exception($msg_error);
+            throw new \Exception( esc_html( $msg_error ) );
         }
 
         // Check if Parsedown version is supported
@@ -65,7 +65,7 @@ class ParsedownToc extends \ParsedownTocParentAlias
             $msg_error .= '  ParsedownToc requires a later version of Parsedown.' . PHP_EOL;
             $msg_error .= '  - Current version : ' . Parsedown::version . PHP_EOL;
             $msg_error .= '  - Required version: ' . self::VERSION_PARSEDOWN_REQUIRED . ' and later' . PHP_EOL;
-            throw new \Exception($msg_error);
+            throw new \Exception( esc_html( $msg_error ) );
         }
 
         # If ParsedownExtra is installed, check its version
@@ -75,7 +75,7 @@ class ParsedownToc extends \ParsedownTocParentAlias
                 $msg_error .= '  ParsedownToc requires a later version of ParsedownExtra.' . PHP_EOL;
                 $msg_error .= '  - Current version : ' . ParsedownExtra::version . PHP_EOL;
                 $msg_error .= '  - Required version: ' . self::VERSION_PARSEDOWN_EXTRA_REQUIRED . ' and later' . PHP_EOL;
-                throw new \Exception($msg_error);
+                throw new \Exception( esc_html( $msg_error ) );
             }
             
             /** @psalm-suppress DirectConstructorCall */
@@ -319,7 +319,7 @@ class ParsedownToc extends \ParsedownTocParentAlias
                 $backtrace = debug_backtrace();
                 $caller = $backtrace[0];
                 $errorMessage = "Unknown return type '{$type_return}' given while parsing ToC. Called in " . $caller['file'] . " on line " . $caller['line'];
-                throw new \InvalidArgumentException($errorMessage);
+                throw new \InvalidArgumentException( esc_html( $errorMessage ) );
         }
     }
 
@@ -597,7 +597,7 @@ class ParsedownToc extends \ParsedownTocParentAlias
      */
     protected function fetchText(string $text): string
     {
-        return trim(strip_tags($this->line($text)));
+        return trim( wp_strip_all_tags( $this->line( $text ) ) );
     }
 
     /**

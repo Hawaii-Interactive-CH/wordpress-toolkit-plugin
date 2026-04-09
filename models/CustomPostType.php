@@ -84,6 +84,7 @@ abstract class CustomPostType extends PostType {
 				return;
 			}
 			$model = new static( $post_id );
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render callback is defined by the developer and expected to return escaped HTML
 			echo $columns[ $column ]['render']( $model );
 		}, 10, 2 );
 

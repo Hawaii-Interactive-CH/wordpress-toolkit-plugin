@@ -22,9 +22,9 @@ class DocService {
             return;
         }
 
-        wp_enqueue_style( 'highlightjs-default-style', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css', array(), null );
-        wp_enqueue_script( 'highlightjs', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js', array(), null, true );
-        wp_enqueue_script( 'highlightjs-lang-go', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js', array( 'highlightjs' ), null, true );
+        wp_enqueue_style( 'highlightjs-default-style', WP_TOOLKIT_URL . 'admin/assets/css/highlight-default.min.css', array(), '11.9.0' );
+        wp_enqueue_script( 'highlightjs', WP_TOOLKIT_URL . 'admin/assets/js/highlight.min.js', array(), '11.9.0', true );
+        wp_enqueue_script( 'highlightjs-lang-go', WP_TOOLKIT_URL . 'admin/assets/js/highlight-go.min.js', array( 'highlightjs' ), '11.9.0', true );
         wp_add_inline_script( 'highlightjs', 'hljs.highlightAll();' );
 
         wp_add_inline_script( 'highlightjs', '

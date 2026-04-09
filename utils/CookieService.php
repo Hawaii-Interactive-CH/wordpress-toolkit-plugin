@@ -69,7 +69,7 @@ class CookieService
             ]);
         });
         add_action('wp_enqueue_scripts', function () {
-            wp_enqueue_script('aloha-cookie-consent-script', WP_TOOLKIT_URL . 'admin/assets/js/toolkit-cookie-consent.js', array('jquery'), false, true);
+            wp_enqueue_script('aloha-cookie-consent-script', WP_TOOLKIT_URL . 'admin/assets/js/toolkit-cookie-consent.js', array('jquery'), WP_TOOLKIT_VERSION, true);
             wp_enqueue_style('aloha-cookie-consent-style', WP_TOOLKIT_URL . 'admin/assets/css/toolkit-cookie-consent.css');
             $inline = 'localStorage.setItem("cookieConsentAdditionalData", ' . wp_json_encode(get_option('cookie_consent_additional_data', '')) . ');'
                 . 'localStorage.setItem("cookieConsentAllowedScriptHosts", ' . wp_json_encode(self::get_allowed_script_hosts()) . ');';
@@ -84,9 +84,9 @@ class CookieService
     public static function banner()
     {
         ob_start();
-        include( WP_TOOLKIT_DIR. '/views/banner.php' );
+        include( WP_TOOLKIT_DIR . '/views/banner.php' );
         $banner = ob_get_clean();
-        echo $banner;
+        echo wp_kses_post( $banner );
 
     }
 
@@ -124,6 +124,7 @@ class CookieService
                         'option_none_value' => '',
                         'selected'         => esc_attr(get_option('cookie_consent_page', '')),
                     );
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_dropdown_pages() is a trusted WP core function that handles its own escaping
                     wp_dropdown_pages($args);
                 ?>
 

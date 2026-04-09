@@ -36,8 +36,8 @@ class RegisterService
 ?>
         <div class="wrap">
             <h2 class="nav-tab-wrapper">
-                <a class="nav-tab nav-tab-active" href="#tab1"><?= __('Model', 'wordpress-toolkit-plugin'); ?></a>
-                <a class="nav-tab" href="#tab2"><?= __('Block', 'wordpress-toolkit-plugin'); ?></a>
+                <a class="nav-tab nav-tab-active" href="#tab1"><?php esc_html_e( 'Model', 'wordpress-toolkit-plugin' ); ?></a>
+                <a class="nav-tab" href="#tab2"><?php esc_html_e( 'Block', 'wordpress-toolkit-plugin' ); ?></a>
             </h2>
 
             <?php
@@ -55,7 +55,7 @@ class RegisterService
             <div id="response-message"></div>
             <!-- Model content -->
             <div id="tab1" class="tab-content toolkit">
-                <h3><?= __('Create New Model', 'wordpress-toolkit-plugin'); ?></h3>
+                <h3><?php esc_html_e( 'Create New Model', 'wordpress-toolkit-plugin' ); ?></h3>
 
                 <form id="create-model-form">
                     <div class="fields">
@@ -136,23 +136,23 @@ class RegisterService
 
             <!-- Block content -->
             <div id="tab2" class="tab-content toolkit" style="display: none;">
-                <h3><?= __('Create New Block', 'wordpress-toolkit-plugin'); ?></h3>
+                <h3><?php esc_html_e( 'Create New Block', 'wordpress-toolkit-plugin' ); ?></h3>
                 <form id="create-block-form">
                     <div class="fields">
                         <div class="field">
-                            <label for="block_title"><?= __("Title", "wordpress-toolkit-plugin"); ?>:</label>
+                            <label for="block_title"><?php esc_html_e( 'Title', 'wordpress-toolkit-plugin' ); ?>:</label>
                             <input type="text" id="block_title" name="block_title" required>
                         </div>
                         <div class="field">
-                            <label for="block_description"><?= __("Description", "wordpress-toolkit-plugin"); ?>:</label>
+                            <label for="block_description"><?php esc_html_e( 'Description', 'wordpress-toolkit-plugin' ); ?>:</label>
                             <input type="text" id="block_description" name="block_description" required>
                         </div>
                         <div class="field">
-                            <label for="block_icon"><?= __("Icon", "wordpress-toolkit-plugin"); ?>:</label>
+                            <label for="block_icon"><?php esc_html_e( 'Icon', 'wordpress-toolkit-plugin' ); ?>:</label>
                             <input type="text" id="block_icon" name="block_icon" value="block-default">
                         </div>
                         <div class="field">
-                            <label for="block_keywords"><?= __("Keywords", "wordpress-toolkit-plugin"); ?>:</label>
+                            <label for="block_keywords"><?php esc_html_e( 'Keywords', 'wordpress-toolkit-plugin' ); ?>:</label>
                             <input type="text" id="block_keywords" name="block_keywords" value="section, hi-block">
                         </div>
                     </div>
@@ -367,9 +367,9 @@ class RegisterService
     public static function prepare_block_settings(array $formData)
     {
         return [
-            'title' => __($formData['block_title'], 'wordpress-toolkit-plugin'),
+            'title' => sanitize_text_field( $formData['block_title'] ),
             'mode' => 'auto',
-            'description' => __($formData['block_description'], 'wordpress-toolkit-plugin'),
+            'description' => sanitize_text_field( $formData['block_description'] ),
             'icon' => $formData['block_icon'],
             'keywords' => explode(", ", $formData['block_keywords']),
         ];
