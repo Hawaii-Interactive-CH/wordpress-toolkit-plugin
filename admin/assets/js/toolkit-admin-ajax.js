@@ -16,7 +16,7 @@ jQuery(document).ready(function ($) {
       type: "post",
       url: ajaxurl, // WordPress AJAX URL
       data: {
-        action: "create_cpt_models", // AJAX action name
+        action: "hithto_create_cpt_models", // AJAX action name
         security: $("#create_model_nonce").val(), // Nonce for security
         formData: $("#create-model-form").serializeArray(), // Use serializeArray() to serialize form data
       },
@@ -48,7 +48,7 @@ jQuery(document).ready(function ($) {
       type: "post",
       url: ajaxurl, // WordPress AJAX URL
       data: {
-        action: "create_cpt_blocks", // AJAX action name
+        action: "hithto_create_cpt_blocks", // AJAX action name
         security: $("#create_block_nonce").val(), // Nonce for security
         formData: $("#create-block-form").serializeArray(), // Use serializeArray() to serialize form data
       },
