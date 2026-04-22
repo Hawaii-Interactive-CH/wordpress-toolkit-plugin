@@ -7,9 +7,9 @@ defined( 'ABSPATH' ) || exit;
 
 class ApiAuthService
 {
-    private static $master_token_option_name = 'api_master_token';
-    private static $whitelist_option_name = 'api_auth_whitelist';
-    private static $transient_token_name = 'api_auth_token';
+    private static $master_token_option_name = 'hithto_api_master_token';
+    private static $whitelist_option_name = 'hithto_api_auth_whitelist';
+    private static $transient_token_name = 'hithto_api_auth_token';
 
     private static function ensure_manage_options_capability()
     {
@@ -30,12 +30,12 @@ class ApiAuthService
         add_action('admin_enqueue_scripts', [self::class, 'enqueue_styles']);
 
         // Planifier l'événement cron
-        if (!wp_next_scheduled('api_auth_cleanup_expired_transients')) {
-            wp_schedule_event(time(), 'hourly', 'api_auth_cleanup_expired_transients');
+        if (!wp_next_scheduled('hithto_api_auth_cleanup_expired_transients')) {
+            wp_schedule_event(time(), 'hourly', 'hithto_api_auth_cleanup_expired_transients');
         }
-        
+
         // Ajouter l'action pour le nettoyage des transients expirés
-        add_action('api_auth_cleanup_expired_transients', [self::class, 'cleanup_expired_transients']);
+        add_action('hithto_api_auth_cleanup_expired_transients', [self::class, 'cleanup_expired_transients']);
     }
 
     public static function admin_menu()
@@ -52,13 +52,13 @@ class ApiAuthService
 
     public static function display_admin_notices()
     {
-        if ($message = get_transient('api_auth_error')) {
+        if ($message = get_transient('hithto_api_auth_error')) {
             echo '<div class="notice notice-error"><p>' . esc_html($message) . '</p></div>';
-            delete_transient('api_auth_error'); // Supprime le message d'erreur après l'affichage
+            delete_transient('hithto_api_auth_error');
         }
-        if ($message = get_transient('api_auth_message')) {
+        if ($message = get_transient('hithto_api_auth_message')) {
             echo '<div class="notice notice-success"><p>' . esc_html($message) . '</p></div>';
-            delete_transient('api_auth_message'); // Supprime le message de confirmation après l'affichage
+            delete_transient('hithto_api_auth_message');
         }
     }
 
@@ -83,7 +83,7 @@ class ApiAuthService
     public static function display_api_authentication_page()
     {
         $master_token = self::get_master_token();
-        $expiry = get_option('api_transient_expiry', 10);
+        $expiry = get_option('hithto_api_transient_expiry', 10);
         $whitelist = self::get_whitelist();
         $encryption_key_defined = self::get_encryption_key();
 
@@ -180,7 +180,7 @@ class ApiAuthService
         if (defined('ENCRYPTION_KEY')) {
             return ENCRYPTION_KEY;
         }
-        $key = get_option('api_encryption_key', false);
+        $key = get_option('hithto_api_encryption_key', false);
         return $key ?: false;
     }
 
@@ -232,7 +232,7 @@ class ApiAuthService
         self::ensure_manage_options_capability();
         if (isset($_POST['set_transient_expiry']) && check_admin_referer('set_transient_expiry_action', 'set_transient_expiry_nonce')) {
             $expiry = isset($_POST['transient_expiry']) ? intval($_POST['transient_expiry']) : 10;
-            update_option('api_transient_expiry', $expiry);
+            update_option('hithto_api_transient_expiry', $expiry);
             wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
             exit;
         }
@@ -246,7 +246,7 @@ class ApiAuthService
         }
         $_SESSION['transient_token_name'] = strtotime('now');
         $token = wp_generate_password(64, false);
-        $expiry = get_option('api_transient_expiry', 10);
+        $expiry = get_option('hithto_api_transient_expiry', 10);
         $encrypted_token = self::encrypt_token($token);
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token_name'] is set by this plugin, not user input
         set_transient(self::$transient_token_name . '_' . $_SESSION['transient_token_name'], $encrypted_token, $expiry * MINUTE_IN_SECONDS);
@@ -293,12 +293,12 @@ class ApiAuthService
             // Vérifie si c'est une adresse IP valide (IPv4 ou IPv6)
             if (filter_var($ip_or_domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) === false) {
                 // Utilise une option transitoire pour stocker le message d'erreur pour une IP/Domaine invalide
-                set_transient('api_auth_error', 'Invalid IP address or domain.', 30);
+                set_transient('hithto_api_auth_error', 'Invalid IP address or domain.', 30);
             } else {
                 $whitelist = get_option(self::$whitelist_option_name, []);
                 if (in_array($ip_or_domain, $whitelist)) {
                     // Utilise une option transitoire pour stocker le message d'erreur pour un doublon
-                    set_transient('api_auth_error', 'IP address or domain already in whitelist.', 30);
+                    set_transient('hithto_api_auth_error', 'IP address or domain already in whitelist.', 30);
                 } else {
                     $whitelist[] = $ip_or_domain;
                     update_option(self::$whitelist_option_name, $whitelist);
@@ -343,14 +343,14 @@ class ApiAuthService
 
         if (isset($_POST['generate_encryption_key']) && check_admin_referer('generate_encryption_key_action', 'generate_encryption_key_nonce')) {
             if (self::get_encryption_key()) {
-                set_transient('api_auth_error', 'Encryption key is already defined.', 30);
+                set_transient('hithto_api_auth_error', 'Encryption key is already defined.', 30);
                 wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
                 exit;
             }
 
             $key = bin2hex(random_bytes(32));
-            update_option('api_encryption_key', $key, false);
-            set_transient('api_auth_message', 'Encryption key has been generated and stored securely.', 30);
+            update_option('hithto_api_encryption_key', $key, false);
+            set_transient('hithto_api_auth_message', 'Encryption key has been generated and stored securely.', 30);
 
             wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
             exit;
@@ -367,7 +367,7 @@ class ApiAuthService
         $transients = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT option_name AS name FROM $wpdb->options WHERE option_name LIKE %s",
-                '_transient_timeout_%api_auth_token%'
+                '_transient_timeout_%hithto_api_auth_token%'
             )
         );
 
@@ -390,6 +390,6 @@ class ApiAuthService
 
     public static function deactivate()
     {
-        wp_clear_scheduled_hook('api_auth_cleanup_expired_transients');
+        wp_clear_scheduled_hook('hithto_api_auth_cleanup_expired_transients');
     }
 }
