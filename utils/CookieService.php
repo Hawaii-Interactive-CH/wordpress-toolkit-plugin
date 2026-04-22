@@ -44,7 +44,7 @@ class CookieService
                 'toolkit_cookie_settings',
                 [self::class, 'display_settings_page'],
                 'dashicons-icon-security',
-                2
+                65
             );
         });
         add_action('admin_init', function () {
