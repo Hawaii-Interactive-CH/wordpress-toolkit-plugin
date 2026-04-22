@@ -1,9 +1,9 @@
 <?php
 
+namespace Toolkit\utils\parsedown;
+
 // Prevent direct access.
 defined( 'ABSPATH' ) || exit;
-
-namespace Toolkit\utils\parsedown;
 
 #
 #
