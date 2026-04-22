@@ -1,5 +1,5 @@
 === HI Theme Toolkit ===
-Contributors: Hawaii Interactive
+Contributors: hawaiido
 Tags: toolkit, theme, custom post type, acf, developer
 Requires at least: 6.8
 Tested up to: 6.9
