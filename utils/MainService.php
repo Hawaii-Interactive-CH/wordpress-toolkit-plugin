@@ -166,7 +166,7 @@ class MainService
     public static function admin_menu()
     {
         add_action('admin_init', function () {
-            register_setting('wordpress-toolkit-plugin', 'custom_menu_settings', [
+            register_setting('wordpress-toolkit-plugin', 'hithto_menu_settings', [
                 'sanitize_callback' => function ( $value ) {
                     if ( ! is_array( $value ) ) {
                         return [];
@@ -187,7 +187,7 @@ class MainService
                 'wordpress-toolkit-plugin',
                 [self::class, 'display_toolkit_page'],
                 'dashicons-hi',
-                2
+                65
             );
 
             // Add a submenu for settings
@@ -224,7 +224,7 @@ class MainService
     public static function add_action()
     {
         add_action("admin_menu", function () {
-            $options = get_option("custom_menu_settings", []);
+            $options = get_option("hithto_menu_settings", []);
 
             $menu_items = [
                 'edit-comments.php' => 'Comments',
@@ -452,7 +452,7 @@ class MainService
 
         // Check if the form was submitted
         if (isset($post_data['submit'])) {
-            if (!isset($post_data['custom_menu_settings_nonce']) || !wp_verify_nonce(sanitize_text_field($post_data['custom_menu_settings_nonce']), 'custom_menu_settings_action')) {
+            if (!isset($post_data['hithto_menu_settings_nonce']) || !wp_verify_nonce(sanitize_text_field($post_data['hithto_menu_settings_nonce']), 'hithto_menu_settings_action')) {
                 print 'Sorry, your nonce did not verify.';
                 exit;
             } else {
@@ -467,12 +467,12 @@ class MainService
                     $options[$menu_slug] = isset($post_data[$post_key]) ? 1 : 0;
                 }
 
-                update_option('custom_menu_settings', $options);
+                update_option('hithto_menu_settings', $options);
             }
         }
 
         // Retrieve the saved options
-        $options = get_option('custom_menu_settings', []);
+        $options = get_option('hithto_menu_settings', []);
 
         // Output the settings form
 ?>
@@ -480,7 +480,7 @@ class MainService
             <h2>Toolkit Settings</h2>
             <p><?php esc_html_e( 'Check the boxes below to hide the corresponding menu items.', 'hi-theme-toolkit' ); ?></p>
             <form method="post">
-                <?php wp_nonce_field('custom_menu_settings_action', 'custom_menu_settings_nonce'); ?>
+                <?php wp_nonce_field('hithto_menu_settings_action', 'hithto_menu_settings_nonce'); ?>
 
                 <table class="form-table">
                     <?php

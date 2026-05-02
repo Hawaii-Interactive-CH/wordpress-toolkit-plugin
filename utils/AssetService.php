@@ -251,7 +251,7 @@ class AssetService
     {
         if (file_exists(WP_TOOLKIT_THEME_PATH . "/public/css/blocks.css")) {
             wp_enqueue_style(
-                "custom-block-styles",
+                "hithto-block-styles",
                 WP_TOOLKIT_THEME_URL . "/public/css/blocks.css",
                 ["wp-edit-blocks"],
                 filemtime(WP_TOOLKIT_THEME_PATH . "/public/css/blocks.css"),

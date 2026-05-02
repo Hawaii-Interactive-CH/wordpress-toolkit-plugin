@@ -24,8 +24,8 @@ class RegisterService
             wp_enqueue_script('toolkit-admin-scripts', WP_TOOLKIT_URL . '/admin/assets/js/toolkit-admin-scripts.js', array('jquery'), WP_TOOLKIT_VERSION, true);
         });
         // Register AJAX actions.
-        add_action("wp_ajax_create_cpt_models", [self::class, "create_model_action"]);
-        add_action("wp_ajax_create_cpt_blocks", [self::class, "create_block_action"]);
+        add_action("wp_ajax_hithto_create_cpt_models", [self::class, "create_model_action"]);
+        add_action("wp_ajax_hithto_create_cpt_blocks", [self::class, "create_block_action"]);
     }
 
     /**

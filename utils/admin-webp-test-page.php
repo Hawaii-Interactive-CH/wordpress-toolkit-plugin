@@ -15,12 +15,12 @@ class WebPTestPage
     public static function init()
     {
         add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
-        add_action('wp_ajax_process_webp_queue', [__CLASS__, 'ajax_process_queue']);
+        add_action('wp_ajax_hithto_process_webp_queue', [__CLASS__, 'ajax_process_queue']);
     }
 
     public static function ajax_process_queue()
     {
-        check_ajax_referer('process_webp_queue_nonce', 'nonce');
+        check_ajax_referer('hithto_process_webp_queue_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
             wp_send_json_error('Unauthorized');
         }
@@ -241,7 +241,7 @@ class WebPTestPage
                         </button>
                         <script>
                         (function() {
-                            var nonce = <?php echo wp_json_encode(wp_create_nonce('process_webp_queue_nonce')); ?>;
+                            var nonce = <?php echo wp_json_encode(wp_create_nonce('hithto_process_webp_queue_nonce')); ?>;
                             var btn = document.getElementById('process-now-btn');
                             var countEl = document.getElementById('queue-count');
                             var notice = document.getElementById('queue-status-notice');
@@ -252,7 +252,7 @@ class WebPTestPage
                                 fetch(ajaxurl, {
                                     method: 'POST',
                                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                                    body: 'action=process_webp_queue&nonce=' + nonce
+                                    body: 'action=hithto_process_webp_queue&nonce=' + nonce
                                 })
                                 .then(r => r.json())
                                 .then(data => {
