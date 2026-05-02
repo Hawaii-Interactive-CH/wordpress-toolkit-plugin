@@ -1,0 +1,291 @@
+👋 hawaiido - Let’s improve your plugin!
+
+Thank you for submitting your plugin, "HI Theme Toolkit".
+
+Our volunteer reviewers, tools, and/or AI aids identified issues in your plugin that require your attention.
+
+We’ve pended your submission to give you a chance to review and fix these common issues.
+
+This team handles approximately 1,500 plugin reviews each week. That's a lot. To make the most of this process, please do your part and help us help you; otherwise, your plugin won't be approved.
+
+🤖 Please note that this message was generated using a combination of humans, algorithms, and AI in varying proportions. It may not have been reviewed by a human. All AI outputs are marked with the ✨ emoji. Pay attention to it, it's quite accurate.
+
+Who are we?
+
+We are a group of volunteers who help you identify common issues so that you can make your plugin more secure, compatible, reliable and compliant with the guidelines.
+
+For consistency and better communication, your plugin review will be assigned to a single volunteer who will assist you throughout the entire review. However, response times may vary depending on how much time the volunteer is able to contribute to the team and if whether they need to consult something with the rest of the team.
+
+The review process
+
+
+
+
+
+Understanding the Review Queue
+
+When you reply, your plugin enters the review queue again. Fewer review cycles mean quicker approval, while multiple reviews can extend the process to weeks or months.
+Tip: Carefully fix all issues and test your plugin before resubmitting to speed up approval.
+
+This process is designed to help you improve your plugin while making the review experience faster and more efficient for everyone.
+
+
+Have you checked for common technical issues?
+
+Please ensure that your plugin adheres to best practices, including the following:
+
+🔴 Use wp_enqueue commands
+
+ℹ️ Why it matters: Because of performance and compatibility, please make use of the built in functions for including static and dynamic JS and/or CSS.
+
+🔍 Identify JS and CSS outputs: Look for any <script> or <style> HTML tags in your plugin. In the majority of cases you could enqueue them.
+
+🛠 Fix it: Make use of the specific function for enqueue them:
+
+
+
+👉 In the public pages you can enqueue them using the hook wp_enqueue_scripts() .
+👉 In the admin pages you can enqueue them using the hook admin_enqueue_scripts() . You can also use admin_print_scripts() and admin_print_styles() .
+👉 As of WordPress 6.3, you can easily pass attributes like defer or async, as of WordPress 5.7, you can pass other attributes by using functions and filters.
+
+Example:
+function hithto_enqueue_script() { wp_enqueue_script( 'hithto_js', plugins_url( 'inc/main.js', __FILE__ ), array(), HITHTO_VERSION, true );}add_action( 'wp_enqueue_scripts', 'hithto_enqueue_script' );
+Your JS/CSS is now enqueued!
+
+Possible cases from your plugin include:
+utils/admin-webp-test-page.php:79 <style>
+models/MediaTaxonomy.php:107 <script type="text/javascript">
+utils/admin-webp-test-page.php:242 <script>
+utils/AssetService.php:454 echo "<script>window.toolkitConfig = " .
+models/MediaTaxonomy.php:281 <script>
+utils/admin-webp-test-page.php:631 <script>
+
+
+🔴 Proper escaping of outputs
+
+ℹ️ Why it matters: Escaping prevents common security issues like XSS (Cross-Site Scripting) and avoids breaking the HTML structure.
+Please check the official WordPress docs on escaping for details — this is a quick summary.
+
+🔍 Identify unescaped outputs: Check any output ( echo , print , printf , etc. ) outputting a variable (like $title , $key ) or function result (like get_url() )
+If the value is output without escaping, that’s a potential risk! 🕵️
+
+🛠 Fix it: Always wrap any output with the proper escaping function depending on the context, like:
+
+
+
+Refer to the official WordPress documentation for a complete list of escaping functions.
+👉 Use the most restrictive function that fits the context.
+👉 Escaping should be applied as late as possible, ideally right before output.
+
+Example:
+echo '<a href="' . esc_url( $profile_link ) . '" class="' . esc_attr( $username ) . '">' . esc_html( $display_name ) . '</a>';
+Your output is now escaped!
+
+Examples from your code:
+models/Block.php:64 echo \Toolkit\render_partial( implode( '/', array( 'blocks', static::TYPE ) ), array(
+'block' => $block_instance,
+) );
+# ✨ render_partial() only buffers and returns a theme partial include, and this echo outputs it without escaping at render time.  
+
+
+✔️ You can check this using Plugin Check.
+
+🔴 Use Prefixes for declarations, globals and stored data
+
+ℹ️ Why it matters: Prefixing avoid naming collisions with other themes, plugins, or WordPress core functions.
+A prefix is a string placed in front of a name to avoid collisions. It must be at least 4 characters long, feel distinct and unique to the plugin (do not use common words), and be separated by an underscore or dash.
+Please check the official WordPress docs on avoiding name collisions.
+
+🔍 Identify not prefixed names: Look for any name that is used in a place where it can create a collision.
+
+
+
+If the defined name for that is not prefixed, that’s a potential issue! 🕵️
+
+🛠 Fix it: Always prefix those names, for example if your plugin is called "HI Theme Toolkit" then you could use names like these:
+function hithto_save_post(){ ... }
+class HITHTO_Admin { ... }
+update_option( 'hithto_options', $options );
+register_setting( 'hithto_settings', 'hithto_user_id', ... );
+define( 'HITHTO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+global $hithto_options;
+add_action('wp_ajax_hithto_save_data', ... );
+namespace hawaiido\hithemetoolkit;
+Our tool has automatically detected these common issues, please check your code as there may be more names needing a prefix:
+# Using the common word "api" as a prefix.utils/ApiAuthService.php:34 wp_schedule_event(time(), 'hourly', 'api_auth_cleanup_expired_transients');utils/ApiAuthService.php:235 update_option('api_transient_expiry', $expiry);utils/ApiAuthService.php:296 set_transient('api_auth_error', 'Invalid IP address or domain.', 30);utils/ApiAuthService.php:301 set_transient('api_auth_error', 'IP address or domain already in whitelist.', 30);utils/ApiAuthService.php:346 set_transient('api_auth_error', 'Encryption key is already defined.', 30);utils/ApiAuthService.php:352 update_option('api_encryption_key', $key, false);utils/ApiAuthService.php:353 set_transient('api_auth_message', 'Encryption key has been generated and stored securely.', 30);# Using the common word "_" as a prefix.utils/ApiAuthService.php:252 set_transient(self::$transient_token_name . '_' . $_SESSION['transient_token_name'], $encrypted_token, $expiry * MINUTE_IN_SECONDS);# Using the common word "process" as a prefix.utils/admin-webp-test-page.php:18 add_action('wp_ajax_process_webp_queue', [__CLASS__, 'ajax_process_queue']);# Using the common word "custom" as a prefix.utils/AssetService.php:253 wp_enqueue_style("custom-block-styles", WP_TOOLKIT_THEME_URL . "/public/css/blocks.css", ["wp-edit-blocks"], filemtime(WP_TOOLKIT_THEME_PATH . "/public/css/blocks.css"));utils/MainService.php:169 register_setting('wordpress-toolkit-plugin', 'custom_menu_settings', ['sanitize_callback' => function ($value) { if (!is_array($value)) { return []; } return array_map('absint', $value);}]);utils/MainService.php:470 update_option('custom_menu_settings', $options);# Using the common word "create" as a prefix.utils/RegisterService.php:27 add_action("wp_ajax_create_cpt_models", [self::class, "create_model_action"]);utils/RegisterService.php:28 add_action("wp_ajax_create_cpt_blocks", [self::class, "create_block_action"]);# Using the common word "wp" as a prefix.wordpress-toolkit-plugin.php:30 define('WP_TOOLKIT_VERSION', '3.0.0');wordpress-toolkit-plugin.php:31 define('WP_TOOLKIT_DIR', plugin_dir_path(__FILE__));wordpress-toolkit-plugin.php:32 define('WP_TOOLKIT_URL', plugin_dir_url(__FILE__));wordpress-toolkit-plugin.php:33 define('WP_TOOLKIT_THEME_PATH', get_template_directory());wordpress-toolkit-plugin.php:34 define('WP_TOOLKIT_THEME_URL', get_template_directory_uri());wordpress-toolkit-plugin.php:35 define('WP_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates');
+
+
+Other details
+
+We've detected some other details that you may want to check.
+
+## You haven't added yourself to the "Contributors" list for this plugin.
+
+In your readme file, the "Contributors" parameter is a case-sensitive, comma-separated list of all WordPress.org usernames that have contributed to the code.
+
+Your username is not in this list, you need to add yourself if you want to appear listed as a contributor to this plugin.
+
+If you don't want to appear that's fine, this is not mandatory, we're informing you just in case.
+
+Analysis result:
+
+# WARNING: None of the listed contributors "Hawaii Interactive" is the WordPress.org username of the owner of the plugin "hawaiido".
+
+## PHP Syntax errors
+
+We ask developers to pay attention to their PHP syntax. This kind of errors can come wide variety of issues, from obvious ones (a missing semicolon, mismatched braces, or incorrect use of PHP keywords) to other cases where a combination of functions just doesn't make sense.
+
+Please take a look at what we found in this code:
+utils/parsedown/ParsdownExtra.php:6 namespace Toolkit\utils\parsedown;
+   # ↳ PHP syntax error: Namespace declaration statement has to be the very first statement or after any declare call in the script
+utils/parsedown/Parsedown.php:6 namespace Toolkit\utils\parsedown;
+   # ↳ PHP syntax error: Namespace declaration statement has to be the very first statement or after any declare call in the script
+controllers/ToolkitController.php:119 'order'            => 'ASC',
+   # ↳ PHP syntax error: syntax error, unexpected token "=>", expecting "]"
+
+
+
+## Out of Date Libraries
+
+At least one of the 3rd party libraries you're using is out of date. Please upgrade to the latest stable version for better support and security. We do not recommend you use beta releases.
+
+From your plugin:
+admin/assets/js/highlight.min.js:1 🔴  Highlight.js v11.9.0
+   # ↳ Possible URL: 
+https://github.com/highlightjs/highlight.js
+
+
+
+## PHP libraries that might conflict with the same library loaded by other plugins
+
+Your plugin has included a copy of a library in a way that might conflict with other copies of the same library loaded by other plugins.
+
+Remember that all WordPress plugins share the same execution space, which means that you have to pay special attention to how libraries are loaded, as you might be trying to load a library that another plugin has already loaded.
+
+Fortunately, there are ways to avoid these types of conflicts
+Recommended: Using composer, a tool to manage PHP dependencies, is one of the most convenient and maintainable ways to load a PHP library, it will avoid this kind of conflicts and you'll easily manage the updates of the library.
+Checking if the library was already loaded using class_exists or function_exists and avoid loading yourself if that's already loaded.
+
+However, after getting around the conflicts of loading the same library, we come to another point of conflict: Dealing with different versions of the same library.
+
+Your plugin may find that another plugin has loaded a different version of the same library (before your plugin was able to load it) that is incompatible with your code. While this may not be necessary in stable libraries when using well-established functions, there are some ways to handle this and make your plugin resilient:
+Recommended: If you are using Composer, you can use one of the available tools to automatically assign your namespace to these libraries.
+coenjacobs/mozart : https://github.com/coenjacobs/mozart
+brianhenryie/strauss : https://github.com/brianhenryie/strauss
+humbug/php-scoper : https://github.com/humbug/php-scoper
+There are some libraries that provide tools to give a namespace or prefix to the generated library.
+You can manually provide your namespace to this library. Since this would require you to modify the library, it may not be the most practical choice.
+
+From your plugin:
+# hi-theme-toolkit/utils/parsedown/Parsedown.php
+
+
+
+## Check permission_callback in REST API Route
+
+When using register_rest_route() or wp_register_ability() to define custom REST API endpoints, it is crucial to include a proper permission_callback .
+
+🔒 This callback function ensures that only authorized users can access or modify data through your endpoint.
+
+Code example, checking that the user can change options:
+register_rest_route( 'hi-theme-toolkit/v1', '/my-endpoint', array(
+    'methods' => 'GET',
+    'callback' => 'hi-theme-toolkit_callback_function',
+    'permission_callback' => function() {
+        return current_user_can( 'manage_options' );
+    }
+) );
+
+Please check the register_rest_route() documentation and the current_user_can() documentation.
+
+✅ When a permission_callback is NOT Required:
+
+There are valid use cases for public endpoints, such as publicly available data (e.g., posts, public metadata) or endpoints designed for unauthenticated access (e.g., fetching public stats or information).
+
+In these cases, you should use __return_true as the permission_callback to indicate that the endpoint is intentionally public.
+
+🔒 When a permission_callback IS Required:
+
+For endpoints that involve sensitive data or actions (e.g., getting not public data, creating, updating, or deleting content).
+
+In these cases, you should always implement proper permission checks.
+
+Possible cases found on this plugin's code:
+routes/api.php:52 register_rest_route($toolkit_namespace, '/events', array('methods' => 'GET', 'permission_callback' => array($toolkitController, 'permission_callback'), 'callback' => array($toolkitController, 'get_events'), 'args' => array('per_page' => array('sanitize_callback' => $sanitize_int, 'validate_callback' => $validate_positive_int), 'start_date' => array('sanitize_callback' => $sanitize_datetime, 'validate_callback' => $validate_datetime), 'end_date' => array('sanitize_callback' => $sanitize_datetime, 'validate_callback' => $validate_datetime))));
+# ✨ Public permission callback returns true, but this endpoint exposes internal event sync metadata and should not be publicly accessible.
+routes/api.php:93 register_rest_route($toolkit_namespace, '/events/(?P<id>\\d+)', array('methods' => 'GET', 'permission_callback' => array($toolkitController, 'permission_callback'), 'callback' => array($toolkitController, 'get_event'), 'args' => array('id' => array('sanitize_callback' => $sanitize_int, 'validate_callback' => $validate_positive_int))));
+# ✨ Public permission callback returns true, but this single-event endpoint exposes internal sync metadata and source details.
+routes/api.php:86 register_rest_route($toolkit_namespace, '/events/upcoming-period', array('methods' => 'GET', 'permission_callback' => array($toolkitController, 'permission_callback'), 'callback' => array($toolkitController, 'get_upcoming_with_period')));
+# ✨ Public permission callback returns true, but this endpoint exposes Google/source event metadata that should require authorization.
+
+
+
+## High position for your admin dashboard menu item
+
+Your plugin registers its top-level admin menu item using a very high menu position, causing it to appear above or alongside core WordPress items.
+
+WordPress has an established admin hierarchy that users rely on for consistency and navigation: Posts, Media, Pages, Appearance, Plugins, Users, Tools, Settings, etc. Placing a plugin in a prominent or unexpected position can disrupt this structure and create a cluttered experience, especially on sites with multiple plugins.
+
+Plugins should integrate into WordPress, not compete with core items or other plugins for visibility.
+
+Best practices for menu placement include:
+Add configuration pages under Settings - add_options_page() 
+Add utility functionality under Tools - add_management_page() 
+Add extensions or integrations under the relevant parent plugin (for example, WooCommerce-related pages under WooCommerce) - add_submenu_page() 
+Use a lower menu position if a top-level item is necessary.
+
+Positioning a menu item prominently is often perceived as a visibility tactic rather than a usability-driven decision. The WordPress admin interface is a workspace. Please adjust the menu placement accordingly.
+
+Example(s) from your plugin:
+utils/MainService.php:183 add_menu_page('Toolkit', 'Toolkit', 'edit_theme_options', 'wordpress-toolkit-plugin', [self::class, 'display_toolkit_page'], 'dashicons-hi', 2);
+utils/CalendarAdminService.php:96 add_menu_page(
+    __('Calendar', 'hi-theme-toolkit'),
+    // Page title
+    __('Calendar', 'hi-theme-toolkit'),
+    // Menu title
+    'manage_options',
+    // Capability
+    self::MENU_SLUG,
+    // Menu slug
+    [self::class, 'render_main_page'],
+    // Callback
+    'dashicons-calendar-alt',
+    // Icon
+    25
+);
+utils/CookieService.php:40 add_menu_page('Cookie & Privacy', 'Cookie & Privacy', 'publish_pages', 'toolkit_cookie_settings', [self::class, 'display_settings_page'], 'dashicons-icon-security', 2);
+
+
+
+
+👉 Your next steps
+
+This is your checklist:
+Have you checked for common technical issues?
+Other details
+
+If there is something that needs to be fixed, please take your time, fix it and update your plugin files at the "Add your plugin" page, while being logged in with your account "hawaiido".
+Please be concise and do not list the changes done — we will review the entire plugin again — but do share any clarifications or important context you want us to know.
+
+If after checking the list and do the changes you feel that everything is right or need further clarification, please reply to this email and a volunteer will assist you.
+
+If you believe there is a requirement you cannot accomplish and choose not to make changes, your plugin submission will be rejected after three months.
+
+Thanks!
+
+By taking these steps, you're helping the Plugin Review Team work more efficiently — meaning your plugin (along with the thousands of others in the queue) can be reviewed faster. 🚀 We really appreciate your contribution!
+
+Disclaimers
+
+If, at any time during the review process, you wish to change your permalink (aka the plugin slug) "hi-theme-toolkit", you must explicitly and clearly tell us what you would like it to be. Just changing it in your code and in the display name is not sufficient. Remember, permalinks cannot be altered after approval.
+This email was partially auto-generated, so please be aware that some information might not be entirely accurate. No personal data was shared with the AI during this process. If you notice any obvious errors or something seems off, feel free to reply — we’ll be happy to take a closer look and readjust this automation.
+
+Review ID: AUTOPREREVIEW hi-theme-toolkit/hawaiido/21Apr26/T1 21Apr26/3.9 (P0TDX300452HGN)
+
+
+--
+WordPress Plugins Team | plugins@wordpress.org
+https://make.wordpress.org/plugins/ 
+https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/
+https://wordpress.org/plugins/plugin-check/
+{#HS:3297377319-1030550#} 

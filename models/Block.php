@@ -59,12 +59,11 @@ abstract class Block
 	 * @return void
 	 */
 	public static function render( $data ) {
-		$block_instance = new static( $data );
-		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- render_partial returns escaped template output
-		echo \Toolkit\render_partial( implode( '/', array( 'blocks', static::TYPE ) ), array(
-			'block' => $block_instance,
-		) );
-		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
+		$block = new static( $data );
+		$path  = implode( DIRECTORY_SEPARATOR, [ WP_TOOLKIT_THEME_PATH, 'partials', 'blocks', static::TYPE ] ) . '.php';
+		if ( file_exists( $path ) ) {
+			include $path;
+		}
 	}
 
 	/**
