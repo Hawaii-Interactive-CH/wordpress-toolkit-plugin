@@ -8,17 +8,17 @@ use Toolkit\utils\parsedown\Parsedown;
 
 
 /**
- * This code checks if the class 'ParsedownExtra' exists. If it does, it creates an alias for it called 'ParsedownTocParentAlias'.
- * If 'ParsedownExtra' does not exist, it creates an alias for 'Parsedown' called 'ParsedownTocParentAlias'.
+ * This code checks if the class 'ParsedownExtra' exists. If it does, it creates an alias for it called 'Hithto_ParsedownTocParentAlias'.
+ * If 'ParsedownExtra' does not exist, it creates an alias for 'Parsedown' called 'Hithto_ParsedownTocParentAlias'.
  */
 
 if (class_exists('\\Toolkit\\utils\\parsedown\\ParsedownExtra')) {
-    class_alias('\\Toolkit\\utils\\parsedown\\ParsedownExtra', 'ParsedownTocParentAlias');
+    class_alias('\\Toolkit\\utils\\parsedown\\ParsedownExtra', 'Hithto_ParsedownTocParentAlias');
 } else {
-    class_alias('\\Toolkit\\utils\\parsedown\\Parsedown', 'ParsedownTocParentAlias');
+    class_alias('\\Toolkit\\utils\\parsedown\\Parsedown', 'Hithto_ParsedownTocParentAlias');
 }
 
-class ParsedownToc extends \ParsedownTocParentAlias
+class ParsedownToc extends \Hithto_ParsedownTocParentAlias
 {
     public const VERSION = '1.5.3';
     public const VERSION_PARSEDOWN_REQUIRED = '1.7.4';

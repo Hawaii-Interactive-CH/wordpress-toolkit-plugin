@@ -166,11 +166,23 @@ Three files replaced via cdnjs and version strings updated in `utils/DocService.
 
 ## 7. PHP Library Conflict — Parsedown
 
-**Status: Not fixed — architectural decision required**
+**Status: Fixed**
 
-The Parsedown library at `utils/parsedown/Parsedown.php` is loaded directly and could conflict with another plugin loading a different version of Parsedown.
+The `Parsedown` and `ParsedownExtra` classes were already fully namespaced under `Toolkit\utils\parsedown` — no conflict risk there.
 
-**Recommendation:** Use Composer with a namespace-scoping tool such as [brianhenryie/strauss](https://github.com/brianhenryie/strauss) to automatically prefix the Parsedown namespace (e.g., `Toolkit\utils\parsedown` is already partially done but the class names inside are still global). This ensures no collision. A simpler short-term fix is to wrap the class loading with `class_exists()` checks.
+The actual collision risk was in `utils/parsedown/ParsedownToc.php`: it registered a **global** class alias `ParsedownTocParentAlias` via `class_alias()`. Any other plugin doing the same would cause a PHP fatal error.
+
+Fixed by renaming the alias to a plugin-specific name:
+
+```php
+// Before — global namespace, collision risk:
+class_alias('...\\ParsedownExtra', 'ParsedownTocParentAlias');
+class ParsedownToc extends \ParsedownTocParentAlias { ... }
+
+// After — unique name, no collision:
+class_alias('...\\ParsedownExtra', 'Hithto_ParsedownTocParentAlias');
+class ParsedownToc extends \Hithto_ParsedownTocParentAlias { ... }
+```
 
 ---
 
@@ -230,13 +242,12 @@ Changed menu positions from `2` (top of admin menu, above Dashboard) to `65` (be
 | PHP syntax: ParsdownExtra.php namespace | ✅ Fixed |
 | PHP syntax: ToolkitController.php | Not fixed — likely false positive |
 | Highlight.js out of date | ✅ Fixed — updated to v11.11.1 |
-| Parsedown library conflict | Not fixed — needs Composer/Strauss setup |
+| Parsedown library conflict | ✅ Fixed — global alias renamed to `Hithto_ParsedownTocParentAlias` |
 | REST API `permission_callback` | Not fixed — needs architectural decision |
 | Admin menu positions | ✅ Fixed (65 for Toolkit and Cookie menus) |
 
 
 - **`WP_TOOLKIT_*` constants** — breaking change, needs phased migration to `HITHTO_*`
 - **Inline scripts/styles in `admin-webp-test-page.php`** — requires refactoring the full-HTML page to WP admin wrapper pattern
-- **Highlight.js** — needs manual download of latest version
 - **Parsedown library conflict** — needs Composer + Strauss for namespace scoping
 - **REST API `permission_callback`** — needs a decision on whether events are intentionally public
