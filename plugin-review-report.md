@@ -149,11 +149,18 @@ This is syntactically valid PHP. The reviewer's linter may have misidentified it
 
 ## 6. Out-of-Date Libraries
 
-**Status: Not fixed — manual action required**
+**Status: Fixed**
 
-`admin/assets/js/highlight.min.js` is at **v11.9.0**. The current stable release is newer.
+Updated Highlight.js from **v11.9.0** → **v11.11.1** (latest stable, released 2024-12-25).
 
-**Recommendation:** Download the latest Highlight.js release from https://github.com/highlightjs/highlight.js/releases, replace the file, and update the version reference in the enqueue call.
+Three files replaced via cdnjs and version strings updated in `utils/DocService.php`:
+
+| File | Action |
+|------|--------|
+| `admin/assets/js/highlight.min.js` | Replaced with v11.11.1 |
+| `admin/assets/js/highlight-go.min.js` | Replaced with v11.11.1 |
+| `admin/assets/css/highlight-default.min.css` | Replaced with v11.11.1 |
+| `utils/DocService.php` | Version strings updated `'11.9.0'` → `'11.11.1'` |
 
 ---
 
@@ -222,7 +229,14 @@ Changed menu positions from `2` (top of admin menu, above Dashboard) to `65` (be
 | PHP syntax: Parsedown.php namespace | ✅ Fixed |
 | PHP syntax: ParsdownExtra.php namespace | ✅ Fixed |
 | PHP syntax: ToolkitController.php | Not fixed — likely false positive |
-| Highlight.js out of date | Not fixed — download new version manually |
+| Highlight.js out of date | ✅ Fixed — updated to v11.11.1 |
 | Parsedown library conflict | Not fixed — needs Composer/Strauss setup |
 | REST API `permission_callback` | Not fixed — needs architectural decision |
 | Admin menu positions | ✅ Fixed (65 for Toolkit and Cookie menus) |
+
+
+- **`WP_TOOLKIT_*` constants** — breaking change, needs phased migration to `HITHTO_*`
+- **Inline scripts/styles in `admin-webp-test-page.php`** — requires refactoring the full-HTML page to WP admin wrapper pattern
+- **Highlight.js** — needs manual download of latest version
+- **Parsedown library conflict** — needs Composer + Strauss for namespace scoping
+- **REST API `permission_callback`** — needs a decision on whether events are intentionally public
