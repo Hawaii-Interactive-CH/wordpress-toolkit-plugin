@@ -50,9 +50,6 @@ class MediaTaxonomy extends Taxonomy {
 		// Add list view filter to the media library
 		add_action( 'restrict_manage_posts', [ self::class, 'add_media_category_filter' ] );
 
-		// Add grid view filter to the media library
-		// add_action( 'admin_footer', [ self::class, 'add_media_grid_category_filter' ] );
-
 		// Modify attachment query based on selected category
 		add_filter( 'parse_query', [ self::class, 'filter_media_by_category' ] );
 
