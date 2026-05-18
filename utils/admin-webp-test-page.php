@@ -16,6 +16,19 @@ class WebPTestPage
     {
         add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
         add_action('wp_ajax_hithto_process_webp_queue', [__CLASS__, 'ajax_process_queue']);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueue_scripts']);
+    }
+
+    public static function enqueue_scripts($hook)
+    {
+        if ('tools_page_webp-optimization-test' !== $hook) {
+            return;
+        }
+        wp_enqueue_style('hithto-webp-test-page', WP_TOOLKIT_URL . 'admin/assets/css/webp-test-page.css', [], WP_TOOLKIT_VERSION);
+        wp_enqueue_script('hithto-webp-test-page', WP_TOOLKIT_URL . 'admin/assets/js/webp-test-page.js', [], WP_TOOLKIT_VERSION, true);
+        wp_localize_script('hithto-webp-test-page', 'hithtoWebpTest', [
+            'nonce' => wp_create_nonce('hithto_process_webp_queue_nonce'),
+        ]);
     }
 
     public static function ajax_process_queue()
@@ -73,151 +86,7 @@ class WebPTestPage
         }
 
         ?>
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <style>
-                .webp-test-wrap {
-                    margin: 20px 20px 0 0;
-                }
-                .webp-test-wrap h1 {
-                    color: #1d2327;
-                    border-bottom: 3px solid #2271b1;
-                    padding-bottom: 10px;
-                    margin-bottom: 20px;
-                }
-                .test-section {
-                    background: white;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border: 1px solid #c3c4c7;
-                    box-shadow: 0 1px 1px rgba(0,0,0,.04);
-                }
-                .stats {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                    gap: 15px;
-                    margin: 20px 0;
-                }
-                .stat-box {
-                    background: #f6f7f7;
-                    padding: 15px;
-                    border-radius: 4px;
-                    border-left: 4px solid #2271b1;
-                }
-                .stat-label {
-                    font-size: 11px;
-                    color: #646970;
-                    text-transform: uppercase;
-                    margin-bottom: 5px;
-                    font-weight: 600;
-                }
-                .stat-value {
-                    font-size: 32px;
-                    font-weight: 600;
-                    color: #1d2327;
-                    line-height: 1.2;
-                }
-                .stat-box.success {
-                    border-left-color: #00a32a;
-                }
-                .stat-box.warning {
-                    border-left-color: #dba617;
-                }
-                .stat-box.error {
-                    border-left-color: #d63638;
-                }
-                .widefat th {
-                    font-weight: 600;
-                }
-                .size-comparison {
-                    color: #00a32a;
-                    font-weight: 600;
-                }
-                .badge {
-                    display: inline-block;
-                    padding: 3px 8px;
-                    border-radius: 3px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                }
-                .badge-webp {
-                    background: #d5e8d4;
-                    color: #2d7a2d;
-                }
-                .badge-png {
-                    background: #fff3cd;
-                    color: #856404;
-                }
-                .quality-indicator {
-                    display: inline-block;
-                    padding: 2px 8px;
-                    border-radius: 3px;
-                    font-size: 12px;
-                    font-weight: 600;
-                    background: #e7f5ff;
-                    color: #0c5aa6;
-                }
-                .rebuild-controls {
-                    background: #f0f6fc;
-                    border: 2px solid #0969da;
-                    padding: 20px;
-                    border-radius: 6px;
-                    margin: 20px 0;
-                }
-                .rebuild-controls h3 {
-                    margin-top: 0;
-                    color: #0969da;
-                }
-                .button-group {
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-                    margin-top: 15px;
-                }
-                .checkbox-wrapper {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin: 10px 0;
-                }
-                .log-table {
-                    max-height: 500px;
-                    overflow-y: auto;
-                    border: 1px solid #c3c4c7;
-                }
-                .log-table table {
-                    margin: 0;
-                }
-                .log-level {
-                    display: inline-block;
-                    padding: 2px 8px;
-                    border-radius: 3px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                }
-                .log-level-success { background: #d5e8d4; color: #2d7a2d; }
-                .log-level-error { background: #f8d7da; color: #842029; }
-                .log-level-warning { background: #fff3cd; color: #856404; }
-                .log-level-info { background: #e7f5ff; color: #0c5aa6; }
-                .log-filter-bar {
-                    display: flex;
-                    gap: 8px;
-                    align-items: center;
-                    margin-bottom: 10px;
-                    flex-wrap: wrap;
-                }
-                .log-filter-bar .button.active {
-                    background: #2271b1;
-                    color: #fff;
-                    border-color: #2271b1;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="wrap webp-test-wrap">
+        <div class="wrap webp-test-wrap">
                 <h1>🎨 WebP Optimization Test Results</h1>
 
                 <?php
@@ -239,47 +108,6 @@ class WebPTestPage
                         <button type="button" id="process-now-btn" class="button button-secondary" style="margin-bottom: 10px;">
                             ▶ Process Queue Now
                         </button>
-                        <script>
-                        (function() {
-                            var nonce = <?php echo wp_json_encode(wp_create_nonce('hithto_process_webp_queue_nonce')); ?>;
-                            var btn = document.getElementById('process-now-btn');
-                            var countEl = document.getElementById('queue-count');
-                            var notice = document.getElementById('queue-status-notice');
-
-                            function processQueue() {
-                                btn.disabled = true;
-                                btn.textContent = '⏳ Processing...';
-                                fetch(ajaxurl, {
-                                    method: 'POST',
-                                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                                    body: 'action=hithto_process_webp_queue&nonce=' + nonce
-                                })
-                                .then(r => r.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        var remaining = data.data.remaining;
-                                        countEl.textContent = remaining;
-                                        if (remaining > 0) {
-                                            btn.disabled = false;
-                                            btn.textContent = '▶ Process Queue Now (' + remaining + ' left)';
-                                        } else {
-                                            notice.style.display = 'none';
-                                            btn.textContent = '✅ Queue empty — reload to refresh stats';
-                                        }
-                                    } else {
-                                        btn.disabled = false;
-                                        btn.textContent = '▶ Process Queue Now';
-                                    }
-                                })
-                                .catch(() => {
-                                    btn.disabled = false;
-                                    btn.textContent = '▶ Process Queue Now';
-                                });
-                            }
-
-                            btn.addEventListener('click', processQueue);
-                        })();
-                        </script>
                     <?php endif; ?>
 
                     <form method="post" style="display: inline-block;">
@@ -628,15 +456,6 @@ class WebPTestPage
                             </table>
                         </div>
 
-                        <script>
-                        function filterLogs(level, btn) {
-                            document.querySelectorAll('.log-filter-bar .button').forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            document.querySelectorAll('.log-row').forEach(row => {
-                                row.style.display = (level === 'all' || row.dataset.level === level) ? '' : 'none';
-                            });
-                        }
-                        </script>
                     <?php endif; ?>
                 </div>
 
@@ -655,9 +474,7 @@ class WebPTestPage
                     </p>
                 </div>
 
-            </div>
-        </body>
-        </html>
+        </div>
         <?php
     }
 }
