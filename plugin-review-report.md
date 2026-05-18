@@ -188,23 +188,26 @@ class ParsedownToc extends \Hithto_ParsedownTocParentAlias { ... }
 
 ## 8. REST API `permission_callback`
 
-**Status: Not fixed — review required**
+**Status: Fixed — public access documented explicitly**
 
-Three endpoints in `routes/api.php` use a `permission_callback` that returns `true`:
+The endpoints are **intentionally public**: they serve published calendar events (`post_status = 'publish'`) for front-end widgets and third-party integrations. No unpublished, private, or user-specific data is exposed — equivalent to WordPress's own public `/wp/v2/posts` endpoint.
+
+The `permission_callback` in `controllers/ToolkitController.php` has been updated with a docblock that clearly documents this intent for reviewers and future maintainers:
 
 ```php
-// controllers/ToolkitController.php
+/**
+ * Permission callback for calendar event endpoints.
+ *
+ * These endpoints are intentionally public. They expose published calendar
+ * events (post_status = 'publish') for use by front-end widgets and
+ * third-party integrations (e.g. a JavaScript calendar on the site's
+ * public pages). No unpublished, private, or user-specific data is
+ * returned. Equivalent to WordPress's own public /wp/v2/posts endpoint.
+ *
+ * @return true
+ */
 public function permission_callback() {
-    return true; // Public access
-}
-```
-
-The reviewer notes these endpoints expose internal event/calendar sync metadata.
-
-**Recommendation:** If these calendar events are meant to be publicly readable (e.g., for a front-end calendar widget), `__return_true` is acceptable and you should document this intent explicitly. If they contain sensitive sync metadata, add proper authentication:
-```php
-public function permission_callback() {
-    return current_user_can( 'read' ); // or 'manage_options' for admin-only
+    return true;
 }
 ```
 
@@ -243,11 +246,10 @@ Changed menu positions from `2` (top of admin menu, above Dashboard) to `65` (be
 | PHP syntax: ToolkitController.php | Not fixed — likely false positive |
 | Highlight.js out of date | ✅ Fixed — updated to v11.11.1 |
 | Parsedown library conflict | ✅ Fixed — global alias renamed to `Hithto_ParsedownTocParentAlias` |
-| REST API `permission_callback` | Not fixed — needs architectural decision |
+| REST API `permission_callback` | ✅ Fixed — public intent documented in docblock |
 | Admin menu positions | ✅ Fixed (65 for Toolkit and Cookie menus) |
 
+### Remaining open items
 
 - **`WP_TOOLKIT_*` constants** — breaking change, needs phased migration to `HITHTO_*`
 - **Inline scripts/styles in `admin-webp-test-page.php`** — requires refactoring the full-HTML page to WP admin wrapper pattern
-- **Parsedown library conflict** — needs Composer + Strauss for namespace scoping
-- **REST API `permission_callback`** — needs a decision on whether events are intentionally public

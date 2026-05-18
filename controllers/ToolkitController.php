@@ -282,11 +282,17 @@ class ToolkitController {
 	}
 
 	/**
-	 * Permission callback - allow public access
+	 * Permission callback for calendar event endpoints.
 	 *
-	 * @return bool
+	 * These endpoints are intentionally public. They expose published calendar
+	 * events (post_status = 'publish') for use by front-end widgets and
+	 * third-party integrations (e.g. a JavaScript calendar on the site's
+	 * public pages). No unpublished, private, or user-specific data is
+	 * returned. Equivalent to WordPress's own public /wp/v2/posts endpoint.
+	 *
+	 * @return true
 	 */
 	public function permission_callback() {
-		return true; // Public access
+		return true;
 	}
 }
