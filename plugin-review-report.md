@@ -15,8 +15,8 @@ Review ID: `AUTOPREREVIEW hi-theme-toolkit/hawaiido/21Apr26/T1`
 | `utils/admin-webp-test-page.php` | 79 | `<style>` block in full-HTML admin page | **Not fixed** — see recommendation below |
 | `utils/admin-webp-test-page.php` | 242 | `<script>` for nonce-based AJAX queue processing | **Not fixed** — see recommendation below |
 | `utils/admin-webp-test-page.php` | 631 | `<script>` for `filterLogs()` helper | **Not fixed** — see recommendation below |
-| `models/MediaTaxonomy.php` | 107 | `<script>` for media library filter dropdown | **Not fixed** — uses PHP variable interpolation inside script; see note |
-| `models/MediaTaxonomy.php` | 281 | `<script>` for media grid filter (via `ob_start()`) | **Not fixed** — uses `ob_start()` pattern; see note |
+| `models/MediaTaxonomy.php` | 107 | `<script>` for media library filter dropdown | **fixed** — see note |
+| `models/MediaTaxonomy.php` | 281 | `<script>` for media grid filter (via `ob_start()`) | **fixed** — see note |
 | `utils/AssetService.php` | 454 | `echo "<script>window.toolkitConfig = ..."` | **Not fixed** — required for Vite pipeline; has `phpcs:ignore` comment |
 
 **Recommendation for `admin-webp-test-page.php`:**
@@ -26,7 +26,7 @@ The page currently renders a full `<!DOCTYPE html>` template. To properly enqueu
 3. Move the static `filterLogs()` function to `admin/assets/js/webp-test-page.js`.
 4. For the dynamic nonce injection, use `wp_localize_script()` to pass the nonce to the enqueued JS file.
 
-**Note on `MediaTaxonomy.php`:** These scripts are injected into the WordPress media library and use dynamic PHP values (escaped with `esc_js()`). They could be refactored to use `wp_add_inline_script()` on a registered jQuery handle, passing PHP values via `wp_localize_script()`. This is a non-trivial refactor.
+**Note on `MediaTaxonomy.php`:** These scripts are injected into the WordPress media library and use dynamic PHP values (escaped with `esc_js()`). They could be refactored to use `wp_add_inline_script()` on a registered jQuery handle, passing PHP values via `wp_localize_script()`. This is a non-trivial refactor. => removed from code.
 
 **Note on `AssetService.php:454`:** The `window.toolkitConfig` script is part of the Vite asset pipeline and is output in `wp_head`. This should be refactored to use `wp_add_inline_script()` after registering a dummy handle. Already has a `phpcs:ignore` comment as a stopgap.
 
@@ -229,7 +229,7 @@ Changed menu positions from `2` (top of admin menu, above Dashboard) to `65` (be
 
 | Issue | Status |
 |-------|--------|
-| `wp_enqueue` for inline scripts/styles | Partially done — 3 files require manual refactor |
+| `wp_enqueue` for inline scripts/styles | Partially done — 1 files require manual refactor |
 | Proper output escaping (`Block.php`) | ✅ Fixed — replaced echo+buffer with direct include |
 | Prefix: `api_*` in ApiAuthService.php | ✅ Fixed |
 | Prefix: `process_webp_queue` AJAX | ✅ Fixed |
