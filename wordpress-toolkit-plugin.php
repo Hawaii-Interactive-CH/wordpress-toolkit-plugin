@@ -27,12 +27,20 @@ namespace Toolkit;
 defined( 'ABSPATH' ) or exit();
 
 // Define plugin constants.
-if ( ! defined( 'WP_TOOLKIT_VERSION' ) )         define( 'WP_TOOLKIT_VERSION', '3.0.0' );
-if ( ! defined( 'WP_TOOLKIT_DIR' ) )             define( 'WP_TOOLKIT_DIR', plugin_dir_path( __FILE__ ) );
-if ( ! defined( 'WP_TOOLKIT_URL' ) )             define( 'WP_TOOLKIT_URL', plugin_dir_url( __FILE__ ) );
-if ( ! defined( 'WP_TOOLKIT_THEME_PATH' ) )      define( 'WP_TOOLKIT_THEME_PATH', get_template_directory() );
-if ( ! defined( 'WP_TOOLKIT_THEME_URL' ) )       define( 'WP_TOOLKIT_THEME_URL', get_template_directory_uri() );
-if ( ! defined( 'WP_TOOLKIT_THEME_VIEWS_PATH' ) ) define( 'WP_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
+if ( ! defined( 'HI_TOOLKIT_VERSION' ) )         define( 'HI_TOOLKIT_VERSION', '3.0.0' );
+if ( ! defined( 'HI_TOOLKIT_DIR' ) )             define( 'HI_TOOLKIT_DIR', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'HI_TOOLKIT_URL' ) )             define( 'HI_TOOLKIT_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'HI_TOOLKIT_THEME_PATH' ) )      define( 'HI_TOOLKIT_THEME_PATH', get_template_directory() );
+if ( ! defined( 'HI_TOOLKIT_THEME_URL' ) )       define( 'HI_TOOLKIT_THEME_URL', get_template_directory_uri() );
+if ( ! defined( 'HI_TOOLKIT_THEME_VIEWS_PATH' ) ) define( 'HI_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
+
+// Deprecated aliases — will be removed in a future major version.
+if ( ! defined( 'WP_TOOLKIT_VERSION' ) )         define( 'WP_TOOLKIT_VERSION', HI_TOOLKIT_VERSION );
+if ( ! defined( 'WP_TOOLKIT_DIR' ) )             define( 'WP_TOOLKIT_DIR', HI_TOOLKIT_DIR );
+if ( ! defined( 'WP_TOOLKIT_URL' ) )             define( 'WP_TOOLKIT_URL', HI_TOOLKIT_URL );
+if ( ! defined( 'WP_TOOLKIT_THEME_PATH' ) )      define( 'WP_TOOLKIT_THEME_PATH', HI_TOOLKIT_THEME_PATH );
+if ( ! defined( 'WP_TOOLKIT_THEME_URL' ) )       define( 'WP_TOOLKIT_THEME_URL', HI_TOOLKIT_THEME_URL );
+if ( ! defined( 'WP_TOOLKIT_THEME_VIEWS_PATH' ) ) define( 'WP_TOOLKIT_THEME_VIEWS_PATH', HI_TOOLKIT_THEME_VIEWS_PATH );
 
 // Autoload classes.
 spl_autoload_register( function ( $class ) {

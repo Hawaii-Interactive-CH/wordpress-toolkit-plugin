@@ -6,25 +6,20 @@ Review ID: `AUTOPREREVIEW hi-theme-toolkit/hawaiido/21Apr26/T1`
 
 ## 1. Use `wp_enqueue` Commands
 
-**Status: Partially fixed / Partially requires manual work**
+**Status: Fixed**
 
-### Files with inline `<script>` / `<style>` that were NOT converted
+### Files with inline `<script>` / `<style>`
 
 | File | Line | Issue | Status |
 |------|------|-------|--------|
-| `utils/admin-webp-test-page.php` | 79 | `<style>` block in full-HTML admin page | **Not fixed** — see recommendation below |
-| `utils/admin-webp-test-page.php` | 242 | `<script>` for nonce-based AJAX queue processing | **Not fixed** — see recommendation below |
-| `utils/admin-webp-test-page.php` | 631 | `<script>` for `filterLogs()` helper | **Not fixed** — see recommendation below |
+| `utils/admin-webp-test-page.php` | — | `<style>` block in full-HTML admin page | ✅ **Fixed** — extracted to `admin/assets/css/webp-test-page.css`, enqueued via `admin_enqueue_scripts` |
+| `utils/admin-webp-test-page.php` | — | `<script>` for nonce-based AJAX queue processing | ✅ **Fixed** — moved to `admin/assets/js/webp-test-page.js`, nonce passed via `wp_localize_script` |
+| `utils/admin-webp-test-page.php` | — | `<script>` for `filterLogs()` helper | ✅ **Fixed** — moved to `admin/assets/js/webp-test-page.js` |
 | `models/MediaTaxonomy.php` | 107 | `<script>` for media library filter dropdown | **fixed** — see note |
 | `models/MediaTaxonomy.php` | 281 | `<script>` for media grid filter (via `ob_start()`) | **fixed** — see note |
 | `utils/AssetService.php` | 454 | `echo "<script>window.toolkitConfig = ..."` | **Not fixed** — required for Vite pipeline; has `phpcs:ignore` comment |
 
-**Recommendation for `admin-webp-test-page.php`:**
-The page currently renders a full `<!DOCTYPE html>` template. To properly enqueue styles and scripts:
-1. Refactor the page to use WordPress admin wrapper (`<div class="wrap">`) instead of a custom full HTML template.
-2. Extract the `<style>` block to `admin/assets/css/webp-test-page.css` and enqueue it in `init()` via `admin_enqueue_scripts`.
-3. Move the static `filterLogs()` function to `admin/assets/js/webp-test-page.js`.
-4. For the dynamic nonce injection, use `wp_localize_script()` to pass the nonce to the enqueued JS file.
+**Note on `admin-webp-test-page.php`:** Page refactored from full `<!DOCTYPE html>` template to WP admin wrapper (`<div class="wrap">`). `enqueue_scripts($hook)` guards on `tools_page_webp-optimization-test` and enqueues both assets. Queue-processor JS reads the nonce from `hithtoWebpTest.nonce` (injected via `wp_localize_script`). `filterLogs()` is exposed as `window.filterLogs` for the existing inline `onclick` attributes.
 
 **Note on `MediaTaxonomy.php`:** These scripts are injected into the WordPress media library and use dynamic PHP values (escaped with `esc_js()`). They could be refactored to use `wp_add_inline_script()` on a registered jQuery handle, passing PHP values via `wp_localize_script()`. This is a non-trivial refactor. => removed from code.
 
@@ -90,19 +85,27 @@ public static function render( $data ) {
 | `admin/assets/js/toolkit-admin-ajax.js` | `create_cpt_models` (JS action) | `hithto_create_cpt_models` |
 | `admin/assets/js/toolkit-admin-ajax.js` | `create_cpt_blocks` (JS action) | `hithto_create_cpt_blocks` |
 
-### Not Fixed — `WP_TOOLKIT_*` Constants
+### Fixed — `WP_TOOLKIT_*` Constants → `HI_TOOLKIT_*`
 
-**Status: Requires decision**
+**Status: Fixed with deprecated aliases**
 
-The constants `WP_TOOLKIT_VERSION`, `WP_TOOLKIT_DIR`, `WP_TOOLKIT_URL`, `WP_TOOLKIT_THEME_PATH`, `WP_TOOLKIT_THEME_URL`, `WP_TOOLKIT_THEME_VIEWS_PATH` in `wordpress-toolkit-plugin.php` use the `WP_` prefix which is reserved by WordPress core.
+The constants `WP_TOOLKIT_VERSION`, `WP_TOOLKIT_DIR`, `WP_TOOLKIT_URL`, `WP_TOOLKIT_THEME_PATH`, `WP_TOOLKIT_THEME_URL`, `WP_TOOLKIT_THEME_VIEWS_PATH` in `wordpress-toolkit-plugin.php` used the `WP_` prefix which is reserved by WordPress core.
 
-**Recommendation:** Rename to `HITHTO_*` (e.g., `HITHTO_VERSION`, `HITHTO_DIR`, etc.). However, this is a **breaking change** — all themes using this plugin reference these constants directly. If you rename them, you must update every theme simultaneously. Suggested approach:
-1. Define both old and new names for one release cycle:
-   ```php
-   define( 'HITHTO_VERSION', '3.0.0' );
-   if ( ! defined( 'WP_TOOLKIT_VERSION' ) ) define( 'WP_TOOLKIT_VERSION', HITHTO_VERSION ); // deprecated
-   ```
-2. Remove the deprecated aliases in the next major version.
+Renamed to `HI_TOOLKIT_*`. The old `WP_TOOLKIT_*` names are kept as deprecated aliases pointing to the new constants, so existing themes continue to work without changes:
+
+```php
+// New canonical constants
+define( 'HI_TOOLKIT_VERSION', '3.0.0' );
+define( 'HI_TOOLKIT_DIR',     plugin_dir_path( __FILE__ ) );
+// … etc.
+
+// Deprecated aliases — will be removed in a future major version.
+if ( ! defined( 'WP_TOOLKIT_VERSION' ) ) define( 'WP_TOOLKIT_VERSION', HI_TOOLKIT_VERSION );
+if ( ! defined( 'WP_TOOLKIT_DIR' ) )     define( 'WP_TOOLKIT_DIR',     HI_TOOLKIT_DIR );
+// … etc.
+```
+
+Themes can migrate to `HI_TOOLKIT_*` at their own pace; the aliases will be removed in the next major version.
 
 ---
 
@@ -232,14 +235,14 @@ Changed menu positions from `2` (top of admin menu, above Dashboard) to `65` (be
 
 | Issue | Status |
 |-------|--------|
-| `wp_enqueue` for inline scripts/styles | Partially done — 1 files require manual refactor |
+| `wp_enqueue` for inline scripts/styles | ✅ Fixed — `admin-webp-test-page.php` refactored; only `AssetService.php` Vite inline remains (intentional) |
 | Proper output escaping (`Block.php`) | ✅ Fixed — replaced echo+buffer with direct include |
 | Prefix: `api_*` in ApiAuthService.php | ✅ Fixed |
 | Prefix: `process_webp_queue` AJAX | ✅ Fixed |
 | Prefix: `custom-block-styles` | ✅ Fixed |
 | Prefix: `custom_menu_settings` | ✅ Fixed |
 | Prefix: `create_cpt_*` AJAX actions | ✅ Fixed |
-| Prefix: `WP_TOOLKIT_*` constants | Not fixed — breaking change, needs phased migration |
+| Prefix: `WP_TOOLKIT_*` constants | ✅ Fixed — renamed to `HI_TOOLKIT_*`; deprecated aliases kept for backward compat |
 | Contributors in readme.txt | ✅ Fixed |
 | PHP syntax: Parsedown.php namespace | ✅ Fixed |
 | PHP syntax: ParsdownExtra.php namespace | ✅ Fixed |
@@ -251,5 +254,4 @@ Changed menu positions from `2` (top of admin menu, above Dashboard) to `65` (be
 
 ### Remaining open items
 
-- **`WP_TOOLKIT_*` constants** — breaking change, needs phased migration to `HITHTO_*`
-- **Inline scripts/styles in `admin-webp-test-page.php`** — requires refactoring the full-HTML page to WP admin wrapper pattern
+- **`AssetService.php:454`** — `window.toolkitConfig` inline script; intentional Vite pipeline requirement, has `phpcs:ignore` stopgap
