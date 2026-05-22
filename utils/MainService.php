@@ -677,7 +677,7 @@ class MainService
                     <p>
                         <label for="file_size">
                             <?php esc_html_e( 'Maximum file size (in MB):', 'hi-theme-toolkit' ); ?>
-                            <input type="number" id="file_size" name="file_size" min="1" max="100" step="1" value="<?php echo esc_attr(get_option('file_size', 1) / (1024 * 1024)); ?>" required>
+                            <input type="number" id="file_size" name="file_size" min="1" max="300" step="1" value="<?php echo esc_attr(get_option('file_size', 1) / (1024 * 1024)); ?>" required>
                         </label>
                     </p>
                     <p class="submit">
