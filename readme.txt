@@ -2,7 +2,7 @@
 Contributors: hawaiido
 Tags: toolkit, theme, custom post type, acf, developer
 Requires at least: 6.8
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.0
 Stable tag: 3.0.0
 License: GPL-2.0-or-later

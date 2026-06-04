@@ -17,7 +17,6 @@ class MainService
         self::add_filter();
         self::add_theme_support();
         self::remove_action();
-        self::disable_auto_update();
         self::upload_limit();
         self::templates_directory();
         self::maintenance_mode();
@@ -415,21 +414,6 @@ class MainService
         remove_action("wp_head", "wlwmanifest_link");
     }
 
-    public static function disable_auto_update()
-    {
-        // disable auto-updates if mainwp is installed
-        $plugins = get_option("active_plugins", []);
-        if (in_array("mainwp-child/mainwp-child.php", $plugins)) {
-            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- intentionally disabling auto-updates when MainWP is active
-            add_filter("auto_update_plugin", "__return_false");
-            add_filter("gform_disable_auto_update", "__return_true", 50000);
-            add_filter(
-                "option_gform_enable_background_updates",
-                "__return_false",
-                50000
-            );
-        }
-    }
 
     public static function display_settings_page()
     {
