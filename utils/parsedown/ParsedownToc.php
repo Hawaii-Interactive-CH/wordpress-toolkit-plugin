@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Toolkit\utils\parsedown;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 use Toolkit\utils\parsedown\ParsedownExtra;
 use Toolkit\utils\parsedown\Parsedown;
 
