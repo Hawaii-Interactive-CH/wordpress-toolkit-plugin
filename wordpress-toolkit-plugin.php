@@ -62,6 +62,9 @@ spl_autoload_register( function ( $class ) {
 
 
 
+// Redirect legacy option names before any theme or service reads them.
+\Toolkit\utils\LegacyOptionService::register();
+
 // Register routes & main utils.
 include WP_TOOLKIT_DIR . '/main.php';
 include WP_TOOLKIT_DIR . '/routes/api.php';

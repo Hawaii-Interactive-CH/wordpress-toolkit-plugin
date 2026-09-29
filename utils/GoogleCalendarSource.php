@@ -44,26 +44,36 @@ class GoogleCalendarSource
         try {
             // Get events from Google Calendar API
             $events = self::fetch_google_events($google_settings);
-            
-            if (empty($events)) {
-                return [
-                    'success' => true,
-                    'message' => 'No events found',
-                    'events_synced' => 0
-                ];
-            }
-            
+
             // Process and save each event
-            $synced_count = 0;
+            $synced_ids = [];
             foreach ($events as $google_event) {
-                if (self::save_event($google_event)) {
-                    $synced_count++;
+                $saved = self::save_event($google_event);
+                if ($saved) {
+                    $synced_ids[] = $saved;
                 }
             }
-            
+            $synced_count = count($synced_ids);
+
+            // Remove events deleted from Google, only inside the fetched time window
+            // and only if the API response was not truncated by max_results
+            $deleted_count = 0;
+            $max_results = !empty($google_settings['max_results']) ? intval($google_settings['max_results']) : 250;
+            if (count($events) < $max_results) {
+                [$time_min, $time_max] = self::get_time_window($google_settings);
+                $deleted_count = CalendarService::cleanup_deleted_events('_google_event_id', $synced_ids, [
+                    [
+                        'key' => '_event_start_date',
+                        'value' => [gmdate('Y-m-d H:i:s', $time_min), gmdate('Y-m-d H:i:s', $time_max)],
+                        'compare' => 'BETWEEN',
+                        'type' => 'DATETIME'
+                    ]
+                ]);
+            }
+
             return [
                 'success' => true,
-                'message' => sprintf('%d events synced successfully', $synced_count),
+                'message' => sprintf('%d events synced successfully, %d deleted', $synced_count, $deleted_count),
                 'events_synced' => $synced_count
             ];
             
@@ -76,6 +86,20 @@ class GoogleCalendarSource
         }
     }
     
+    /**
+     * Get the sync time window as timestamps
+     *
+     * @param array $settings Calendar settings
+     * @return array [time_min, time_max]
+     */
+    private static function get_time_window($settings)
+    {
+        $time_min_offset = !empty($settings['time_min_offset']) ? intval($settings['time_min_offset']) : -30;
+        $time_max_offset = !empty($settings['time_max_offset']) ? intval($settings['time_max_offset']) : 365;
+
+        return [strtotime("{$time_min_offset} days"), strtotime("+{$time_max_offset} days")];
+    }
+
     /**
      * Fetch events from Google Calendar API
      * 
@@ -90,11 +114,9 @@ class GoogleCalendarSource
         $max_results = !empty($settings['max_results']) ? intval($settings['max_results']) : 250;
         
         // Calculate time range
-        $time_min_offset = !empty($settings['time_min_offset']) ? intval($settings['time_min_offset']) : -30;
-        $time_max_offset = !empty($settings['time_max_offset']) ? intval($settings['time_max_offset']) : 365;
-        
-        $time_min = gmdate('c', strtotime("{$time_min_offset} days")); // Past date
-        $time_max = gmdate('c', strtotime("+{$time_max_offset} days")); // Future date
+        [$time_min, $time_max] = self::get_time_window($settings);
+        $time_min = gmdate('c', $time_min); // Past date
+        $time_max = gmdate('c', $time_max); // Future date
         
         // Build API URL
         $url = "https://www.googleapis.com/calendar/v3/calendars/{$calendar_id}/events";

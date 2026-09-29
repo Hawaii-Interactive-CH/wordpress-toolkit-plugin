@@ -33,10 +33,9 @@ Use this checklist after security-related changes.
    - `/wp-json/toolkit/v1/events/upcoming`
    - `/wp-json/toolkit/v1/events/{id}`
 2. Confirm responses do not expose internal sync metadata:
-   - `_google_event_id`
-   - `_google_calendar_link`
-   - `_last_synced`
-3. Confirm public event fields are returned as expected.
+   - `last_synced`
+3. `google_event_id` and `google_calendar_link` are intentionally exposed: they come from a public Google Calendar (API key only, no OAuth) and are used by client sites.
+4. Confirm public event fields are returned as expected.
 
 ## Docs Index Regeneration Flow
 

@@ -28,8 +28,9 @@ class CalendarService
         // Hook cron action
         add_action(self::CRON_HOOK, [self::class, 'sync_all']);
         
-        // Schedule cron on activation
-        add_action('init', [self::class, 'maybe_schedule_cron']);
+        // Schedule cron (register() already runs during 'init', so a callback
+        // added to 'init' at the current priority would never fire)
+        add_action('wp_loaded', [self::class, 'maybe_schedule_cron']);
         
         // Cleanup on deactivation
         register_deactivation_hook(__FILE__, [self::class, 'unschedule_cron']);
@@ -43,6 +44,13 @@ class CalendarService
      */
     public static function add_cron_schedules($schedules)
     {
+        if (!isset($schedules['toolkit_30min'])) {
+            $schedules['toolkit_30min'] = [
+                'interval' => 1800,
+                'display' => __('Every 30 Minutes', 'hi-theme-toolkit')
+            ];
+        }
+
         if (!isset($schedules['weekly'])) {
             $schedules['weekly'] = [
                 'interval' => 604800,
@@ -69,8 +77,19 @@ class CalendarService
             return;
         }
         
-        // Use Google Calendar interval if enabled, otherwise use daily as default
-        $interval = $google_enabled ? ($settings['google']['sync_interval'] ?? 'daily') : 'daily';
+        // Single cron for both sources: use the shortest interval among enabled ones
+        $intervals = [];
+        if ($google_enabled) {
+            $intervals[] = $settings['google']['sync_interval'] ?? 'daily';
+        }
+        if ($wp_events_enabled) {
+            $intervals[] = $settings['wordpress_events']['sync_interval'] ?? 'daily';
+        }
+
+        $schedules = wp_get_schedules();
+        $intervals = array_filter($intervals, fn($name) => isset($schedules[$name]));
+        usort($intervals, fn($a, $b) => $schedules[$a]['interval'] <=> $schedules[$b]['interval']);
+        $interval = $intervals[0] ?? 'daily';
         
         // Check if already scheduled with correct interval
         $scheduled = wp_next_scheduled(self::CRON_HOOK);
@@ -263,37 +282,37 @@ class CalendarService
     }
     
     /**
-     * Delete events that no longer exist in source
-     * 
-     * @param array $existing_google_ids Array of Google Calendar event IDs that exist
+     * Delete events of a source that were not seen during the last sync
+     *
+     * @param string $source_meta_key Meta key identifying the source (_google_event_id or _wp_event_source_id)
+     * @param array $synced_post_ids calendar_event IDs created/updated during the sync
+     * @param array $extra_meta_query Additional meta_query clauses to restrict the candidates
+     * @return int Number of deleted events
      */
-    public static function cleanup_deleted_events($existing_google_ids = [])
+    public static function cleanup_deleted_events($source_meta_key, $synced_post_ids = [], $extra_meta_query = [])
     {
-        // Get all calendar events with Google IDs
-        $args = [
+        $candidates = get_posts([
             'post_type' => 'calendar_event',
+            'post_status' => 'any',
             'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post__not_in' => array_map('intval', $synced_post_ids),
             // phpcs:ignore WordPress.DB.SlowDBQuery
-            'meta_query' => [
+            'meta_query' => array_merge([
+                'relation' => 'AND',
                 [
-                    'key' => '_google_event_id',
+                    'key' => $source_meta_key,
                     'compare' => 'EXISTS'
                 ]
-            ]
-        ];
-        
-        $query = new \WP_Query($args);
-        
-        if ($query->have_posts()) {
-            foreach ($query->posts as $post) {
-                $google_id = get_post_meta($post->ID, '_google_event_id', true);
-                
-                // If this Google ID is not in the existing list, delete it
-                if (!in_array($google_id, $existing_google_ids)) {
-                    wp_trash_post($post->ID);
-                }
-            }
+            ], $extra_meta_query)
+        ]);
+
+        // Force delete: a trashed copy would be ignored by the next sync and duplicated
+        foreach ($candidates as $post_id) {
+            wp_delete_post($post_id, true);
         }
+
+        return count($candidates);
     }
     
     /**

@@ -27,7 +27,7 @@ class MainService
     public static function maintenance_mode()
     {
         // Maintenance mode if .maintenance file exists in root redirect until login
-        if (get_option('maintenance_mode', 0) == 1) {
+        if (get_option('hithto_maintenance_mode', 0) == 1) {
             // if url is not wp-login.php and not wp-admin redirect to maintenance page
             if (!in_array($GLOBALS['pagenow'], ['wp-login.php', 'wp-register.php']) && !is_user_logged_in() && !is_admin()) {
                 // load custom maintenance page
@@ -173,9 +173,9 @@ class MainService
                     return array_map( 'absint', $value );
                 },
             ]);
-            register_setting('wordpress-toolkit-plugin', 'maintenance_mode', [ 'sanitize_callback' => 'absint' ]);
+            register_setting('wordpress-toolkit-plugin', 'hithto_maintenance_mode', [ 'sanitize_callback' => 'absint' ]);
             register_setting('wordpress-toolkit-plugin', 'cookie_consent', [ 'sanitize_callback' => 'absint' ]);
-            register_setting('wordpress-toolkit-plugin', 'file_size', [ 'sanitize_callback' => 'absint' ]);
+            register_setting('wordpress-toolkit-plugin', 'hithto_file_size', [ 'sanitize_callback' => 'absint' ]);
         });
 
         add_action('admin_menu', function () {
@@ -205,10 +205,10 @@ class MainService
     {
         // Upload limit for media library
         add_filter("upload_size_limit", function ($_size) {
-                if (!get_option('file_size')) {
-                    update_option('file_size', 5 * 1024 * 1024);
+                if (!get_option('hithto_file_size')) {
+                    update_option('hithto_file_size', 5 * 1024 * 1024);
                 }
-                return get_option('file_size', 5 * 1024 * 1024);
+                return get_option('hithto_file_size', 5 * 1024 * 1024);
             },
             20
         );
@@ -503,7 +503,7 @@ class MainService
 
                 $options['maintenance_mode'] = isset($post_data['maintenance_mode']) ? 1 : 0;
 
-                update_option('maintenance_mode', $options['maintenance_mode']);
+                update_option('hithto_maintenance_mode', $options['maintenance_mode']);
         }
 
         if (isset($post_data['submit']) && isset($post_data['cookie_consent_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['cookie_consent_nonce']), 'cookie_consent_action')) {
@@ -540,7 +540,7 @@ class MainService
             $min_size_bytes = 1 * 1024 * 1024; // 1 Mo en octets
             if ($file_size_bytes >= $min_size_bytes && $file_size_bytes <= $max_size_bytes) {
                 $options['file_size'] = $file_size_bytes;
-                update_option('file_size', $options['file_size']);
+                update_option('hithto_file_size', $options['file_size']);
             }
         }
 
@@ -591,7 +591,7 @@ class MainService
                     <?php wp_nonce_field('maintenance_mode_action', 'maintenance_mode_nonce'); ?>
                     <p>
                         <label for="maintenance_mode">
-                            <input type="checkbox" name="maintenance_mode" id="maintenance_mode" value="1" <?php checked(get_option('maintenance_mode', 0), 1); ?>>
+                            <input type="checkbox" name="maintenance_mode" id="maintenance_mode" value="1" <?php checked(get_option('hithto_maintenance_mode', 0), 1); ?>>
                             <?php esc_html_e( 'Enable maintenance mode', 'hi-theme-toolkit' ); ?>
                         </label>
                     </p>
@@ -661,7 +661,7 @@ class MainService
                     <p>
                         <label for="file_size">
                             <?php esc_html_e( 'Maximum file size (in MB):', 'hi-theme-toolkit' ); ?>
-                            <input type="number" id="file_size" name="file_size" min="1" max="300" step="1" value="<?php echo esc_attr(get_option('file_size', 1) / (1024 * 1024)); ?>" required>
+                            <input type="number" id="file_size" name="file_size" min="1" max="300" step="1" value="<?php echo esc_attr(get_option('hithto_file_size', 1) / (1024 * 1024)); ?>" required>
                         </label>
                     </p>
                     <p class="submit">

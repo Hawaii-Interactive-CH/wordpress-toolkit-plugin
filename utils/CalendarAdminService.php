@@ -157,6 +157,7 @@ class CalendarAdminService {
 				'enabled'          => false,
 				'custom_post_type' => 'calendar_event',
 				'acf_field_group'  => '',
+				'sync_interval'    => 'daily',
 			],
 		];
 	}
@@ -186,6 +187,7 @@ class CalendarAdminService {
 				'enabled'          => ! empty( $input['wordpress_events']['enabled'] ),
 				'custom_post_type' => sanitize_text_field( $input['wordpress_events']['custom_post_type'] ?? 'calendar_event' ),
 				'acf_field_group'  => sanitize_text_field( $input['wordpress_events']['acf_field_group'] ?? '' ),
+				'sync_interval'    => sanitize_text_field( $input['wordpress_events']['sync_interval'] ?? 'daily' ),
 			];
 		}
 
@@ -421,6 +423,9 @@ class CalendarAdminService {
 									name="<?php echo esc_attr( self::OPTION_NAME ); ?>[google][sync_interval]"
 									id="google_sync_interval"
 								>
+									<option value="toolkit_30min" <?php selected( $google['sync_interval'], 'toolkit_30min' ); ?>>
+										<?php esc_html_e( 'Every 30 Minutes', 'hi-theme-toolkit' ); ?>
+									</option>
 									<option value="hourly" <?php selected( $google['sync_interval'], 'hourly' ); ?>>
 										<?php esc_html_e( 'Every Hour', 'hi-theme-toolkit' ); ?>
 									</option>
@@ -784,6 +789,40 @@ class CalendarAdminService {
 									</p>
 									<input type="hidden" name="<?php echo esc_attr( self::OPTION_NAME ); ?>[wordpress_events][acf_field_group]" value="<?php echo esc_attr( $wp_events['acf_field_group'] ); ?>">
 								<?php endif; ?>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row">
+								<label for="wordpress_events_sync_interval">
+									<?php esc_html_e( 'Sync Interval', 'hi-theme-toolkit' ); ?>
+								</label>
+							</th>
+							<td>
+								<?php $wp_sync_interval = $wp_events['sync_interval'] ?? 'daily'; ?>
+								<select
+									name="<?php echo esc_attr( self::OPTION_NAME ); ?>[wordpress_events][sync_interval]"
+									id="wordpress_events_sync_interval"
+								>
+									<option value="toolkit_30min" <?php selected( $wp_sync_interval, 'toolkit_30min' ); ?>>
+										<?php esc_html_e( 'Every 30 Minutes', 'hi-theme-toolkit' ); ?>
+									</option>
+									<option value="hourly" <?php selected( $wp_sync_interval, 'hourly' ); ?>>
+										<?php esc_html_e( 'Every Hour', 'hi-theme-toolkit' ); ?>
+									</option>
+									<option value="twicedaily" <?php selected( $wp_sync_interval, 'twicedaily' ); ?>>
+										<?php esc_html_e( 'Twice Daily', 'hi-theme-toolkit' ); ?>
+									</option>
+									<option value="daily" <?php selected( $wp_sync_interval, 'daily' ); ?>>
+										<?php esc_html_e( 'Once Daily', 'hi-theme-toolkit' ); ?>
+									</option>
+									<option value="weekly" <?php selected( $wp_sync_interval, 'weekly' ); ?>>
+										<?php esc_html_e( 'Once Weekly', 'hi-theme-toolkit' ); ?>
+									</option>
+								</select>
+								<p class="description">
+									<?php esc_html_e( 'Automatic event synchronization frequency.', 'hi-theme-toolkit' ); ?>
+								</p>
 							</td>
 						</tr>
 					</table>

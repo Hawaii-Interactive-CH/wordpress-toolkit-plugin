@@ -78,7 +78,6 @@ class ToolkitController {
 					'is_all_day'           => get_post_meta( $post_id, '_event_is_all_day', true ) === '1',
 					'google_event_id'      => get_post_meta( $post_id, '_google_event_id', true ),
 					'google_calendar_link' => get_post_meta( $post_id, '_google_calendar_link', true ),
-					'last_synced'          => get_post_meta( $post_id, '_last_synced', true ),
 					'source_post_id'       => $source_post_id ?: null,
 					'source_post_type'     => $source_post_type ?: null,
 					'source_link'          => $source_post_id ? get_permalink( $source_post_id ) : null,
@@ -248,7 +247,7 @@ class ToolkitController {
 		$id   = absint( $request->get_param( 'id' ) );
 		$post = get_post( $id );
 
-		if ( ! $post || 'calendar_event' !== $post->post_type ) {
+		if ( ! $post || 'calendar_event' !== $post->post_type || 'publish' !== $post->post_status ) {
 			return new WP_Error(
 				'event_not_found',
 				__( 'Event not found', 'hi-theme-toolkit' ),
@@ -273,26 +272,10 @@ class ToolkitController {
 				'is_all_day'           => get_post_meta( $post->ID, '_event_is_all_day', true ) === '1',
 				'google_event_id'      => get_post_meta( $post->ID, '_google_event_id', true ),
 				'google_calendar_link' => get_post_meta( $post->ID, '_google_calendar_link', true ),
-				'last_synced'          => get_post_meta( $post->ID, '_last_synced', true ),
 				'source_post_id'       => $source_post_id ?: null,
 				'source_post_type'     => $source_post_type ?: null,
 				'source_link'          => $source_post_id ? get_permalink( $source_post_id ) : null,
 			],
 		], 200 );
-	}
-
-	/**
-	 * Permission callback for calendar event endpoints.
-	 *
-	 * These endpoints are intentionally public. They expose published calendar
-	 * events (post_status = 'publish') for use by front-end widgets and
-	 * third-party integrations (e.g. a JavaScript calendar on the site's
-	 * public pages). No unpublished, private, or user-specific data is
-	 * returned. Equivalent to WordPress's own public /wp/v2/posts endpoint.
-	 *
-	 * @return true
-	 */
-	public function permission_callback() {
-		return true;
 	}
 }

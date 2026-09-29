@@ -81,6 +81,9 @@ class EventWPCalendar
         ]);
         
         if (empty($posts)) {
+            // Every source post is gone: remove all previously synced events
+            CalendarService::cleanup_deleted_events('_wp_event_source_id');
+
             return [
                 'success' => true,
                 // translators: %s is the custom post type slug.
@@ -88,47 +91,78 @@ class EventWPCalendar
                 'count' => 0
             ];
         }
-        
+
+        // Where to read the date: the selected field can be a date field, a repeater/group
+        // containing date sub-fields, or a date sub-field inside a repeater/group
+        $container = null;
+        $date_fields = [];
+        $date_types = ['date_picker', 'date_time_picker'];
+
+        if (in_array($acf_field['type'], ['repeater', 'group'], true)) {
+            $container = $acf_field;
+            foreach ($acf_field['sub_fields'] ?? [] as $sub_field) {
+                if (in_array($sub_field['type'], $date_types, true)) {
+                    $date_fields[] = $sub_field;
+                }
+            }
+        } else {
+            $date_fields[] = $acf_field;
+            $parent_field = !empty($acf_field['parent']) ? acf_get_field($acf_field['parent']) : false;
+            if ($parent_field && in_array($parent_field['type'], ['repeater', 'group'], true)) {
+                $container = $parent_field;
+            }
+        }
+
         $event_count = 0;
-        $is_repeater = ($acf_field['type'] === 'repeater');
-        
+        $synced_ids = [];
+
         // Loop through each post
         foreach ($posts as $post) {
-            $post_id = $post->ID;
-            
-            if ($is_repeater) {
-                // Handle repeater field
-                $repeater_rows = get_field($acf_field['name'], $post_id);
-                
-                if ($repeater_rows && is_array($repeater_rows)) {
-                    // Create one event for each repeater row
-                    foreach ($repeater_rows as $row_index => $row_data) {
-                        $saved = self::save_event($post, $acf_field, $row_data, $row_index);
-                        if ($saved) {
-                            $event_count++;
-                        }
+            // Raw DB values (format = false): always Ymd for date_picker and Y-m-d H:i:s for
+            // date_time_picker, whatever the field's return format is. Sub-fields are keyed by field key.
+            if ($container) {
+                $raw = get_field($container['name'], $post->ID, false);
+                if (empty($raw) || !is_array($raw)) {
+                    continue;
+                }
+                $rows = $container['type'] === 'repeater' ? $raw : [$raw];
+            } else {
+                $rows = [[$acf_field['key'] => get_field($acf_field['name'], $post->ID, false)]];
+            }
+
+            foreach ($rows as $row_index => $row) {
+                // Use the first date field with a valid value
+                $event_date = false;
+                foreach ($date_fields as $date_field) {
+                    $value = $row[$date_field['key']] ?? $row[$date_field['name']] ?? null;
+                    $event_date = self::extract_date_from_field($value, $date_field['type']);
+                    if ($event_date) {
+                        break;
                     }
                 }
-            } else {
-                // Handle simple field (not repeater)
-                $field_value = get_field($acf_field['name'], $post_id);
-                
-                if ($field_value) {
-                    $saved = self::save_event($post, $acf_field, $field_value, null);
-                    if ($saved) {
-                        $event_count++;
-                    }
+
+                if (!$event_date) {
+                    continue;
+                }
+
+                $saved = self::save_event($post, $acf_field, $event_date, $container && $container['type'] === 'repeater' ? $row_index : null);
+                if ($saved) {
+                    $synced_ids[] = $saved;
+                    $event_count++;
                 }
             }
         }
-        
+
+        // Remove events whose source post, repeater row or date no longer exists
+        $deleted_count = CalendarService::cleanup_deleted_events('_wp_event_source_id', $synced_ids);
+
         // Update last sync time
         update_option('toolkit_calendar_last_sync', time());
-        
+
         return [
             'success' => true,
-            // translators: %1$d is the number of events synchronized, %2$s is the custom post type slug.
-            'message' => sprintf(__('%1$d event(s) synchronized from %2$s.', 'hi-theme-toolkit'), $event_count, $custom_post_type),
+            // translators: %1$d is the number of events synchronized, %2$s is the custom post type slug, %3$d is the number of deleted events.
+            'message' => sprintf(__('%1$d event(s) synchronized from %2$s, %3$d deleted.', 'hi-theme-toolkit'), $event_count, $custom_post_type, $deleted_count),
             'count' => $event_count
         ];
     }
@@ -137,14 +171,14 @@ class EventWPCalendar
      * Save or update a WordPress post as a calendar_event
      * 
      * @param WP_Post $source_post The source WordPress post
-     * @param array $acf_field The ACF field configuration
-     * @param mixed $field_value The ACF field value (can be a single value or repeater row data)
+     * @param array $acf_field The selected ACF field configuration
+     * @param string $event_date Event date in Y-m-d H:i:s format
      * @param int|null $row_index If it's a repeater, the row index
      * @return int|false Post ID on success, false on failure
      */
-    private static function save_event($source_post, $acf_field, $field_value, $row_index = null)
+    private static function save_event($source_post, $acf_field, $event_date, $row_index = null)
     {
-        if (empty($source_post) || empty($field_value)) {
+        if (empty($source_post) || empty($event_date)) {
             return false;
         }
         
@@ -164,37 +198,7 @@ class EventWPCalendar
         ]);
         
         $post_id = !empty($existing_posts) ? $existing_posts[0]->ID : 0;
-        
-        // Extract date from field value
-        $event_date = null;
-        
-        // If it's a repeater, $field_value is an array of sub-field values
-        if ($acf_field['type'] === 'repeater' && is_array($field_value)) {
-            // Look for a date field in the repeater sub-fields
-            foreach ($acf_field['sub_fields'] as $sub_field) {
-                if (in_array($sub_field['type'], ['date_picker', 'date_time_picker'])) {
-                    $sub_field_name = $sub_field['name'];
-                    if (isset($field_value[$sub_field_name])) {
-                        $event_date = self::extract_date_from_field($field_value[$sub_field_name], $sub_field['type']);
-                        if ($event_date) {
-                            break; // Use the first date field found
-                        }
-                    }
-                }
-            }
-        } else {
-            // Simple field
-            $event_date = self::extract_date_from_field($field_value, $acf_field['type']);
-        }
-        
-        if (!$event_date) {
-            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-                error_log( 'EventWPCalendar: Unable to extract date from field value for post ' . $source_post->ID );
-            }
-            return false;
-        }
-        
+
         // Build event title (without row number)
         $title = $source_post->post_title;
         
@@ -263,55 +267,36 @@ class EventWPCalendar
     /**
      * Extract date from ACF field value based on field type
      * 
-     * @param mixed $field_value The field value
+     * @param mixed $field_value The raw (unformatted) field value
      * @param string $field_type The ACF field type
      * @return string|false Date in Y-m-d H:i:s format or false on failure
      */
     private static function extract_date_from_field($field_value, $field_type)
     {
-        // Handle only date_picker and date_time_picker types
-        switch ($field_type) {
-            case 'date_picker':
-                // Date picker can return various formats
-                
-                // Unix timestamp (numeric)
-                if (is_numeric($field_value)) {
-                    return gmdate('Y-m-d H:i:s', intval($field_value));
-                }
-                
-                // Ymd format (20240127)
-                if (is_string($field_value) && strlen($field_value) === 8) {
-                    return gmdate('Y-m-d H:i:s', strtotime($field_value));
-                }
-                
-                // Y-m-d or other string format
-                if (is_string($field_value)) {
-                    $timestamp = strtotime($field_value);
-                    if ($timestamp) {
-                        return gmdate('Y-m-d H:i:s', $timestamp);
-                    }
-                }
-                break;
-                
-            case 'date_time_picker':
-                // Date time picker can return timestamp or formatted string
-                
-                // Unix timestamp (numeric)
-                if (is_numeric($field_value)) {
-                    return gmdate('Y-m-d H:i:s', intval($field_value));
-                }
-                
-                // Y-m-d H:i:s or other string format
-                if (is_string($field_value)) {
-                    $timestamp = strtotime($field_value);
-                    if ($timestamp) {
-                        return gmdate('Y-m-d H:i:s', $timestamp);
-                    }
-                }
-                break;
+        if (!in_array($field_type, ['date_picker', 'date_time_picker'], true)) {
+            return false;
         }
-        
-        // If not a date field type, return false
+
+        if (empty($field_value) || !is_scalar($field_value)) {
+            return false;
+        }
+
+        $field_value = trim((string) $field_value);
+
+        // ACF storage formats: Ymd (date_picker) and Y-m-d H:i:s (date_time_picker).
+        // Checked before is_numeric(), otherwise 20261201 would be read as a timestamp (1970).
+        foreach (['!Ymd', 'Y-m-d H:i:s', '!Y-m-d'] as $format) {
+            $date = \DateTime::createFromFormat($format, $field_value);
+            if ($date && $date->format(ltrim($format, '!')) === $field_value) {
+                return $date->format('Y-m-d H:i:s');
+            }
+        }
+
+        // Legacy values saved as a Unix timestamp
+        if (ctype_digit($field_value)) {
+            return gmdate('Y-m-d H:i:s', intval($field_value));
+        }
+
         return false;
     }
 }

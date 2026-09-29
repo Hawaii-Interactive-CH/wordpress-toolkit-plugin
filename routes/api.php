@@ -48,10 +48,13 @@ $toolkit_app_name = sanitize_title(get_bloginfo('name'));
     };
 
     // Calendar routes
+    // These endpoints are intentionally public: they only expose published
+    // calendar events (post_status = 'publish') for the front-end calendar
+    // widgets, like WordPress's own public /wp/v2/posts endpoint.
     // GET /wp-json/toolkit/v1/events
     register_rest_route($toolkit_namespace, '/events', array(
         'methods' => 'GET',
-        'permission_callback' => array($toolkitController, 'permission_callback'),
+        'permission_callback' => '__return_true',
         'callback' => array($toolkitController, 'get_events'),
         'args' => array(
             'per_page' => array(
@@ -72,7 +75,7 @@ $toolkit_app_name = sanitize_title(get_bloginfo('name'));
     // GET /wp-json/toolkit/v1/events/upcoming
     register_rest_route($toolkit_namespace, '/events/upcoming', array(
         'methods' => 'GET',
-        'permission_callback' => array($toolkitController, 'permission_callback'),
+        'permission_callback' => '__return_true',
         'callback' => array($toolkitController, 'get_upcoming'),
         'args' => array(
             'limit' => array(
@@ -85,14 +88,14 @@ $toolkit_app_name = sanitize_title(get_bloginfo('name'));
     // GET /wp-json/toolkit/v1/events/upcoming-period
     register_rest_route($toolkit_namespace, '/events/upcoming-period', array(
         'methods' => 'GET',
-        'permission_callback' => array($toolkitController, 'permission_callback'),
+        'permission_callback' => '__return_true',
         'callback' => array($toolkitController, 'get_upcoming_with_period'),
     ));
 
     // GET /wp-json/toolkit/v1/events/{id}
     register_rest_route($toolkit_namespace, '/events/(?P<id>\d+)', array(
         'methods' => 'GET',
-        'permission_callback' => array($toolkitController, 'permission_callback'),
+        'permission_callback' => '__return_true',
         'callback' => array($toolkitController, 'get_event'),
         'args' => array(
             'id' => array(
