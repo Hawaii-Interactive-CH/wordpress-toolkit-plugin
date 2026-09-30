@@ -1,30 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace Toolkit\utils\parsedown;
+namespace Hithto\Vendor\Parsedown;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-use Toolkit\utils\parsedown\ParsedownExtra;
-use Toolkit\utils\parsedown\Parsedown;
-
-
 /**
- * This code checks if the class 'ParsedownExtra' exists. If it does, it creates an alias for it called 'Hithto_ParsedownTocParentAlias'.
- * If 'ParsedownExtra' does not exist, it creates an alias for 'Parsedown' called 'Hithto_ParsedownTocParentAlias'.
+ * Extends the bundled copy of Parsedown under the plugin's own namespace.
+ * No global class is declared or referenced, so it cannot conflict with
+ * another plugin's copy of Parsedown or ParsedownExtra.
  */
-
-if (class_exists('\\Toolkit\\utils\\parsedown\\ParsedownExtra')) {
-    class_alias('\\Toolkit\\utils\\parsedown\\ParsedownExtra', 'Hithto_ParsedownTocParentAlias');
-} else {
-    class_alias('\\Toolkit\\utils\\parsedown\\Parsedown', 'Hithto_ParsedownTocParentAlias');
-}
-
-class ParsedownToc extends \Hithto_ParsedownTocParentAlias
+class ParsedownToc extends Parsedown
 {
     public const VERSION = '1.5.3';
     public const VERSION_PARSEDOWN_REQUIRED = '1.7.4';
-    public const VERSION_PARSEDOWN_EXTRA_REQUIRED = '0.8.1';
     public const MIN_PHP_VERSION = '7.4';
 
     protected array $options = [];
@@ -68,20 +57,6 @@ class ParsedownToc extends \Hithto_ParsedownTocParentAlias
             $msg_error .= '  - Current version : ' . Parsedown::version . PHP_EOL;
             $msg_error .= '  - Required version: ' . self::VERSION_PARSEDOWN_REQUIRED . ' and later' . PHP_EOL;
             throw new \Exception( esc_html( $msg_error ) );
-        }
-
-        # If ParsedownExtra is installed, check its version
-        if (class_exists('ParsedownExtra')) {
-            if (version_compare(ParsedownExtra::version, self::VERSION_PARSEDOWN_EXTRA_REQUIRED) < 0) {
-                $msg_error  = 'Version Error.' . PHP_EOL;
-                $msg_error .= '  ParsedownToc requires a later version of ParsedownExtra.' . PHP_EOL;
-                $msg_error .= '  - Current version : ' . ParsedownExtra::version . PHP_EOL;
-                $msg_error .= '  - Required version: ' . self::VERSION_PARSEDOWN_EXTRA_REQUIRED . ' and later' . PHP_EOL;
-                throw new \Exception( esc_html( $msg_error ) );
-            }
-            
-            /** @psalm-suppress DirectConstructorCall */
-            parent::__construct();
         }
 
         // Initialize default options

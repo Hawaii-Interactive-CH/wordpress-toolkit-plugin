@@ -44,7 +44,8 @@ class CookieService
                 'toolkit_cookie_settings',
                 [self::class, 'display_settings_page'],
                 'dashicons-icon-security',
-                65
+                82 // Below Settings
+
             );
         });
         add_action('admin_init', function () {
@@ -123,9 +124,12 @@ class CookieService
                         'show_option_none' => 'Select a page',
                         'option_none_value' => '',
                         'selected'         => esc_attr(get_option('cookie_consent_page', '')),
+                        'echo'             => 0,
                     );
-                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_dropdown_pages() is a trusted WP core function that handles its own escaping
-                    wp_dropdown_pages($args);
+                    echo wp_kses(wp_dropdown_pages($args), array(
+                        'select' => array('name' => true, 'id' => true, 'class' => true),
+                        'option' => array('value' => true, 'class' => true, 'selected' => true),
+                    ));
                 ?>
 
                 <br><br>

@@ -75,7 +75,6 @@ $toolkit_to_register = [
 	// Utils
 	'\\Toolkit\\utils\\MainService',
 	'\\Toolkit\\utils\\ModelService',
-	'\\Toolkit\\utils\\RegisterService',
 	'\\Toolkit\\utils\\DocService',
 	'\\Toolkit\\utils\\ApiAuthService',
 	'\\Toolkit\\utils\\MenuService',

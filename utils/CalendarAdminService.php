@@ -100,7 +100,7 @@ class CalendarAdminService {
 			self::MENU_SLUG,                              // Menu slug
 			[ self::class, 'render_main_page' ],         // Callback
 			'dashicons-calendar-alt',                     // Icon
-			25                                            // Position
+			81                                            // Position (below Settings)
 		);
 
 		// Submenu: Paramètres (settings)

@@ -70,7 +70,9 @@ class AssetService
             [self::class, "enqueue_admin_assets"],
             20,
         );
-        add_action("wp_head", [AssetService::class, "output_vite_assets"], 5);
+        add_action("wp_enqueue_scripts", [self::class, "enqueue_vite_assets"], 5);
+        add_action("wp_head", [self::class, "output_vite_dev"], 5);
+        add_filter("wp_preload_resources", [self::class, "preload_vite_fonts"]);
         add_action("enqueue_block_editor_assets", [
             self::class,
             "enqueue_block_editor_assets",
@@ -260,18 +262,67 @@ class AssetService
     }
 
     /**
-     * Output Vite assets
+     * Enqueue Vite production assets (dev server assets are printed by output_vite_dev)
      */
-    public static function output_vite_assets()
+    public static function enqueue_vite_assets()
     {
-        // In development mode
-        if (self::is_dev_mode()) {
-            self::output_vite_dev();
+        if (self::is_dev_mode() || !isset(self::$viteManifest["src/javascript/app.js"])) {
+            return;
         }
-        // In production mode
-        elseif (self::$viteManifest) {
-            self::output_vite_prod();
+
+        $entry = self::$viteManifest["src/javascript/app.js"];
+        $baseUrl = WP_TOOLKIT_THEME_URL . "/public/";
+
+        // CSS (file names are hashed by Vite, no version needed)
+        foreach ($entry["css"] ?? [] as $index => $cssFile) {
+            wp_enqueue_style("hithto-vite-app-" . $index, $baseUrl . $cssFile, [], null);
         }
+
+        // Configuration for JavaScript, printed in <head> before the app module
+        wp_register_script("hithto-toolkit-config", false, [], WP_TOOLKIT_VERSION, false);
+        wp_enqueue_script("hithto-toolkit-config");
+        wp_add_inline_script(
+            "hithto-toolkit-config",
+            "window.toolkitConfig = " .
+                wp_json_encode([
+                    "ajaxUrl" => admin_url("admin-ajax.php"),
+                    "debug" => defined("WP_DEBUG") && WP_DEBUG,
+                ]) .
+                ";",
+        );
+
+        // App entry, loaded as <script type="module">
+        if (isset($entry["file"])) {
+            wp_enqueue_script_module("hithto-vite-app", $baseUrl . $entry["file"], [], null);
+        }
+    }
+
+    /**
+     * Preload Vite font assets
+     *
+     * @param array $resources Resources to preload
+     * @return array
+     */
+    public static function preload_vite_fonts($resources)
+    {
+        if (is_admin() || self::is_dev_mode() || !isset(self::$viteManifest["src/javascript/app.js"])) {
+            return $resources;
+        }
+
+        $baseUrl = WP_TOOLKIT_THEME_URL . "/public/";
+
+        foreach (self::$viteManifest["src/javascript/app.js"]["assets"] ?? [] as $assetFile) {
+            if (preg_match('/\.(woff|woff2|ttf|otf|eot)$/', $assetFile)) {
+                $resources[] = [
+                    "href" => $baseUrl . $assetFile,
+                    "as" => "font",
+                    "type" => "font/" . pathinfo($assetFile, PATHINFO_EXTENSION),
+                    "crossorigin" => "anonymous",
+                ];
+            }
+        }
+
+        return $resources;
     }
 
     /**
@@ -388,85 +439,36 @@ class AssetService
     }
 
     /**
-     * Output Vite dev server assets
+     * Output Vite dev server assets (local development only)
+     *
+     * The React refresh preamble must run before the Vite client and the entry,
+     * so the tags are printed in order in <head> with the WordPress tag helpers.
      */
-    private static function output_vite_dev()
+    public static function output_vite_dev()
     {
-        $vite_dev_server = untrailingslashit(self::$viteDevServer);
-        $refresh_runtime = $vite_dev_server . "/@react-refresh";
-        $vite_client = $vite_dev_server . "/@vite/client";
-        $vite_entry = $vite_dev_server . "/src/javascript/app.js";
-        ?>
-        <!-- Toolkit Vite Dev Server -->
-        <script type="module">
-            import RefreshRuntime from <?php echo wp_json_encode($refresh_runtime); ?>;
-            RefreshRuntime.injectIntoGlobalHook(window);
-            window.$RefreshReg$ = () => {};
-            window.$RefreshSig$ = () => (type) => type;
-            window.__vite_plugin_react_preamble_installed__ = true;
-        </script>
-        <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Vite HMR client cannot use wp_enqueue_script ?>
-        <script type="module" src="<?php echo esc_url($vite_client); ?>"></script>
-        <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Vite entry point cannot use wp_enqueue_script ?>
-        <script type="module" src="<?php echo esc_url($vite_entry); ?>"></script>
-        <!-- End Toolkit Vite Dev Server -->
-        <?php
-    }
-
-    /**
-     * Output Vite production assets
-     */
-    private static function output_vite_prod()
-    {
-        if (!isset(self::$viteManifest["src/javascript/app.js"])) {
+        if (!self::is_dev_mode()) {
             return;
         }
 
-        $entry = self::$viteManifest["src/javascript/app.js"];
-        $baseUrl = WP_TOOLKIT_THEME_URL . "/public/";
+        $vite_dev_server = untrailingslashit(self::$viteDevServer);
+        $refresh_runtime = $vite_dev_server . "/@react-refresh";
 
-        // Enqueue CSS if exists
-        if (isset($entry["css"])) {
-            foreach ($entry["css"] as $cssFile) {
-                // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Vite manifest CSS cannot use wp_enqueue_style at this point
-                echo '<link rel="stylesheet" href="' .
-                    esc_url($baseUrl . $cssFile) .
-                    '">' .
-                    "\n";
-            }
-        }
-
-        // Preload font assets if they exist
-        if (isset($entry["assets"])) {
-            foreach ($entry["assets"] as $assetFile) {
-                if (preg_match('/\.(woff|woff2|ttf|otf|eot)$/', $assetFile)) {
-                    echo '<link rel="preload" href="' .
-                        esc_url($baseUrl . $assetFile) .
-                        '" as="font" type="font/' .
-                        esc_attr( pathinfo($assetFile, PATHINFO_EXTENSION) ) .
-                        '" crossorigin>' .
-                        "\n";
-                }
-            }
-        }
-
-        // Add configuration for JavaScript
-        echo "<script>window.toolkitConfig = " .
-            wp_json_encode([
-                "ajaxUrl" => admin_url("admin-ajax.php"),
-                "debug" => defined("WP_DEBUG") && WP_DEBUG,
-            ]) .
-            ";</script>" .
-            "\n";
-
-        // Enqueue JS
-        if (isset($entry["file"])) {
-            // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Vite manifest JS cannot use wp_enqueue_script at this point
-            echo '<script type="module" src="' .
-                esc_url($baseUrl . $entry["file"]) .
-                '"></script>' .
-                "\n";
-        }
+        wp_print_inline_script_tag(
+            "import RefreshRuntime from " . wp_json_encode($refresh_runtime) . ";\n" .
+            "RefreshRuntime.injectIntoGlobalHook(window);\n" .
+            "window.\$RefreshReg\$ = () => {};\n" .
+            "window.\$RefreshSig\$ = () => (type) => type;\n" .
+            "window.__vite_plugin_react_preamble_installed__ = true;",
+            ["type" => "module"],
+        );
+        wp_print_script_tag([
+            "type" => "module",
+            "src" => esc_url($vite_dev_server . "/@vite/client"),
+        ]);
+        wp_print_script_tag([
+            "type" => "module",
+            "src" => esc_url($vite_dev_server . "/src/javascript/app.js"),
+        ]);
     }
 
     /**

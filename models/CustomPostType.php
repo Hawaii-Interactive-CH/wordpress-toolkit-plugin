@@ -84,8 +84,7 @@ abstract class CustomPostType extends PostType {
 				return;
 			}
 			$model = new static( $post_id );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render callback is defined by the developer and expected to return escaped HTML
-			echo $columns[ $column ]['render']( $model );
+			echo wp_kses_post( $columns[ $column ]['render']( $model ) );
 		}, 10, 2 );
 
 		$sortable = array_filter( $columns, fn( $col ) => ! empty( $col['sortable'] ) );

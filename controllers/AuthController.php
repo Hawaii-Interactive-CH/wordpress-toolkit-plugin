@@ -47,8 +47,7 @@ class AuthController {
 			session_start();
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token'] is set by this plugin's ApiAuthService, not user input
-		$transient_token = isset( $_SESSION['transient_token'] ) ? $_SESSION['transient_token'] : '';
+		$transient_token = isset( $_SESSION['transient_token'] ) ? sanitize_text_field( wp_unslash( $_SESSION['transient_token'] ) ) : '';
 		if ( ! ApiAuthService::verify_token( $transient_token ) ) {
 			return new WP_Error( 'invalid_transient_token', 'Token expired or invalid, please provide master token to generate a new transient token', array( 'status' => 403 ) );
 		}
@@ -88,27 +87,42 @@ class AuthController {
 		$ipaddress = '';
 
 		// Vérifie les différentes variables de serveur pour trouver l'adresse IP du client
-		// phpcs:disable WordPress.Security.ValidatedSanitizedInput -- IP headers are validated via filter_var(FILTER_VALIDATE_IP) in is_valid_ip(); wp_unslash() is not meaningful for IP addresses
-		if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) && $this->is_valid_ip( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			$ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) && $this->is_valid_ip( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$client_ip       = $this->get_server_value( 'HTTP_CLIENT_IP' );
+		$x_forwarded_for = $this->get_server_value( 'HTTP_X_FORWARDED_FOR' );
+		$x_forwarded     = $this->get_server_value( 'HTTP_X_FORWARDED' );
+		$forwarded_for   = $this->get_server_value( 'HTTP_FORWARDED_FOR' );
+		$forwarded       = $this->get_server_value( 'HTTP_FORWARDED' );
+		$remote_addr     = $this->get_server_value( 'REMOTE_ADDR' );
+
+		if ( $this->is_valid_ip( $client_ip ) ) {
+			$ipaddress = $client_ip;
+		} elseif ( $this->is_valid_ip( $x_forwarded_for ) ) {
 			// HTTP_X_FORWARDED_FOR peut contenir une liste d'adresses IP
-			$ip_list = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
+			$ip_list = explode( ',', $x_forwarded_for );
 			$ipaddress = trim( reset( $ip_list ) ); // Utilise la première adresse IP de la liste
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED'] ) && $this->is_valid_ip( $_SERVER['HTTP_X_FORWARDED'] ) ) {
-			$ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED_FOR'] ) && $this->is_valid_ip( $_SERVER['HTTP_FORWARDED_FOR'] ) ) {
-			$ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED'] ) && $this->is_valid_ip( $_SERVER['HTTP_FORWARDED'] ) ) {
-			$ipaddress = $_SERVER['HTTP_FORWARDED'];
-		} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) && $this->is_valid_ip( $_SERVER['REMOTE_ADDR'] ) ) {
-			$ipaddress = $_SERVER['REMOTE_ADDR'];
+		} elseif ( $this->is_valid_ip( $x_forwarded ) ) {
+			$ipaddress = $x_forwarded;
+		} elseif ( $this->is_valid_ip( $forwarded_for ) ) {
+			$ipaddress = $forwarded_for;
+		} elseif ( $this->is_valid_ip( $forwarded ) ) {
+			$ipaddress = $forwarded;
+		} elseif ( $this->is_valid_ip( $remote_addr ) ) {
+			$ipaddress = $remote_addr;
 		} else {
 			$ipaddress = 'UNKNOWN';
 		}
-		// phpcs:enable WordPress.Security.ValidatedSanitizedInput
 
 		return $ipaddress;
+	}
+
+	/**
+	 * Récupère une valeur de $_SERVER, unslashée et nettoyée.
+	 *
+	 * @param string $key The $_SERVER key.
+	 * @return string Empty string if the key is not set.
+	 */
+	private function get_server_value( $key ) {
+		return isset( $_SERVER[ $key ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) ) : '';
 	}
 
 	/**

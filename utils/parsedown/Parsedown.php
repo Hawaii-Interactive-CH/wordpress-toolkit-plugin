@@ -1,6 +1,6 @@
 <?php
 
-namespace Toolkit\utils\parsedown;
+namespace Hithto\Vendor\Parsedown;
 
 // Prevent direct access.
 defined( 'ABSPATH' ) || exit;

@@ -4,47 +4,6 @@
     width: 20px;
 }
 
-#create-block-form .fields,
-#create-model-form .fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 1rem;
-}
-
-#create-block-form .field,
-#create-model-form .field {
-    display: flex;
-    flex-direction: column;
-}
-
-#create-block-form .field--submit,
-#create-model-form .field--submit {
-    margin-top: 1.5rem;
-    width: fit-content;
-}
-
-#create-block-form .fields label,
-#create-model-form .fields label {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-#icon_preview.dashicons-before::before {
-    width: 16px;
-    height: 16px;
-}
-
 .flex {
     display: flex;
-}
-
-.tab-content {
-    opacity: 0;
-}
-
-@media screen and (max-width: 768px) {
-    #create-block-form .fields,
-    #create-model-form .fields {
-        grid-template-columns: 1fr;
-    }
 }

@@ -65,7 +65,8 @@ No data is sent to any external service by default. External connections are opt
 
 This plugin includes the following third-party libraries:
 
-* **Parsedown** and **ParsedownExtra** — Markdown parser by Emanuil Rusev. Licensed under the MIT License. [Source](https://github.com/erusev/parsedown).
+* **Parsedown** — Markdown parser by Emanuil Rusev. Licensed under the MIT License. [Source](https://github.com/erusev/parsedown). Bundled under the plugin's own `Hithto\Vendor\Parsedown` namespace.
+* **ParsedownToc** — Table of contents extension for Parsedown by KEINOS. Licensed under the MIT License. [Source](https://github.com/KEINOS/parsedown-toc). Bundled under the plugin's own `Hithto\Vendor\Parsedown` namespace.
 
 == Screenshots ==
 

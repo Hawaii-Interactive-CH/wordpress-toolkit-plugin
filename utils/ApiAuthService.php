@@ -244,12 +244,12 @@ class ApiAuthService
         if (!session_id()) {
             session_start();
         }
-        $_SESSION['transient_token_name'] = strtotime('now');
+        $transient_token_name = strtotime('now');
+        $_SESSION['transient_token_name'] = $transient_token_name;
         $token = wp_generate_password(64, false);
         $expiry = get_option('hithto_api_transient_expiry', 10);
         $encrypted_token = self::encrypt_token($token);
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token_name'] is set by this plugin, not user input
-        set_transient(self::$transient_token_name . '_' . $_SESSION['transient_token_name'], $encrypted_token, $expiry * MINUTE_IN_SECONDS);
+        set_transient(self::$transient_token_name . '_' . $transient_token_name, $encrypted_token, $expiry * MINUTE_IN_SECONDS);
         return $token;
     }
 
@@ -260,11 +260,16 @@ class ApiAuthService
         return $stored_token !== false && hash_equals($stored_token, $token);
     }
 
+    /** Récupère le nom du token transient stocké en session (timestamp), nettoyé */
+    private static function get_session_token_name()
+    {
+        return isset($_SESSION['transient_token_name']) ? absint($_SESSION['transient_token_name']) : 0;
+    }
+
     /** Récupère le token stocké dans un transient et le déchiffre */
     public static function get_token()
     {
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token_name'] is set by this plugin, not user input
-        $encrypted_token = get_transient(self::$transient_token_name . '_' . $_SESSION['transient_token_name']);
+        $encrypted_token = get_transient(self::$transient_token_name . '_' . self::get_session_token_name());
         if ($encrypted_token !== false) {
             return self::decrypt_token($encrypted_token);
         }
@@ -274,8 +279,7 @@ class ApiAuthService
     /** Récupère le temps restant avant l'expiration du token transient. */
     public static function get_transient_remaining_time()
     {
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- $_SESSION['transient_token_name'] is set by this plugin, not user input
-        $transient_timeout = get_option('_transient_timeout_' . self::$transient_token_name . '_' . $_SESSION['transient_token_name']);
+        $transient_timeout = get_option('_transient_timeout_' . self::$transient_token_name . '_' . self::get_session_token_name());
         if ($transient_timeout !== false) {
             $current_time = time();
             return $transient_timeout - $current_time;

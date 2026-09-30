@@ -21,7 +21,6 @@ WordPress Toolkit is a professional development framework for building complex W
 - **MainService** — Maintenance mode, cookie consent banner, SVG upload support, emoji removal, comment system toggle, WordPress version hiding, login page customization, custom admin branding.
 - **AssetService** — CSS/JS registration and enqueuing with Vite dev server and production manifest support.
 - **ModelService** — Auto-scans `/models/custom/` and registers enabled post types via an admin toggle UI.
-- **RegisterService** — Admin UI to scaffold new CPT model files and ACF block files with AJAX generation.
 - **MenuService** — Register and auto-create default navigation menu locations.
 - **CalendarService** — Google Calendar synchronization: fetch, create, update, and clean up events on a configurable cron schedule.
 - **CalendarAdminService** — Calendar admin UI with four areas: (1) a **dashboard** showing Google Calendar and WordPress Events sync status, published event count, last sync time, and quick-action buttons; (2) a **Google Calendar settings** page (enable/disable, API key, Calendar ID, sync interval hourly/twice-daily/daily/weekly, max events up to 2500, past and future date-range offsets in days); (3) a **live connection test** that calls the Google Calendar API and reports the calendar name and event count; (4) a **WordPress Events** page to map any public CPT with an ACF date field — including date fields nested inside repeaters — to `calendar_event` posts. All pages include a nonce-protected manual sync trigger.

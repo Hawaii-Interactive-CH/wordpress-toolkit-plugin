@@ -5,8 +5,6 @@ namespace Toolkit\utils;
 // Prevent direct access.
 defined("ABSPATH") or exit();
 
-use Toolkit\utils\RegisterService;
-
 class ModelService
 {
     public static function register()
@@ -128,7 +126,7 @@ class ModelService
                 </p>
             </form>
         </div>
-<?php RegisterService::render_create_model_tab();
+<?php
     }
 
     public static function enable()
