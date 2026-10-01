@@ -6,7 +6,7 @@ namespace Toolkit\models;
 defined( 'ABSPATH' ) or exit;
 
 class MediaTaxonomy extends Taxonomy {
-	const TYPE             = 'media_category';
+	const TYPE             = 'hithto_media_category';
 	const DEFAULT_CATEGORY = 'Uncategorized';
 
 	/**
@@ -28,6 +28,8 @@ class MediaTaxonomy extends Taxonomy {
 				'show_ui'                 => true,
 				'show_tagcloud'           => false,
 				'update_count_callback'   => '_update_generic_term_count',
+				// Keep the public URLs of the former "media_category" taxonomy
+				'rewrite'                 => [ 'slug' => 'media_category' ],
 				'labels'                  => [
 					'name'              => __( 'Categories', 'hi-theme-toolkit' ),
 					'singular_name'     => __( 'Category', 'hi-theme-toolkit' ),
@@ -140,7 +142,7 @@ class MediaTaxonomy extends Taxonomy {
 		);
 
 		// Pass data to script
-		wp_localize_script( 'media-category-filter', 'MediaCategories', [
+		wp_localize_script( 'media-category-filter', 'hithtoMediaCategories', [
 			'categories' => $categories,
 			'taxonomy'   => self::TYPE,
 			'labels'     => [

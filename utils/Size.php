@@ -11,7 +11,10 @@ class Size
     private $_image_sizes = [];
     private $_fly_dir = "";
 
-    const LOG_OPTION = 'fly_images_webp_log';
+    const QUEUE_OPTION = 'hithto_images_queue';
+    const CRON_HOOK = 'hithto_images_process_queue';
+    const CRON_INTERVAL = 'hithto_every_minute';
+    const LOG_OPTION = 'hithto_webp_log';
     const LOG_MAX_ENTRIES = 500;
 
     /**
@@ -35,7 +38,7 @@ class Size
 
         add_action('delete_attachment', array($this, 'delete_attachment_fly_images'));
         add_action('wp_generate_attachment_metadata', array($this, 'queue_image_for_processing'), 10, 2);
-        add_action('fly_images_process_queue', array($this, 'process_image_queue'));
+        add_action(self::CRON_HOOK, array($this, 'process_image_queue'));
         add_filter('cron_schedules', array($this, 'add_cron_interval'));
         add_filter('wp_image_editors', function($editors) {
             // Move GD before Imagick so WebP is supported
@@ -47,20 +50,20 @@ class Size
             return $editors;
         });
         
-        if (!wp_next_scheduled('fly_images_process_queue')) {
-            wp_schedule_event(time(), 'every_minute', 'fly_images_process_queue');
+        if (!wp_next_scheduled(self::CRON_HOOK)) {
+            wp_schedule_event(time(), self::CRON_INTERVAL, self::CRON_HOOK);
         }
     }
 
     public function add_cron_interval($schedules)
     {
-        $schedules['every_minute'] = array('interval' => 60, 'display' => 'Every Minute');
+        $schedules[self::CRON_INTERVAL] = array('interval' => 60, 'display' => 'Every Minute');
         return $schedules;
     }
 
     public static function deactivate()
     {
-        wp_clear_scheduled_hook('fly_images_process_queue');
+        wp_clear_scheduled_hook(self::CRON_HOOK);
     }
 
 
@@ -169,10 +172,10 @@ class Size
             return $metadata;
         }
 
-        $queue = get_option('fly_images_queue', []);
+        $queue = get_option(self::QUEUE_OPTION, []);
         if (!in_array($attachment_id, $queue)) {
             $queue[] = $attachment_id;
-            update_option('fly_images_queue', $queue, false);
+            update_option(self::QUEUE_OPTION, $queue, false);
         }
 
         return $metadata;
@@ -180,7 +183,7 @@ class Size
 
     public function process_image_queue()
     {
-        $queue = get_option('fly_images_queue', []);
+        $queue = get_option(self::QUEUE_OPTION, []);
         if (empty($queue)) return;
 
         $start_time = time();
@@ -193,7 +196,7 @@ class Size
         }
 
         $queue = array_diff($queue, $processed);
-        update_option('fly_images_queue', array_values($queue), false);
+        update_option(self::QUEUE_OPTION, array_values($queue), false);
     }
 
     /**
@@ -224,7 +227,7 @@ class Size
         $skipped_no_metadata = 0;
         $skipped_format = 0;
         $skipped_already_queued = 0;
-        $queue = get_option('fly_images_queue', []);
+        $queue = get_option(self::QUEUE_OPTION, []);
         
         foreach ($attachment_ids as $attachment_id) {
             $metadata = wp_get_attachment_metadata($attachment_id);
@@ -257,7 +260,7 @@ class Size
             }
         }
         
-        update_option('fly_images_queue', $queue, false);
+        update_option(self::QUEUE_OPTION, $queue, false);
         
         $this->add_webp_log('info', "Rebuild summary: $queued_count queued, $skipped_no_metadata skipped (no metadata), $skipped_format skipped (unsupported format), $skipped_already_queued already in queue");
         
@@ -271,7 +274,7 @@ class Size
      */
     public function get_queue_status()
     {
-        $queue = get_option('fly_images_queue', []);
+        $queue = get_option(self::QUEUE_OPTION, []);
         return [
             'count' => count($queue),
             'queue' => $queue
@@ -285,7 +288,7 @@ class Size
      */
     public function clear_queue()
     {
-        return update_option('fly_images_queue', [], false);
+        return update_option(self::QUEUE_OPTION, [], false);
     }
 
     /**

@@ -21,11 +21,11 @@ class ApiAuthService
     public static function register()
     {
         add_action('admin_menu', [self::class, 'admin_menu']);
-        add_action('admin_post_generate_master_token', [self::class, 'generate_master_token']);
-        add_action('admin_post_set_transient_expiry', [self::class, 'set_transient_expiry']);
-        add_action('admin_post_add_whitelist', [self::class, 'add_to_whitelist']);
-        add_action('admin_post_remove_whitelist', [self::class, 'remove_from_whitelist']);
-        add_action('admin_post_generate_encryption_key', [self::class, 'generate_encryption_key']);
+        add_action('admin_post_hithto_generate_master_token', [self::class, 'generate_master_token']);
+        add_action('admin_post_hithto_set_transient_expiry', [self::class, 'set_transient_expiry']);
+        add_action('admin_post_hithto_add_whitelist', [self::class, 'add_to_whitelist']);
+        add_action('admin_post_hithto_remove_whitelist', [self::class, 'remove_from_whitelist']);
+        add_action('admin_post_hithto_generate_encryption_key', [self::class, 'generate_encryption_key']);
         add_action('admin_notices', [self::class, 'display_admin_notices']);
         add_action('admin_enqueue_scripts', [self::class, 'enqueue_styles']);
 
@@ -95,7 +95,7 @@ class ApiAuthService
                 <h2>Generate Encryption Key</h2>
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                     <?php wp_nonce_field('generate_encryption_key_action', 'generate_encryption_key_nonce'); ?>
-                    <input type="hidden" name="action" value="generate_encryption_key">
+                    <input type="hidden" name="action" value="hithto_generate_encryption_key">
                     <p>
                         <input type="submit" name="generate_encryption_key" class="button-primary" value="Generate Encryption Key" <?php echo $encryption_key_defined ? 'disabled' : ''; ?>>
                     </p>
@@ -110,7 +110,7 @@ class ApiAuthService
             <div class="api-auth-section">
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                     <?php wp_nonce_field('generate_master_token_action', 'generate_master_token_nonce'); ?>
-                    <input type="hidden" name="action" value="generate_master_token">
+                    <input type="hidden" name="action" value="hithto_generate_master_token">
                     <h2>Generate Master Token</h2>
                     <p>
                         <input type="submit" name="generate_master_token" class="button-primary" value="Generate Master Token" <?php echo !$encryption_key_defined ? 'disabled' : ''; ?>>
@@ -126,7 +126,7 @@ class ApiAuthService
             <div class="api-auth-section">
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                     <?php wp_nonce_field('set_transient_expiry_action', 'set_transient_expiry_nonce'); ?>
-                    <input type="hidden" name="action" value="set_transient_expiry">
+                    <input type="hidden" name="action" value="hithto_set_transient_expiry">
                     <h2>Set Transient Token Expiry</h2>
                     <p>
                         <label for="transient_expiry">Expiry Time (in minutes):</label>
@@ -141,7 +141,7 @@ class ApiAuthService
             <div class="api-auth-section">
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                     <?php wp_nonce_field('add_whitelist_action', 'add_whitelist_nonce'); ?>
-                    <input type="hidden" name="action" value="add_whitelist">
+                    <input type="hidden" name="action" value="hithto_add_whitelist">
                     <h2>Whitelist IP/Domain</h2>
                     <p>
                         <label for="whitelist">IP/Domain:</label>
@@ -162,7 +162,7 @@ class ApiAuthService
                             <?php echo esc_html($item); ?>
                             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline;">
                                 <?php wp_nonce_field('remove_whitelist_action', 'remove_whitelist_nonce'); ?>
-                                <input type="hidden" name="action" value="remove_whitelist">
+                                <input type="hidden" name="action" value="hithto_remove_whitelist">
                                 <input type="hidden" name="whitelist_item" value="<?php echo esc_attr($item); ?>">
                                 <input type="submit" class="button-secondary" value="Remove">
                             </form>
@@ -318,7 +318,7 @@ class ApiAuthService
     public static function remove_from_whitelist()
     {
         self::ensure_manage_options_capability();
-        if (isset($_POST['action']) && $_POST['action'] === 'remove_whitelist' && check_admin_referer('remove_whitelist_action', 'remove_whitelist_nonce')) {
+        if (isset($_POST['action']) && $_POST['action'] === 'hithto_remove_whitelist' && check_admin_referer('remove_whitelist_action', 'remove_whitelist_nonce')) {
 
             $ip_or_domain = sanitize_text_field( wp_unslash( $_POST['whitelist_item'] ) );
             $whitelist = get_option(self::$whitelist_option_name, []);

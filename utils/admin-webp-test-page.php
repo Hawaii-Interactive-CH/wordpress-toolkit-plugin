@@ -465,7 +465,7 @@ class WebPTestPage
                         <li>✅ <strong>Upload a new image</strong> to test the optimization in real-time</li>
                         <li>✅ <strong>Check file sizes</strong> - WebP should be 20-35% smaller than originals</li>
                         <li>✅ <strong>Verify no PNG/JPG fallbacks</strong> are created (unless WebP is unsupported)</li>
-                        <li>✅ <strong>Monitor cron job</strong> <code>fly_images_process_queue</code> for queue processing</li>
+                        <li>✅ <strong>Monitor cron job</strong> <code>hithto_images_process_queue</code> for queue processing</li>
                     </ul>
                     <p>
                         <a href="<?php echo esc_url(admin_url('upload.php')); ?>" class="button button-primary">Upload New Image</a>

@@ -12,14 +12,33 @@ use \WP_Error;
 class ToolkitController {
 
 	/**
+	 * Normalize a result limit for WP_Query.
+	 *
+	 * No limit, or a limit of 1 (also what absint() turns the legacy "-1" into),
+	 * means "all results".
+	 *
+	 * @param mixed    $value Raw request parameter.
+	 * @param int|null $max   Maximum for other limits, null for no cap.
+	 * @return int Limit for posts_per_page, -1 for all results.
+	 */
+	private function parse_limit( $value, $max = null ) {
+		$limit = absint( $value );
+
+		if ( $limit <= 1 ) {
+			return -1;
+		}
+
+		return null === $max ? $limit : min( $limit, $max );
+	}
+
+	/**
 	 * Get all events
 	 *
 	 * @param WP_REST_Request $request The REST request.
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_events( WP_REST_Request $request ) {
-		$per_page = absint( $request->get_param( 'per_page' ) ?: 100 );
-		$per_page = max( 1, min( $per_page, 100 ) );
+		$per_page = $this->parse_limit( $request->get_param( 'per_page' ), 100 );
 
 		$args = [
 			'post_type'      => 'calendar_event',
@@ -100,8 +119,7 @@ class ToolkitController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_upcoming_with_period( WP_REST_Request $request ) {
-		$limit  = absint( $request->get_param( 'limit' ) );
-		$limit  = $limit !== 0 ? $limit : 10;
+		$limit  = $this->parse_limit( $request->get_param( 'limit' ) );
 		$before = absint( $request->get_param( 'before' ) );
 		$before = $before >= 0 ? $before : 0;
 		$lang   = sanitize_text_field( $request->get_param( 'lang' ) ?: 'fr' );
@@ -187,8 +205,7 @@ class ToolkitController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_upcoming( WP_REST_Request $request ) {
-		$limit = absint( $request->get_param( 'limit' ) ?: 10 );
-		$limit = max( 1, min( $limit, 100 ) );
+		$limit = $this->parse_limit( $request->get_param( 'limit' ), 100 );
 		$now   = current_time( 'mysql' );
 
 		$args = [

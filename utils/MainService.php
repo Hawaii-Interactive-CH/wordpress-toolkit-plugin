@@ -46,7 +46,7 @@ class MainService
 
     public static function enable_calendar()
     {
-        if (get_option('calendar', 0) == 1) {
+        if (get_option('hithto_calendar', 0) == 1) {
             \Toolkit\models\CalendarEvent::register();
             \Toolkit\utils\CalendarService::register();
             CalendarAdminService::register();
@@ -522,7 +522,7 @@ class MainService
 
             $options['calendar'] = isset($post_data['calendar']) ? 1 : 0;
 
-            update_option('calendar', $options['calendar']);
+            update_option('hithto_calendar', $options['calendar']);
         }
 
         if (isset($post_data['submit']) && isset($post_data['admin_footer_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['admin_footer_nonce']), 'admin_footer_action')) {
@@ -623,7 +623,7 @@ class MainService
                     <?php wp_nonce_field('calendar_action', 'calendar_nonce'); ?>
                     <p>
                         <label for="calendar_action">
-                            <input type="checkbox" name="calendar" id="calendar" value="1" <?php checked(get_option('calendar', 0), 1); ?>>
+                            <input type="checkbox" name="calendar" id="calendar" value="1" <?php checked(get_option('hithto_calendar', 0), 1); ?>>
                             <?php esc_html_e( 'Enable calendar', 'hi-theme-toolkit' ); ?>
                         </label>
                     </p>
