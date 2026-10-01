@@ -35,7 +35,7 @@ abstract class Block
 	}
 
 	public static function register() {
-		if ( ! function_exists( 'acf_register_block' ) ) {
+		if ( ! function_exists( 'acf_register_block_type' ) ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- intentional developer warning
 			trigger_error( 'Plug-in ACF is not installed.', E_USER_WARNING );
 		} else {
@@ -43,7 +43,7 @@ abstract class Block
 			$setting['name']            = static::TYPE;
 			$setting['render_callback'] = array( static::class, 'render' );
 
-			acf_register_block( $setting );
+			acf_register_block_type( $setting );
 
 			$file = WP_TOOLKIT_THEME_PATH . '/partials/blocks/' . static::TYPE . '.php';
 			if ( ! file_exists( $file ) ) {

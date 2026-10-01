@@ -61,6 +61,7 @@ class MainService
 
             $views_path = WP_TOOLKIT_THEME_VIEWS_PATH;
             $custom_template = $template;
+            $types = [];
 
             if (is_singular()) {
                 $types[] = 'singular-' . get_query_var('post_type');

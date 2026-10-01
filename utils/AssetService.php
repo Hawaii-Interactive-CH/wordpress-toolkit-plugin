@@ -472,11 +472,11 @@ class AssetService
     }
 
     /**
-     * Check if in development mode
+     * Check if in development mode (assets served by the Vite dev server)
      *
      * @return bool
      */
-    private static function is_dev_mode()
+    public static function is_dev_mode()
     {
         // Return cached result if available
         if (self::$isDevMode !== null) {
@@ -488,13 +488,10 @@ class AssetService
             return self::$isDevMode = false;
         }
 
-        // Check if environment is set to local
-        if (defined("WP_ENVIRONMENT_TYPE") && WP_ENVIRONMENT_TYPE === "local") {
-            return self::$isDevMode = true;
-        }
-
-        // Only check dev server if debug mode is enabled
-        if (!defined("WP_DEBUG") || !WP_DEBUG) {
+        // Only check dev server in a local environment or when debug mode is enabled
+        $is_local = defined("WP_ENVIRONMENT_TYPE") && WP_ENVIRONMENT_TYPE === "local";
+        $is_debug = defined("WP_DEBUG") && WP_DEBUG;
+        if (!$is_local && !$is_debug) {
             return self::$isDevMode = false;
         }
 

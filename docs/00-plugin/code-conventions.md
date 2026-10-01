@@ -52,13 +52,13 @@ Always add a space inside parentheses for control structures and function calls.
 // correct
 if ( $x ) {
 }
-function_exists( 'acf_register_block' );
+function_exists( 'acf_register_block_type' );
 in_array( $value, $array, true );
 
 // incorrect
 if ($x) {
 }
-function_exists("acf_register_block");
+function_exists("acf_register_block_type");
 ```
 
 ### After `!`

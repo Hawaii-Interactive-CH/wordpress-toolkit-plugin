@@ -50,18 +50,18 @@ class ModelService
         // Check if plugin models directory exists before scanning
         if (file_exists($plugin_models_path) && is_dir($plugin_models_path)) {
             $plugin_models = scandir($plugin_models_path);
-            // Filter out non-PHP files
+            // Filter out non-PHP files and the index.php directory guard
             $plugin_models = array_filter($plugin_models, function ($file) {
-                return strpos($file, ".php") !== false;
+                return strpos($file, ".php") !== false && $file !== "index.php";
             });
         }
 
         // Check if theme models directory exists before scanning
         if (file_exists($theme_models_path) && is_dir($theme_models_path)) {
             $theme_models = scandir($theme_models_path);
-            // Filter out non-PHP files
+            // Filter out non-PHP files and the index.php directory guard
             $theme_models = array_filter($theme_models, function ($file) {
-                return strpos($file, ".php") !== false;
+                return strpos($file, ".php") !== false && $file !== "index.php";
             });
         }
 

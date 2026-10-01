@@ -17,7 +17,7 @@ abstract class AbstractMedia extends PostType {
 	 * original full-size URL if the requested size has not been generated yet.
 	 *
 	 * @param string $size A size name registered via Size::add(), or "full".
-	 * @return string|false The image URL, or false if the attachment doesn't exist.
+	 * @return string The image URL, or an empty string if the attachment doesn't exist.
 	 */
 	public function src( $size = 'thumbnail' ): string {
 		$data = Size::src( $this->id(), $size );
@@ -27,7 +27,7 @@ abstract class AbstractMedia extends PostType {
 		}
 
 		if ( ! $data ) {
-			return false;
+			return '';
 		}
 
 		if ( isset( $data[0] ) ) {
