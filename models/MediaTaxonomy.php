@@ -135,9 +135,9 @@ class MediaTaxonomy extends Taxonomy {
 		// Add script
 		wp_enqueue_script(
 			'media-category-filter',
-			WP_TOOLKIT_URL . 'admin/assets/js/media-category-filter.js',
+			HITHTO_URL . 'admin/assets/js/media-category-filter.js',
 			[ 'media-views' ],
-			WP_TOOLKIT_VERSION,
+			HITHTO_VERSION,
 			true
 		);
 

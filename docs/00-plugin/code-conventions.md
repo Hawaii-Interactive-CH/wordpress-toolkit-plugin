@@ -209,7 +209,7 @@ Private methods and one-liner helpers may omit the docblock only when the method
 | Classes | `PascalCase` | `CustomPostType`, `BlockHero` |
 | Methods & functions | `snake_case` | `find_by_id()`, `acf_media()` |
 | Variables | `snake_case` | `$post_id`, `$render_callback` |
-| Constants | `UPPER_SNAKE_CASE` | `TYPE`, `WP_TOOLKIT_VERSION` |
+| Constants | `UPPER_SNAKE_CASE` | `TYPE`, `HITHTO_VERSION` |
 | Hooks | `snake_case` with prefix | `toolkit_register_block` |
 
 ---

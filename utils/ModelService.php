@@ -40,8 +40,8 @@ class ModelService
 
     public static function display_settings_page()
     {
-        $plugin_models_path = WP_TOOLKIT_DIR . "/models/custom"; // Path to plugin's models
-        $theme_models_path = WP_TOOLKIT_THEME_PATH . "/models/custom"; // Path to theme's models
+        $plugin_models_path = HITHTO_DIR . "/models/custom"; // Path to plugin's models
+        $theme_models_path = HITHTO_THEME_PATH . "/models/custom"; // Path to theme's models
 
         // Initialize arrays
         $plugin_models = [];
@@ -137,7 +137,7 @@ class ModelService
             if ($enabled) {
                 // Define the file path based on the model name
                 $file_path =
-                    WP_TOOLKIT_THEME_PATH . "/models/custom/$model.php";
+                    HITHTO_THEME_PATH . "/models/custom/$model.php";
 
                 // Check if the file exists before including it
                 if (file_exists($file_path)) {
@@ -149,7 +149,7 @@ class ModelService
                         $class::register();
                     }
                 } else {
-                    $file_path = WP_TOOLKIT_DIR . "/models/custom/$model.php";
+                    $file_path = HITHTO_DIR . "/models/custom/$model.php";
 
                     // Check if the file exists before including it
                     if (file_exists($file_path)) {

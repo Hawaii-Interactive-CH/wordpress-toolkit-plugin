@@ -75,7 +75,7 @@ class ApiAuthService
             .api-auth-section input[type="number"], .api-auth-section input[type="text"] { width: 100%; padding: 5px; margin: 5px 0; }
             .api-auth-section .button-primary { margin-right: 10px; }
         ';
-        wp_register_style('api-auth-admin', false, [], WP_TOOLKIT_VERSION);
+        wp_register_style('api-auth-admin', false, [], HITHTO_VERSION);
         wp_enqueue_style('api-auth-admin');
         wp_add_inline_style('api-auth-admin', $css);
     }

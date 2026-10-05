@@ -27,20 +27,20 @@ namespace Toolkit;
 defined( 'ABSPATH' ) or exit();
 
 // Define plugin constants.
-if ( ! defined( 'HI_TOOLKIT_VERSION' ) )         define( 'HI_TOOLKIT_VERSION', '3.0.0' );
-if ( ! defined( 'HI_TOOLKIT_DIR' ) )             define( 'HI_TOOLKIT_DIR', plugin_dir_path( __FILE__ ) );
-if ( ! defined( 'HI_TOOLKIT_URL' ) )             define( 'HI_TOOLKIT_URL', plugin_dir_url( __FILE__ ) );
-if ( ! defined( 'HI_TOOLKIT_THEME_PATH' ) )      define( 'HI_TOOLKIT_THEME_PATH', get_template_directory() );
-if ( ! defined( 'HI_TOOLKIT_THEME_URL' ) )       define( 'HI_TOOLKIT_THEME_URL', get_template_directory_uri() );
-if ( ! defined( 'HI_TOOLKIT_THEME_VIEWS_PATH' ) ) define( 'HI_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
+if ( ! defined( 'HITHTO_VERSION' ) )         define( 'HITHTO_VERSION', '3.0.0' );
+if ( ! defined( 'HITHTO_DIR' ) )             define( 'HITHTO_DIR', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'HITHTO_URL' ) )             define( 'HITHTO_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'HITHTO_THEME_PATH' ) )      define( 'HITHTO_THEME_PATH', get_template_directory() );
+if ( ! defined( 'HITHTO_THEME_URL' ) )       define( 'HITHTO_THEME_URL', get_template_directory_uri() );
+if ( ! defined( 'HITHTO_THEME_VIEWS_PATH' ) ) define( 'HITHTO_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
 
 // Deprecated aliases — will be removed in a future major version.
-if ( ! defined( 'WP_TOOLKIT_VERSION' ) )         define( 'WP_TOOLKIT_VERSION', HI_TOOLKIT_VERSION );
-if ( ! defined( 'WP_TOOLKIT_DIR' ) )             define( 'WP_TOOLKIT_DIR', HI_TOOLKIT_DIR );
-if ( ! defined( 'WP_TOOLKIT_URL' ) )             define( 'WP_TOOLKIT_URL', HI_TOOLKIT_URL );
-if ( ! defined( 'WP_TOOLKIT_THEME_PATH' ) )      define( 'WP_TOOLKIT_THEME_PATH', HI_TOOLKIT_THEME_PATH );
-if ( ! defined( 'WP_TOOLKIT_THEME_URL' ) )       define( 'WP_TOOLKIT_THEME_URL', HI_TOOLKIT_THEME_URL );
-if ( ! defined( 'WP_TOOLKIT_THEME_VIEWS_PATH' ) ) define( 'WP_TOOLKIT_THEME_VIEWS_PATH', HI_TOOLKIT_THEME_VIEWS_PATH );
+if ( ! defined( 'WP_TOOLKIT_VERSION' ) )         define( 'WP_TOOLKIT_VERSION', HITHTO_VERSION );
+if ( ! defined( 'WP_TOOLKIT_DIR' ) )             define( 'WP_TOOLKIT_DIR', HITHTO_DIR );
+if ( ! defined( 'WP_TOOLKIT_URL' ) )             define( 'WP_TOOLKIT_URL', HITHTO_URL );
+if ( ! defined( 'WP_TOOLKIT_THEME_PATH' ) )      define( 'WP_TOOLKIT_THEME_PATH', HITHTO_THEME_PATH );
+if ( ! defined( 'WP_TOOLKIT_THEME_URL' ) )       define( 'WP_TOOLKIT_THEME_URL', HITHTO_THEME_URL );
+if ( ! defined( 'WP_TOOLKIT_THEME_VIEWS_PATH' ) ) define( 'WP_TOOLKIT_THEME_VIEWS_PATH', HITHTO_THEME_VIEWS_PATH );
 
 // Autoload classes.
 spl_autoload_register( function ( $class ) {
@@ -51,7 +51,7 @@ spl_autoload_register( function ( $class ) {
 		// Replace backslashes with directory separators to get the correct file path
 		$path = str_replace( '\\', DIRECTORY_SEPARATOR, $path );
 		// Construct the file path
-		$file = WP_TOOLKIT_DIR . $path . '.php';
+		$file = HITHTO_DIR . $path . '.php';
 
 		// Check if the file exists and include it if it does
 		if ( file_exists( $file ) ) {
@@ -66,8 +66,8 @@ spl_autoload_register( function ( $class ) {
 \Toolkit\utils\LegacyOptionService::register();
 
 // Register routes & main utils.
-include WP_TOOLKIT_DIR . '/main.php';
-include WP_TOOLKIT_DIR . '/routes/api.php';
+include HITHTO_DIR . '/main.php';
+include HITHTO_DIR . '/routes/api.php';
 
 
 // Register other classes on init
@@ -84,7 +84,7 @@ $toolkit_to_register = [
 ];
 
 // Load WebP test admin page
-require_once WP_TOOLKIT_DIR . 'utils/admin-webp-test-page.php';
+require_once HITHTO_DIR . 'utils/admin-webp-test-page.php';
 
 add_action( 'init', function () use ( $toolkit_to_register ) {
 	foreach ( $toolkit_to_register as $class ) {

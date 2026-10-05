@@ -21,9 +21,9 @@ class DocService {
             return;
         }
 
-        wp_enqueue_style( 'highlightjs-default-style', WP_TOOLKIT_URL . 'admin/assets/css/highlight-default.min.css', array(), '11.12.0' );
-        wp_enqueue_script( 'highlightjs', WP_TOOLKIT_URL . 'admin/assets/js/highlight.min.js', array(), '11.12.0', true );
-        wp_enqueue_script( 'highlightjs-lang-go', WP_TOOLKIT_URL . 'admin/assets/js/highlight-go.min.js', array( 'highlightjs' ), '11.12.0', true );
+        wp_enqueue_style( 'highlightjs-default-style', HITHTO_URL . 'admin/assets/css/highlight-default.min.css', array(), '11.12.0' );
+        wp_enqueue_script( 'highlightjs', HITHTO_URL . 'admin/assets/js/highlight.min.js', array(), '11.12.0', true );
+        wp_enqueue_script( 'highlightjs-lang-go', HITHTO_URL . 'admin/assets/js/highlight-go.min.js', array( 'highlightjs' ), '11.12.0', true );
         wp_add_inline_script( 'highlightjs', 'hljs.highlightAll();' );
 
         wp_add_inline_script( 'highlightjs', '
@@ -57,7 +57,7 @@ class DocService {
     public static function display_markdown_docs() {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only file display; nonce not appropriate for bookmarkable URLs
         $requested_file = isset($_GET['file']) ? sanitize_text_field( wp_unslash( $_GET['file'] ) ) : 'index.html';
-        $base_dir = WP_TOOLKIT_DIR . 'docs/';
+        $base_dir = HITHTO_DIR . 'docs/';
         $file_path = realpath($base_dir . $requested_file);
         $is_index_request = ('index.html' === $requested_file);
 
@@ -107,8 +107,8 @@ class DocService {
 
     private static function parse_markdown($markdown) {
         // Bundled library, namespaced under Hithto\Vendor (not covered by the Toolkit\ autoloader)
-        require_once WP_TOOLKIT_DIR . 'utils/parsedown/Parsedown.php';
-        require_once WP_TOOLKIT_DIR . 'utils/parsedown/ParsedownToc.php';
+        require_once HITHTO_DIR . 'utils/parsedown/Parsedown.php';
+        require_once HITHTO_DIR . 'utils/parsedown/ParsedownToc.php';
 
         $Parsedown = new ParsedownToc();
         $body = $Parsedown->body($markdown);

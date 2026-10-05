@@ -371,8 +371,8 @@ Download the [wordpress-toolkit-plugin](https://github.com/Hawaii-Interactive-CH
 1. Update the version number in `wordpress-toolkit-plugin.php` (header and constant):
 
 ```php
- * Version: 2.x.x
-define("WP_TOOLKIT_VERSION", "2.x.x");
+ * Version: 3.x.x
+if ( ! defined( 'HITHTO_VERSION' ) ) define( 'HITHTO_VERSION', '3.x.x' );
 ```
 
 2. Commit and push the changes:

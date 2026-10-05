@@ -24,8 +24,8 @@ class WebPTestPage
         if ('tools_page_webp-optimization-test' !== $hook) {
             return;
         }
-        wp_enqueue_style('hithto-webp-test-page', WP_TOOLKIT_URL . 'admin/assets/css/webp-test-page.css', [], WP_TOOLKIT_VERSION);
-        wp_enqueue_script('hithto-webp-test-page', WP_TOOLKIT_URL . 'admin/assets/js/webp-test-page.js', [], WP_TOOLKIT_VERSION, true);
+        wp_enqueue_style('hithto-webp-test-page', HITHTO_URL . 'admin/assets/css/webp-test-page.css', [], HITHTO_VERSION);
+        wp_enqueue_script('hithto-webp-test-page', HITHTO_URL . 'admin/assets/js/webp-test-page.js', [], HITHTO_VERSION, true);
         wp_localize_script('hithto-webp-test-page', 'hithtoWebpTest', [
             'nonce' => wp_create_nonce('hithto_process_webp_queue_nonce'),
         ]);

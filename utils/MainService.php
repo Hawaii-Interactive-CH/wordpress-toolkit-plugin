@@ -31,7 +31,7 @@ class MainService
             // if url is not wp-login.php and not wp-admin redirect to maintenance page
             if (!in_array($GLOBALS['pagenow'], ['wp-login.php', 'wp-register.php']) && !is_user_logged_in() && !is_admin()) {
                 // load custom maintenance page
-                include(WP_TOOLKIT_DIR . '/views/maintenance.php');
+                include(HITHTO_DIR . '/views/maintenance.php');
                 exit;
             }
         }
@@ -59,7 +59,7 @@ class MainService
         // Hook into the template_include filter
         add_filter('template_include', function ($template) {
 
-            $views_path = WP_TOOLKIT_THEME_VIEWS_PATH;
+            $views_path = HITHTO_THEME_VIEWS_PATH;
             $custom_template = $template;
             $types = [];
 
@@ -554,8 +554,8 @@ class MainService
                 <p>
                     <strong>Name:</strong>
                     <?php
-                    if (WP_TOOLKIT_THEME_PATH) {
-                        echo esc_html(basename(WP_TOOLKIT_THEME_PATH));
+                    if (HITHTO_THEME_PATH) {
+                        echo esc_html(basename(HITHTO_THEME_PATH));
                     } else {
                         echo 'None';
                     }
@@ -564,8 +564,8 @@ class MainService
                 <p>
                     <strong>URL:</strong>
                     <?php
-                    if (WP_TOOLKIT_THEME_URL) {
-                        echo esc_html(WP_TOOLKIT_THEME_URL);
+                    if (HITHTO_THEME_URL) {
+                        echo esc_html(HITHTO_THEME_URL);
                     } else {
                         echo 'None';
                     }
@@ -574,8 +574,8 @@ class MainService
                 <p>
                     <strong>Directory:</strong>
                     <?php
-                    if (WP_TOOLKIT_THEME_PATH) {
-                        echo esc_html(WP_TOOLKIT_THEME_PATH);
+                    if (HITHTO_THEME_PATH) {
+                        echo esc_html(HITHTO_THEME_PATH);
                     } else {
                         echo 'None';
                     }

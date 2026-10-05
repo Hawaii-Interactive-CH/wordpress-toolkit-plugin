@@ -45,7 +45,7 @@ abstract class Block
 
 			acf_register_block_type( $setting );
 
-			$file = WP_TOOLKIT_THEME_PATH . '/partials/blocks/' . static::TYPE . '.php';
+			$file = HITHTO_THEME_PATH . '/partials/blocks/' . static::TYPE . '.php';
 			if ( ! file_exists( $file ) ) {
 				throw new \Exception( esc_html( 'Missing block template ' . $file ) );
 			}
@@ -60,7 +60,7 @@ abstract class Block
 	 */
 	public static function render( $data ) {
 		$block = new static( $data );
-		$path  = implode( DIRECTORY_SEPARATOR, [ WP_TOOLKIT_THEME_PATH, 'partials', 'blocks', static::TYPE ] ) . '.php';
+		$path  = implode( DIRECTORY_SEPARATOR, [ HITHTO_THEME_PATH, 'partials', 'blocks', static::TYPE ] ) . '.php';
 		if ( file_exists( $path ) ) {
 			include $path;
 		}

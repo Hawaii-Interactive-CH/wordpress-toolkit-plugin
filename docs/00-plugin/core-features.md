@@ -12,21 +12,26 @@ This plugin loads the core features of a WordPress theme.
 ## Available Constants
 
 ```php
+// Plugin version
+define( 'HITHTO_VERSION', '3.0.0' );
+
 // Absolute path to the plugin
-define( 'WP_TOOLKIT_DIR', plugin_dir_path(__FILE__) );
+define( 'HITHTO_DIR', plugin_dir_path(__FILE__) );
 
 // Plugin URL
-define( 'WP_TOOLKIT_URL', plugin_dir_url(__FILE__) );
+define( 'HITHTO_URL', plugin_dir_url(__FILE__) );
 
 // Absolute path to the theme
-define( 'WP_TOOLKIT_THEME_PATH', get_template_directory() );
+define( 'HITHTO_THEME_PATH', get_template_directory() );
 
 // Theme URL
-define( 'WP_TOOLKIT_THEME_URL', get_template_directory_uri() );
+define( 'HITHTO_THEME_URL', get_template_directory_uri() );
 
 // Absolute path to the theme's view files
-define( 'WP_TOOLKIT_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
+define( 'HITHTO_THEME_VIEWS_PATH', get_template_directory() . '/templates' );
 ```
+
+> **Deprecated names:** the former `WP_TOOLKIT_*` constants (`WP_TOOLKIT_DIR`, `WP_TOOLKIT_URL`, …) are still defined as aliases of the `HITHTO_*` ones for existing themes, but will be removed in a future major version. Use the `HITHTO_*` names in new code.
 
 ## Customizing the Login Page — `MainService::customize_login()`
 

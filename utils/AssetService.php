@@ -111,7 +111,7 @@ class AssetService
         self::$assets["css"][$handle] = [
             "src" => $src,
             "deps" => $deps,
-            "ver" => $ver ?: WP_TOOLKIT_VERSION,
+            "ver" => $ver ?: HITHTO_VERSION,
             "media" => $media,
         ];
     }
@@ -145,7 +145,7 @@ class AssetService
         self::$assets["js"][$handle] = [
             "src" => $src,
             "deps" => $deps,
-            "ver" => $ver ?: WP_TOOLKIT_VERSION,
+            "ver" => $ver ?: HITHTO_VERSION,
             "in_footer" => $in_footer,
         ];
     }
@@ -176,7 +176,7 @@ class AssetService
         // Remove leading slash if present
         $path = ltrim($path, "/");
 
-        return WP_TOOLKIT_THEME_URL . "/public/" . $path;
+        return HITHTO_THEME_URL . "/public/" . $path;
     }
 
     /**
@@ -225,21 +225,21 @@ class AssetService
         // Always enqueue admin-specific assets
         wp_enqueue_style(
             "toolkit-admin-css",
-            WP_TOOLKIT_URL . "/admin/assets/css/toolkit-admin.css",
+            HITHTO_URL . "/admin/assets/css/toolkit-admin.css",
             [],
-            WP_TOOLKIT_VERSION,
+            HITHTO_VERSION,
         );
         wp_enqueue_style(
             "toolkit-icomoon-style",
-            WP_TOOLKIT_URL . "/admin/assets/css/toolkit-icomoon.css",
+            HITHTO_URL . "/admin/assets/css/toolkit-icomoon.css",
             [],
-            WP_TOOLKIT_VERSION,
+            HITHTO_VERSION,
         );
         wp_enqueue_style(
             "toolkit-md-style",
-            WP_TOOLKIT_URL . "/admin/assets/css/toolkit-md.css",
+            HITHTO_URL . "/admin/assets/css/toolkit-md.css",
             [],
-            WP_TOOLKIT_VERSION,
+            HITHTO_VERSION,
         );
 
         // Enqueue regular assets in admin too
@@ -251,12 +251,12 @@ class AssetService
      */
     public static function enqueue_block_editor_assets()
     {
-        if (file_exists(WP_TOOLKIT_THEME_PATH . "/public/css/blocks.css")) {
+        if (file_exists(HITHTO_THEME_PATH . "/public/css/blocks.css")) {
             wp_enqueue_style(
                 "hithto-block-styles",
-                WP_TOOLKIT_THEME_URL . "/public/css/blocks.css",
+                HITHTO_THEME_URL . "/public/css/blocks.css",
                 ["wp-edit-blocks"],
-                filemtime(WP_TOOLKIT_THEME_PATH . "/public/css/blocks.css"),
+                filemtime(HITHTO_THEME_PATH . "/public/css/blocks.css"),
             );
         }
     }
@@ -271,7 +271,7 @@ class AssetService
         }
 
         $entry = self::$viteManifest["src/javascript/app.js"];
-        $baseUrl = WP_TOOLKIT_THEME_URL . "/public/";
+        $baseUrl = HITHTO_THEME_URL . "/public/";
 
         // CSS (file names are hashed by Vite, no version needed)
         foreach ($entry["css"] ?? [] as $index => $cssFile) {
@@ -279,7 +279,7 @@ class AssetService
         }
 
         // Configuration for JavaScript, printed in <head> before the app module
-        wp_register_script("hithto-toolkit-config", false, [], WP_TOOLKIT_VERSION, false);
+        wp_register_script("hithto-toolkit-config", false, [], HITHTO_VERSION, false);
         wp_enqueue_script("hithto-toolkit-config");
         wp_add_inline_script(
             "hithto-toolkit-config",
@@ -309,7 +309,7 @@ class AssetService
             return $resources;
         }
 
-        $baseUrl = WP_TOOLKIT_THEME_URL . "/public/";
+        $baseUrl = HITHTO_THEME_URL . "/public/";
 
         foreach (self::$viteManifest["src/javascript/app.js"]["assets"] ?? [] as $assetFile) {
             if (preg_match('/\.(woff|woff2|ttf|otf|eot)$/', $assetFile)) {
@@ -341,7 +341,7 @@ class AssetService
         ];
 
         foreach ($possiblePaths as $path) {
-            $fullPath = WP_TOOLKIT_THEME_PATH . "/" . $path;
+            $fullPath = HITHTO_THEME_PATH . "/" . $path;
             if (file_exists($fullPath)) {
                 return $path;
             }
@@ -366,7 +366,7 @@ class AssetService
         ];
 
         foreach ($possiblePaths as $path) {
-            $fullPath = WP_TOOLKIT_THEME_PATH . "/" . $path;
+            $fullPath = HITHTO_THEME_PATH . "/" . $path;
             if (file_exists($fullPath)) {
                 return $path;
             }
@@ -387,7 +387,7 @@ class AssetService
             return $path;
         }
 
-        return WP_TOOLKIT_THEME_URL . "/" . ltrim($path, "/");
+        return HITHTO_THEME_URL . "/" . ltrim($path, "/");
     }
 
     /**
@@ -423,8 +423,8 @@ class AssetService
     public static function load_vite_manifest()
     {
         $manifestPaths = [
-            WP_TOOLKIT_THEME_PATH . "/public/.vite/manifest.json",
-            WP_TOOLKIT_THEME_PATH . "/public/manifest.json",
+            HITHTO_THEME_PATH . "/public/.vite/manifest.json",
+            HITHTO_THEME_PATH . "/public/manifest.json",
         ];
 
         foreach ($manifestPaths as $manifestPath) {
