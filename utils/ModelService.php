@@ -103,7 +103,7 @@ class ModelService
         ?>
         <div class="wrap">
             <h2>Model Settings</h2>
-            <p><?php esc_html_e( "Check the boxes below to enable the corresponding post type.", "hi-theme-toolkit" ); ?></p>
+            <p><?php esc_html_e( "Check the boxes below to enable the corresponding models (post types, taxonomies, blocks, patterns...).", "hi-theme-toolkit" ); ?></p>
             <form method="post">
                 <?php wp_nonce_field(
                     "toolkit_model_settings_save",

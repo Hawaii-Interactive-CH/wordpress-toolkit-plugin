@@ -22,6 +22,9 @@ class MainService
         self::maintenance_mode();
         self::enable_cookie_consent();
         self::enable_calendar();
+        self::pattern_category();
+        self::pattern_lock();
+        self::pattern_toolkit_only();
     }
 
     public static function maintenance_mode()
@@ -50,6 +53,44 @@ class MainService
             \Toolkit\models\CalendarEvent::register();
             \Toolkit\utils\CalendarService::register();
             CalendarAdminService::register();
+        }
+    }
+
+    public static function pattern_category()
+    {
+        // Category grouping the theme patterns in the editor
+        register_block_pattern_category('hithto', [
+            'label' => get_option('hithto_pattern_category_label') ?: 'Hawaii',
+        ]);
+    }
+
+    public static function pattern_lock()
+    {
+        // Lock the layout of the toolkit patterns for non-administrators
+        if (get_option('hithto_pattern_lock_admin_only', 0) == 1) {
+            add_action('enqueue_block_editor_assets', function () {
+                if (!current_user_can('edit_theme_options')) {
+                    wp_enqueue_script('hithto-pattern-lock', HITHTO_URL . 'admin/assets/js/pattern-lock.js', ['wp-data', 'wp-blocks', 'wp-block-editor'], HITHTO_VERSION, true);
+                }
+            });
+        }
+    }
+
+    public static function pattern_toolkit_only()
+    {
+        // Only show the toolkit patterns in the editor
+        if (get_option('hithto_pattern_toolkit_only', 0) == 1) {
+            // Patterns from the wordpress.org directory
+            add_filter('should_load_remote_block_patterns', '__return_false');
+
+            // Patterns from WordPress, the theme and other plugins (the editor loads them through the REST API)
+            add_action('rest_api_init', function () {
+                foreach (\WP_Block_Patterns_Registry::get_instance()->get_all_registered() as $pattern) {
+                    if (strpos($pattern['name'], 'hithto/') !== 0) {
+                        unregister_block_pattern($pattern['name']);
+                    }
+                }
+            }, PHP_INT_MAX);
         }
     }
 
@@ -530,6 +571,12 @@ class MainService
             update_option( 'toolkit_admin_footer_url', esc_url_raw( $post_data['admin_footer_url'] ?? '' ) );
         }
 
+        if (isset($post_data['submit']) && isset($post_data['pattern_category_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['pattern_category_nonce']), 'pattern_category_action')) {
+            update_option('hithto_pattern_category_label', sanitize_text_field($post_data['pattern_category_label'] ?? ''));
+            update_option('hithto_pattern_lock_admin_only', isset($post_data['pattern_lock_admin_only']) ? 1 : 0);
+            update_option('hithto_pattern_toolkit_only', isset($post_data['pattern_toolkit_only']) ? 1 : 0);
+        }
+
         if (isset($post_data['submit']) && isset($post_data['file_size_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['file_size_nonce']), 'file_size_action')) {
             // Save the user's choices to options
             $options = [];
@@ -645,6 +692,40 @@ class MainService
                         <tr>
                             <th scope="row"><label for="admin_footer_url"><?php esc_html_e( 'Agency URL', 'hi-theme-toolkit' ); ?></label></th>
                             <td><input type="url" id="admin_footer_url" name="admin_footer_url" class="regular-text" value="<?php echo esc_attr(get_option('toolkit_admin_footer_url', '')); ?>"></td>
+                        </tr>
+                    </table>
+                    <p class="submit">
+                        <input type="submit" name="submit" class="button-primary" value="Save Changes">
+                    </p>
+                </form>
+            </div>
+
+            <div class="pattern-category">
+                <h2>Patterns</h2>
+                <form method="post">
+                    <?php wp_nonce_field('pattern_category_action', 'pattern_category_nonce'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="pattern_category_label"><?php esc_html_e( 'Pattern category name', 'hi-theme-toolkit' ); ?></label></th>
+                            <td><input type="text" id="pattern_category_label" name="pattern_category_label" class="regular-text" placeholder="Hawaii" value="<?php echo esc_attr(get_option('hithto_pattern_category_label', '')); ?>"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'Pattern layout', 'hi-theme-toolkit' ); ?></th>
+                            <td>
+                                <label for="pattern_lock_admin_only">
+                                    <input type="checkbox" name="pattern_lock_admin_only" id="pattern_lock_admin_only" value="1" <?php checked(get_option('hithto_pattern_lock_admin_only', 0), 1); ?>>
+                                    <?php esc_html_e( 'Only administrators can edit the layout of patterns', 'hi-theme-toolkit' ); ?>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'Available patterns', 'hi-theme-toolkit' ); ?></th>
+                            <td>
+                                <label for="pattern_toolkit_only">
+                                    <input type="checkbox" name="pattern_toolkit_only" id="pattern_toolkit_only" value="1" <?php checked(get_option('hithto_pattern_toolkit_only', 0), 1); ?>>
+                                    <?php esc_html_e( 'Only show toolkit patterns in the editor', 'hi-theme-toolkit' ); ?>
+                                </label>
+                            </td>
                         </tr>
                     </table>
                     <p class="submit">
