@@ -4,7 +4,7 @@
 
 To create a `Block`, add a file in the theme's `models/custom` folder and create its partial in the `partials/blocks` folder with the same name as the `TYPE`.
 
-You can generate one via the `Toolkit > Models` tab in the WordPress admin by clicking the `Block` tab, or by copying and modifying the following code:
+Copy and modify the following code, then enable the block in `Toolkit > Models`:
 
 ```php
 <?php
@@ -37,3 +37,26 @@ class BlockDemo extends Block
 ## Usage
 
 `Blocks` are content elements that can be added to `Posts` and `Pages` from the WordPress editor. They behave like `Gutenberg Blocks` and can be added, edited, and removed from the `Post` or `Page` content.
+
+## Inserter Preview
+
+Without example data, the block inserter shows an empty preview of the block. Add `example` to `settings()` to render it with sample field values (keyed by field name):
+
+```php
+public static function settings()
+{
+  return array(
+    'title' => 'Demo',
+    // ...
+    'example' => array(
+      'attributes' => array(
+        'mode' => 'preview',
+        'data' => array(
+          'title' => 'Join us',
+          'text' => 'Lorem ipsum dolor sit amet.',
+        ),
+      ),
+    ),
+  );
+}
+```

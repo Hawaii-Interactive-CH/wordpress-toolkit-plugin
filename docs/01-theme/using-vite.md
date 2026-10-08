@@ -38,6 +38,12 @@ npm run staging
 
 Add files to the theme's `src` folder. They will be automatically compiled and minified.
 
+#### Block editor styles
+
+The toolkit loads the build of `src/scss/blocks.scss` inside the block editor canvas, so blocks and patterns look like the front-end. Use another entry with `\Toolkit\utils\AssetService::set_block_editor_entry('src/scss/editor.scss');` if needed. Themes without Vite can use a `public/css/blocks.css` file instead.
+
+In the editor, links and form fields of the ACF block previews are disabled: a click selects the block instead of following the link.
+
 ### 2. Using aliases
 
 Aliases are configured in `vite.config.js` and simplify file imports. Instead of writing:

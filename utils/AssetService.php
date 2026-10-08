@@ -52,6 +52,13 @@ class AssetService
     private static $viteManifest = null;
 
     /**
+     * Vite entry of the block editor styles
+     *
+     * @var string
+     */
+    private static $blockEditorEntry = "src/scss/blocks.scss";
+
+    /**
      * Dev mode cache
      *
      * @var bool|null
@@ -73,7 +80,7 @@ class AssetService
         add_action("wp_enqueue_scripts", [self::class, "enqueue_vite_assets"], 5);
         add_action("wp_head", [self::class, "output_vite_dev"], 5);
         add_filter("wp_preload_resources", [self::class, "preload_vite_fonts"]);
-        add_action("enqueue_block_editor_assets", [
+        add_action("enqueue_block_assets", [
             self::class,
             "enqueue_block_editor_assets",
         ]);
@@ -247,15 +254,47 @@ class AssetService
     }
 
     /**
-     * Enqueue block editor assets
+     * Enqueue block editor assets inside the editor canvas
+     *
+     * Since WordPress 6.9 the editor canvas is always an iframe, and only
+     * "enqueue_block_assets" is mirrored into it. This hook fires twice on the
+     * editor screen: once for the outer admin page, once while WordPress collects
+     * the iframe assets (wp_should_load_block_editor_scripts_and_styles() is
+     * forced to false for that pass). Only the iframe pass is used.
      */
     public static function enqueue_block_editor_assets()
     {
+        if (!is_admin() || wp_should_load_block_editor_scripts_and_styles()) {
+            return;
+        }
+
+        // Block previews are only visual: disable their links and form fields
+        wp_enqueue_style(
+            "hithto-block-preview",
+            HITHTO_URL . "admin/assets/css/block-preview.css",
+            [],
+            HITHTO_VERSION,
+        );
+
+        // Theme block styles built by Vite
+        $entry = self::$viteManifest[self::$blockEditorEntry] ?? null;
+        $file = $entry["file"] ?? ($entry["css"][0] ?? null);
+        if ($file && file_exists(HITHTO_THEME_PATH . "/public/" . $file)) {
+            wp_enqueue_style(
+                "hithto-block-styles",
+                HITHTO_THEME_URL . "/public/" . $file,
+                [],
+                filemtime(HITHTO_THEME_PATH . "/public/" . $file),
+            );
+            return;
+        }
+
+        // Theme block styles without Vite
         if (file_exists(HITHTO_THEME_PATH . "/public/css/blocks.css")) {
             wp_enqueue_style(
                 "hithto-block-styles",
                 HITHTO_THEME_URL . "/public/css/blocks.css",
-                ["wp-edit-blocks"],
+                [],
                 filemtime(HITHTO_THEME_PATH . "/public/css/blocks.css"),
             );
         }
@@ -512,5 +551,13 @@ class AssetService
     public static function set_vite_dev_server($url)
     {
         self::$viteDevServer = rtrim($url, "/");
+    }
+
+    /**
+     * Set the Vite entry of the block editor styles
+     */
+    public static function set_block_editor_entry($entry)
+    {
+        self::$blockEditorEntry = $entry;
     }
 }

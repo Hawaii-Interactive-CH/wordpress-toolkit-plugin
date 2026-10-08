@@ -80,17 +80,7 @@
         });
     }
 
-    function applyModes() {
-        var blocks = wp.data.select(STORE).getBlocks();
-
-        // Only recompute when the block tree changes
-        if (isApplying || blocks === lastBlocks) {
-            return;
-        }
-        lastBlocks = blocks;
-        isApplying = true;
-
-        var dispatch = wp.data.dispatch(STORE);
+    function applyModes(dispatch, blocks) {
         var modes = {};
         collectModes(blocks, modes);
 
@@ -108,8 +98,42 @@
         });
 
         appliedModes = modes;
+    }
+
+    /**
+     * Lock the structure of the pattern containers (move, insert, remove),
+     * even when the user enters the "Edit pattern" mode.
+     * The inner blocks component can reset these settings, so they are checked on every change.
+     */
+    function applyTemplateLock(select, dispatch) {
+        Object.keys(appliedModes).forEach(function(clientId) {
+            var settings = select.getBlockListSettings(clientId);
+            if (settings && settings.templateLock !== 'all') {
+                dispatch.updateBlockListSettings(clientId, Object.assign({}, settings, { templateLock: 'all' }));
+            }
+        });
+    }
+
+    function lockPatterns() {
+        if (isApplying) {
+            return;
+        }
+        isApplying = true;
+
+        var select = wp.data.select(STORE);
+        var dispatch = wp.data.dispatch(STORE);
+        var blocks = select.getBlocks();
+
+        // Only recompute the editing modes when the block tree changes
+        if (blocks !== lastBlocks) {
+            lastBlocks = blocks;
+            applyModes(dispatch, blocks);
+        }
+
+        applyTemplateLock(select, dispatch);
+
         isApplying = false;
     }
 
-    wp.data.subscribe(applyModes, STORE);
+    wp.data.subscribe(lockPatterns, STORE);
 })(window.wp);

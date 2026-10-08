@@ -71,6 +71,7 @@ class MainService
             add_action('enqueue_block_editor_assets', function () {
                 if (!current_user_can('edit_theme_options')) {
                     wp_enqueue_script('hithto-pattern-lock', HITHTO_URL . 'admin/assets/js/pattern-lock.js', ['wp-data', 'wp-blocks', 'wp-block-editor'], HITHTO_VERSION, true);
+                    wp_enqueue_style('hithto-pattern-lock', HITHTO_URL . 'admin/assets/css/pattern-lock.css', [], HITHTO_VERSION);
                 }
             });
         }

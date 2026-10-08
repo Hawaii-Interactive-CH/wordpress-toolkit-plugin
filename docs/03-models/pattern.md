@@ -60,11 +60,66 @@ ACF blocks can be used in a pattern too:
 <!-- wp:acf/block-demo {"name":"acf/block-demo","data":{"title":"Demo"},"mode":"preview"} /-->
 ```
 
+## Naming the Elements
+
+By default, the `Content` panel and the list view show the block type (`Paragraph`, `Image`...). Give each element a name with `metadata.name` to show what it is used for:
+
+```php
+<!-- wp:heading {"metadata":{"name":"<?php esc_attr_e( 'Section title', 'theme' ); ?>"}} -->
+<h2 class="wp-block-heading"><?php esc_html_e( 'Title', 'theme' ); ?></h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"metadata":{"name":"<?php esc_attr_e( 'Introduction', 'theme' ); ?>"}} -->
+<p>Lorem ipsum dolor sit amet.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:acf/block-demo {"name":"acf/block-demo","metadata":{"name":"<?php esc_attr_e( 'Banner', 'theme' ); ?>"},"mode":"preview"} /-->
+```
+
+## Placeholders
+
+Instead of a sample text, a `placeholder` tells the user what to write. It is only displayed in the editor while the element is empty:
+
+```php
+<!-- wp:heading {"placeholder":"<?php esc_attr_e( 'Event title…', 'theme' ); ?>"} -->
+<h2 class="wp-block-heading"></h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"placeholder":"<?php esc_attr_e( 'Write a short introduction…', 'theme' ); ?>"} -->
+<p></p>
+<!-- /wp:paragraph -->
+```
+
+If the user leaves an element empty, its empty tag (`<p></p>`) is still printed on the front-end: hide it in the theme styles if needed (`p:empty { display: none; }`).
+
+Text values inside the block comments are JSON: escape them with `esc_attr_e()` and avoid double quotes in translations.
+
 ## Settings
 
 `settings()` accepts the arguments of [register_block_pattern](https://developer.wordpress.org/reference/functions/register_block_pattern/) (`title`, `description`, `categories`, `keywords`, `blockTypes`, `viewportWidth`, `inserter`...). The `content` is generated from the partial.
 
 The pattern is registered as `hithto/{TYPE}`.
+
+## Inserter Preview
+
+The inserter shows a preview of each pattern, rendered with the theme block styles.
+
+- `viewportWidth` sets the width (in pixels) used to render the preview, so a full-width pattern looks like on a desktop screen.
+- `description` and `keywords` are used by the inserter search.
+
+```php
+public static function settings()
+{
+  return array(
+    'title' => 'Demo',
+    'description' => 'A section with a title, a text and a banner.',
+    'keywords' => array( 'section', 'banner' ),
+    'viewportWidth' => 1400,
+  );
+}
+```
+
+ACF blocks inside a pattern are previewed with the data set in the pattern markup (`data`). To give an ACF block a filled preview in the block inserter, see `example` in the Block documentation.
 
 ## Starter Patterns
 
@@ -131,9 +186,11 @@ class PatternDemo extends Pattern
 
 In the `Patterns` section of the `Toolkit` page, check `Only administrators can edit the layout of patterns` to lock the toolkit patterns (`hithto/*`) for users who can't edit the theme options (editors, authors...).
 
-Once inserted in a page, these users can still edit texts, images and links, and move or remove the pattern, but they can't change its styles (colors, font sizes, spacing...) or add, remove and reorder the blocks inside it. Administrators are not affected.
+Once inserted in a page, these users can still edit texts, images and links, and move or remove the pattern, but they can't change its styles (colors, font sizes, spacing...) or add, remove and reorder the blocks inside it. This also applies in the `Edit pattern` mode. The `Edit pattern` button of the block settings sidebar is hidden, so the sidebar only shows the `Content` panel. Administrators are not affected.
 
 The pattern must have a single root block (a group for example): WordPress only keeps the pattern name on the inserted blocks in this case, and the lock relies on it.
+
+The lock is applied in the editor only, nothing is saved in the post content.
 
 ## Only Toolkit Patterns
 
