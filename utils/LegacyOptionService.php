@@ -8,29 +8,32 @@ defined('ABSPATH') or exit;
 /**
  * Backward compatibility with legacy (unprefixed) option names.
  *
- * The plugin now stores these options under prefixed names. Themes that still
- * call get_option() / update_option() with the legacy names are transparently
- * redirected to the prefixed options, and existing values are migrated once.
+ * The plugin now stores these options under prefixed names. Values saved under
+ * the legacy names are migrated once per site, only when they have the format
+ * this plugin stores, so options of other plugins using the same generic names
+ * are never read, overwritten or deleted.
  */
 class LegacyOptionService
 {
     /**
-     * Legacy option name => prefixed option name.
-     */
-    const OPTIONS = [
-        'file_size'        => 'hithto_file_size',
-        'maintenance_mode' => 'hithto_maintenance_mode',
-    ];
-
-    /**
-     * Legacy option name => prefixed option name, migrated once without read/write
-     * redirection: no theme uses them, and redirecting a name as generic as
-     * "calendar" could hijack another plugin's option.
+     * Legacy option name => prefixed option name, migrated once (no read/write
+     * redirection: redirecting generic names could hijack another plugin's option).
      */
     const MIGRATE_ONLY_OPTIONS = [
+        'file_size'           => 'hithto_file_size',
+        'maintenance_mode'    => 'hithto_maintenance_mode',
         'calendar'            => 'hithto_calendar',
         'fly_images_queue'    => 'hithto_images_queue',
         'fly_images_webp_log' => 'hithto_webp_log',
+    ];
+
+    /**
+     * Small settings read on every request, stored with autoload.
+     */
+    const AUTOLOADED_OPTIONS = [
+        'file_size',
+        'maintenance_mode',
+        'calendar',
     ];
 
     const LEGACY_MEDIA_TAXONOMY = 'media_category';
@@ -39,7 +42,7 @@ class LegacyOptionService
      * Option storing the version of the one-time migrations already run.
      */
     const MIGRATION_VERSION_OPTION = 'hithto_legacy_migration_version';
-    const MIGRATION_VERSION        = 2;
+    const MIGRATION_VERSION        = 3;
 
     /**
      * Cron hooks renamed with the hithto prefix: the old scheduled events are removed,
@@ -49,47 +52,80 @@ class LegacyOptionService
         'fly_images_process_queue',
     ];
 
+    /**
+     * Options with names specific to this plugin: if one of them exists,
+     * the plugin was already installed on this site.
+     */
+    const INSTALL_MARKER_OPTIONS = [
+        'hithto_file_size',
+        'hithto_maintenance_mode',
+        'hithto_menu_settings',
+        'toolkit_enabled_models',
+        'hithto_calendar',
+        'toolkit_calendar_settings',
+        'hithto_api_encryption_key',
+        'hithto_legacy_migration_version',
+    ];
+
+    /**
+     * Generic option names used by previous versions of the plugin: they only count
+     * as install markers when their value has the format this plugin stores.
+     */
+    const GENERIC_INSTALL_MARKER_OPTIONS = [
+        'file_size',
+        'maintenance_mode',
+        'calendar',
+        'cookie_consent',
+        'custom_menu_settings',
+    ];
+
+    /**
+     * Features that used to be always on and are now opt-in settings: they stay
+     * enabled on sites where the plugin was already installed, off on new installs.
+     */
+    const FORMERLY_DEFAULT_FEATURES = [
+        'hithto_disable_comments',
+        'hithto_allow_svg_upload',
+        'hithto_limit_upload_size',
+    ];
+
     public static function register()
     {
-        self::migrate();
+        // Checked before any migration, as migrations create options themselves
+        $is_existing_install = self::is_existing_install();
 
         if ((int) get_option(self::MIGRATION_VERSION_OPTION, 0) < self::MIGRATION_VERSION) {
             self::migrate_prefixed_names();
             update_option(self::MIGRATION_VERSION_OPTION, self::MIGRATION_VERSION);
         }
 
-        foreach (self::OPTIONS as $legacy_name => $option_name) {
-            // Reads of the legacy name return the prefixed option.
-            add_filter("pre_option_{$legacy_name}", function () use ($option_name) {
-                return get_option($option_name, false);
-            });
-
-            // Writes to the legacy name go to the prefixed option; returning the
-            // old value makes WordPress skip writing the legacy option itself.
-            add_filter("pre_update_option_{$legacy_name}", function ($value, $old_value) use ($option_name) {
-                update_option($option_name, $value);
-                return $old_value;
-            }, 10, 2);
+        // Set once per site: the option exists afterwards, whatever its value
+        foreach (self::FORMERLY_DEFAULT_FEATURES as $feature_option) {
+            if (null === get_option($feature_option, null)) {
+                update_option($feature_option, $is_existing_install ? 1 : 0);
+            }
         }
     }
 
     /**
-     * Copies values saved under the legacy names to the prefixed ones, then
-     * deletes the legacy rows. Does nothing once the legacy rows are gone.
+     * @return bool True if a previous version of the plugin was installed on this site
      */
-    public static function migrate()
+    private static function is_existing_install()
     {
-        foreach (self::OPTIONS as $legacy_name => $option_name) {
-            $legacy_value = get_option($legacy_name, null);
-            if (null === $legacy_value) {
-                continue;
+        foreach (self::INSTALL_MARKER_OPTIONS as $option) {
+            if (null !== get_option($option, null)) {
+                return true;
             }
-
-            if (null === get_option($option_name, null)) {
-                update_option($option_name, $legacy_value);
-            }
-            delete_option($legacy_name);
         }
+
+        foreach (self::GENERIC_INSTALL_MARKER_OPTIONS as $option) {
+            $value = get_option($option, null);
+            if (null !== $value && self::is_own_legacy_value($option, $value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -107,7 +143,7 @@ class LegacyOptionService
             }
 
             if (null === get_option($option_name, null)) {
-                update_option($option_name, $legacy_value, 'calendar' === $legacy_name);
+                update_option($option_name, $legacy_value, in_array($legacy_name, self::AUTOLOADED_OPTIONS, true));
             }
             delete_option($legacy_name);
         }
@@ -126,11 +162,17 @@ class LegacyOptionService
      */
     private static function is_own_legacy_value($legacy_name, $value)
     {
-        if ('calendar' === $legacy_name) {
-            return in_array((string) $value, ['0', '1'], true);
+        // On/off settings stored as 0 or 1
+        if (in_array($legacy_name, ['calendar', 'maintenance_mode', 'cookie_consent'], true)) {
+            return is_scalar($value) && in_array((string) $value, ['0', '1'], true);
         }
 
-        // fly_images_queue and fly_images_webp_log are always stored as arrays
+        // Upload limit stored as a positive number of bytes
+        if ('file_size' === $legacy_name) {
+            return is_scalar($value) && ctype_digit((string) $value) && (int) $value > 0;
+        }
+
+        // fly_images_queue, fly_images_webp_log and custom_menu_settings are always stored as arrays
         return is_array($value);
     }
 

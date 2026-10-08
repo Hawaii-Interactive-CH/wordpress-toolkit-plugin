@@ -86,10 +86,17 @@ class ApiAuthService
         $expiry = get_option('hithto_api_transient_expiry', 10);
         $whitelist = self::get_whitelist();
         $encryption_key_defined = self::get_encryption_key();
+        $encryption_available = self::is_encryption_available();
 
         ?>
         <div class="wrap">
             <h1>API Authentication</h1>
+
+            <?php if (!$encryption_available) : ?>
+                <div class="notice notice-error inline">
+                    <p><?php esc_html_e('The OpenSSL PHP extension is required for API authentication, but it is not available on this server. Please ask your host to enable it.', 'hi-theme-toolkit'); ?></p>
+                </div>
+            <?php endif; ?>
 
             <div class="api-auth-section">
                 <h2>Generate Encryption Key</h2>
@@ -97,7 +104,7 @@ class ApiAuthService
                     <?php wp_nonce_field('generate_encryption_key_action', 'generate_encryption_key_nonce'); ?>
                     <input type="hidden" name="action" value="hithto_generate_encryption_key">
                     <p>
-                        <input type="submit" name="generate_encryption_key" class="button-primary" value="Generate Encryption Key" <?php echo $encryption_key_defined ? 'disabled' : ''; ?>>
+                        <input type="submit" name="generate_encryption_key" class="button-primary" value="Generate Encryption Key" <?php echo ($encryption_key_defined || !$encryption_available) ? 'disabled' : ''; ?>>
                     </p>
                     <?php if ($encryption_key_defined) : ?>
                         <p>Encryption key is already defined.</p>
@@ -113,7 +120,7 @@ class ApiAuthService
                     <input type="hidden" name="action" value="hithto_generate_master_token">
                     <h2>Generate Master Token</h2>
                     <p>
-                        <input type="submit" name="generate_master_token" class="button-primary" value="Generate Master Token" <?php echo !$encryption_key_defined ? 'disabled' : ''; ?>>
+                        <input type="submit" name="generate_master_token" class="button-primary" value="Generate Master Token" <?php echo (!$encryption_key_defined || !$encryption_available) ? 'disabled' : ''; ?>>
                     </p>
                     <?php if (!$encryption_key_defined) : ?>
                         <p class="description">Encryption key is not defined. Please generate the encryption key first.</p>
@@ -184,15 +191,27 @@ class ApiAuthService
         return $key ?: false;
     }
 
-    /** Chiffre le token */
+    /** Vérifie que l'extension PHP OpenSSL, nécessaire au chiffrement des tokens, est disponible */
+    public static function is_encryption_available()
+    {
+        return function_exists('openssl_encrypt') && function_exists('openssl_decrypt');
+    }
+
+    /** Chiffre le token (false si OpenSSL n'est pas disponible) */
     private static function encrypt_token($token)
     {
+        if (!self::is_encryption_available()) {
+            return false;
+        }
         return openssl_encrypt($token, 'aes-256-cbc', self::get_encryption_key(), 0, substr(hash('sha256', self::get_encryption_key()), 0, 16));
     }
 
-    /** Déchiffre le token */
+    /** Déchiffre le token (false si OpenSSL n'est pas disponible) */
     private static function decrypt_token($encrypted_token)
     {
+        if (!self::is_encryption_available()) {
+            return false;
+        }
         return openssl_decrypt($encrypted_token, 'aes-256-cbc', self::get_encryption_key(), 0, substr(hash('sha256', self::get_encryption_key()), 0, 16));
     }
 
@@ -201,6 +220,12 @@ class ApiAuthService
     {
         self::ensure_manage_options_capability();
         if (isset($_POST['generate_master_token']) && check_admin_referer('generate_master_token_action', 'generate_master_token_nonce')) {
+            if (!self::is_encryption_available()) {
+                set_transient('hithto_api_auth_error', 'The OpenSSL PHP extension is required to generate the master token.', 30);
+                wp_safe_redirect(admin_url('admin.php?page=api-authentication'));
+                exit;
+            }
+
             $token = wp_generate_password(64, false);
             $encrypted_token = self::encrypt_token($token);
             update_option(self::$master_token_option_name, $encrypted_token);

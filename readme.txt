@@ -57,7 +57,6 @@ No. WooCommerce support is disabled by default and can be enabled via the plugin
 This plugin may connect to the following external services depending on your configuration:
 
 * **Google Calendar API** — used by `GoogleCalendarSource` to fetch calendar events. This connection is only made when the Google Calendar integration is configured and active. See [Google's Privacy Policy](https://policies.google.com/privacy).
-* **Highlight.js (cdnjs.cloudflare.com)** — used in the admin Docs page to syntax-highlight code blocks. Loaded from `https://cdnjs.cloudflare.com` only when the Docs admin page is visited. See [Cloudflare's Privacy Policy](https://www.cloudflare.com/privacypolicy/).
 
 No data is sent to any external service by default. External connections are opt-in and initiated by your theme code.
 
@@ -66,7 +65,8 @@ No data is sent to any external service by default. External connections are opt
 This plugin includes the following third-party libraries:
 
 * **Parsedown** — Markdown parser by Emanuil Rusev. Licensed under the MIT License. [Source](https://github.com/erusev/parsedown). Bundled under the plugin's own `Hithto\Vendor\Parsedown` namespace.
-* **ParsedownToc** — Table of contents extension for Parsedown by KEINOS. Licensed under the MIT License. [Source](https://github.com/KEINOS/parsedown-toc). Bundled under the plugin's own `Hithto\Vendor\Parsedown` namespace.
+* **ParsedownToc** — Table of contents extension for Parsedown by KEINOS. Licensed under the MIT License. [Source](https://github.com/KEINOS/parsedown-extension_table-of-contents). Bundled under the plugin's own `Hithto\Vendor\Parsedown` namespace.
+* **Highlight.js** v11.12.0 — Syntax highlighter by Josh Goebel and contributors, used in the admin Docs page to highlight code blocks. Licensed under the BSD 3-Clause License. [Source](https://github.com/highlightjs/highlight.js). Bundled locally in `admin/assets/`, no external request is made.
 
 == Screenshots ==
 

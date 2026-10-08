@@ -333,6 +333,11 @@ class GravityForm
 
     public static function all_active()
     {
+        // Gravity Forms is not active: no form to list
+        if (!class_exists('\RGFormsModel')) {
+            return [];
+        }
+
         /**
          * list all GF forms id and title
          */

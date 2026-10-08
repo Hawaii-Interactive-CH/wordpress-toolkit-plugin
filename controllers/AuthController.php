@@ -10,12 +10,29 @@ use Toolkit\utils\ApiAuthService;
 class AuthController {
 
 	/**
+	 * Erreur renvoyée quand l'extension PHP OpenSSL, nécessaire aux tokens, est absente
+	 *
+	 * @return WP_Error
+	 */
+	private static function encryption_unavailable_error() {
+		return new WP_Error(
+			'encryption_unavailable',
+			esc_html__( 'API authentication is unavailable: the OpenSSL PHP extension is not enabled on this server.', 'hi-theme-toolkit' ),
+			array( 'status' => 500 )
+		);
+	}
+
+	/**
 	 * Vérifie le token master et génère un token transient
 	 *
 	 * @param WP_REST_Request $request The REST request.
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function generate_transient_token( WP_REST_Request $request ) {
+		if ( ! ApiAuthService::is_encryption_available() ) {
+			return self::encryption_unavailable_error();
+		}
+
 		$master_token = $request->get_header( 'Authorization' );
 
 		if ( $master_token && preg_match( '/Bearer\s+(.*)/', $master_token, $matches ) ) {
@@ -43,6 +60,10 @@ class AuthController {
 	 * @return array|WP_Error
 	 */
 	public static function verify_transient_token( $request ) {
+		if ( ! ApiAuthService::is_encryption_available() ) {
+			return self::encryption_unavailable_error();
+		}
+
 		if ( ! session_id() ) {
 			session_start();
 		}

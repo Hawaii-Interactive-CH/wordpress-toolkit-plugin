@@ -219,8 +219,10 @@ class AssetService
 
     /**
      * Enqueue admin assets
+     *
+     * @param string $hook Current admin page hook
      */
-    public static function enqueue_admin_assets(): void
+    public static function enqueue_admin_assets($hook = ''): void
     {
         // Always enqueue admin-specific assets
         wp_enqueue_style(
@@ -235,15 +237,19 @@ class AssetService
             [],
             HITHTO_VERSION,
         );
-        wp_enqueue_style(
-            "toolkit-md-style",
-            HITHTO_URL . "/admin/assets/css/toolkit-md.css",
-            [],
-            HITHTO_VERSION,
-        );
 
-        // Enqueue regular assets in admin too
-        self::enqueue_assets();
+        /**
+         * Theme assets registered with AssetService::css()/js() are front-end only.
+         * A theme can opt in to load them on some admin pages:
+         *
+         *   add_filter( 'hithto_enqueue_theme_assets_in_admin', fn( $load, $hook ) => 'post.php' === $hook, 10, 2 );
+         *
+         * @param bool   $load Whether to load the theme assets on this admin page. Default false.
+         * @param string $hook Current admin page hook.
+         */
+        if (apply_filters('hithto_enqueue_theme_assets_in_admin', false, $hook)) {
+            self::enqueue_assets();
+        }
     }
 
     /**

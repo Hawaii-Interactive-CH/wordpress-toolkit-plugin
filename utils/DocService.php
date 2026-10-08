@@ -21,6 +21,7 @@ class DocService {
             return;
         }
 
+        wp_enqueue_style( 'toolkit-md-style', HITHTO_URL . 'admin/assets/css/toolkit-md.css', array(), HITHTO_VERSION );
         wp_enqueue_style( 'highlightjs-default-style', HITHTO_URL . 'admin/assets/css/highlight-default.min.css', array(), '11.12.0' );
         wp_enqueue_script( 'highlightjs', HITHTO_URL . 'admin/assets/js/highlight.min.js', array(), '11.12.0', true );
         wp_enqueue_script( 'highlightjs-lang-go', HITHTO_URL . 'admin/assets/js/highlight-go.min.js', array( 'highlightjs' ), '11.12.0', true );

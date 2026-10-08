@@ -22,6 +22,58 @@ class MainService
         self::maintenance_mode();
         self::enable_cookie_consent();
         self::enable_calendar();
+        self::disable_comments();
+    }
+
+    /**
+     * Disable comments site-wide, only when enabled in the Toolkit settings (off by default)
+     */
+    public static function disable_comments()
+    {
+        if (get_option('hithto_disable_comments', 0) != 1) {
+            return;
+        }
+
+        // Close comments on the front-end
+        add_filter("comments_open", "__return_false", 20, 2);
+        add_filter("pings_open", "__return_false", 20, 2);
+
+        // Hide existing comments
+        add_filter("comments_array", "__return_empty_array", 10, 2);
+
+        add_action("admin_init", function () {
+            // Redirect any user trying to access comments page
+            global $pagenow;
+
+            if ($pagenow === "edit-comments.php") {
+                wp_safe_redirect(admin_url());
+                exit();
+            }
+
+            // Remove comments metabox from dashboard
+            remove_meta_box("dashboard_recent_comments", "dashboard", "normal");
+
+            // Disable support for comments and trackbacks in post types
+            foreach (get_post_types() as $post_type) {
+                if (post_type_supports($post_type, "comments")) {
+                    remove_post_type_support($post_type, "comments");
+                    remove_post_type_support($post_type, "trackbacks");
+                }
+            }
+        });
+
+        // Remove comments links from admin bar
+        add_action("init", function () {
+            if (is_admin_bar_showing()) {
+                remove_action("admin_bar_menu", "wp_admin_bar_comments_menu", 60);
+            }
+        });
+
+        // Remove admin toolbar comment icon
+        add_action("wp_before_admin_bar_render", function () {
+            global $wp_admin_bar;
+            $wp_admin_bar->remove_menu("comments");
+        });
     }
 
     public static function maintenance_mode()
@@ -176,7 +228,10 @@ class MainService
             ]);
             register_setting('wordpress-toolkit-plugin', 'hithto_maintenance_mode', [ 'sanitize_callback' => 'absint' ]);
             register_setting('wordpress-toolkit-plugin', 'cookie_consent', [ 'sanitize_callback' => 'absint' ]);
+            register_setting('wordpress-toolkit-plugin', 'hithto_disable_comments', [ 'sanitize_callback' => 'absint' ]);
             register_setting('wordpress-toolkit-plugin', 'hithto_file_size', [ 'sanitize_callback' => 'absint' ]);
+            register_setting('wordpress-toolkit-plugin', 'hithto_limit_upload_size', [ 'sanitize_callback' => 'absint' ]);
+            register_setting('wordpress-toolkit-plugin', 'hithto_allow_svg_upload', [ 'sanitize_callback' => 'absint' ]);
         });
 
         add_action('admin_menu', function () {
@@ -204,12 +259,13 @@ class MainService
 
     public static function upload_limit()
     {
-        // Upload limit for media library
+        // Upload limit for media library, only when enabled in the Toolkit settings (off by default)
+        if (get_option('hithto_limit_upload_size', 0) != 1) {
+            return;
+        }
+
         add_filter("upload_size_limit", function ($_size) {
-                if (!get_option('hithto_file_size')) {
-                    update_option('hithto_file_size', 5 * 1024 * 1024);
-                }
-                return get_option('hithto_file_size', 5 * 1024 * 1024);
+                return (int) get_option('hithto_file_size', 5 * 1024 * 1024);
             },
             20
         );
@@ -246,40 +302,6 @@ class MainService
                 }
             }
         }, 999);
-
-        add_action("admin_init", function () {
-            // Redirect any user trying to access comments page
-            global $pagenow;
-
-            if ($pagenow === "edit-comments.php") {
-                wp_safe_redirect(admin_url());
-                exit();
-            }
-
-            // Remove comments metabox from dashboard
-            remove_meta_box("dashboard_recent_comments", "dashboard", "normal");
-
-            // Disable support for comments and trackbacks in post types
-            foreach (get_post_types() as $post_type) {
-                if (post_type_supports($post_type, "comments")) {
-                    remove_post_type_support($post_type, "comments");
-                    remove_post_type_support($post_type, "trackbacks");
-                }
-            }
-        });
-
-        // Remove comments links from admin bar
-        add_action("init", function () {
-            if (is_admin_bar_showing()) {
-                remove_action("admin_bar_menu", "wp_admin_bar_comments_menu", 60);
-            }
-        });
-
-        // Remove admin toolbar comment icon
-        add_action("wp_before_admin_bar_render", function () {
-            global $wp_admin_bar;
-            $wp_admin_bar->remove_menu("comments");
-        });
 
         // set admin footer
         add_action("admin_init", function () {
@@ -329,17 +351,13 @@ class MainService
 
     public static function add_filter()
     {
-        // Close comments on the front-end
-        add_filter("comments_open", "__return_false", 20, 2);
-        add_filter("pings_open", "__return_false", 20, 2);
-
-        // Hide existing comments
-        add_filter("comments_array", "__return_empty_array", 10, 2);
-
-        add_filter("upload_mimes", function ($mimes) {
-            $mimes["svg"] = "image/svg+xml";
-            return $mimes;
-        });
+        // Allow SVG uploads, only when enabled in the Toolkit settings (off by default)
+        if (get_option('hithto_allow_svg_upload', 0) == 1) {
+            add_filter("upload_mimes", function ($mimes) {
+                $mimes["svg"] = "image/svg+xml";
+                return $mimes;
+            });
+        }
 
         // updraft ignore dev files and folders
         add_filter(
@@ -525,14 +543,24 @@ class MainService
             update_option('hithto_calendar', $options['calendar']);
         }
 
+        if (isset($post_data['submit']) && isset($post_data['disable_comments_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['disable_comments_nonce']), 'disable_comments_action')) {
+            update_option('hithto_disable_comments', isset($post_data['disable_comments']) ? 1 : 0);
+        }
+
         if (isset($post_data['submit']) && isset($post_data['admin_footer_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['admin_footer_nonce']), 'admin_footer_action')) {
             update_option( 'toolkit_admin_footer_name', sanitize_text_field( $post_data['admin_footer_name'] ?? '' ) );
             update_option( 'toolkit_admin_footer_url', esc_url_raw( $post_data['admin_footer_url'] ?? '' ) );
         }
 
+        if (isset($post_data['submit']) && isset($post_data['allow_svg_upload_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['allow_svg_upload_nonce']), 'allow_svg_upload_action')) {
+            update_option('hithto_allow_svg_upload', isset($post_data['allow_svg_upload']) ? 1 : 0);
+        }
+
         if (isset($post_data['submit']) && isset($post_data['file_size_nonce']) && wp_verify_nonce(sanitize_text_field($post_data['file_size_nonce']), 'file_size_action')) {
             // Save the user's choices to options
             $options = [];
+
+            update_option('hithto_limit_upload_size', isset($post_data['limit_upload_size']) ? 1 : 0);
 
             $file_size_mo = isset($post_data['file_size']) ? floatval($post_data['file_size']) : 0;
             $file_size_bytes = $file_size_mo * 1024 * 1024;
@@ -633,6 +661,25 @@ class MainService
                 </form>
             </div>
 
+            <div class="disable-comments">
+                <h2>Comments</h2>
+                <form method="post">
+                    <?php wp_nonce_field('disable_comments_action', 'disable_comments_nonce'); ?>
+                    <p>
+                        <label for="disable_comments">
+                            <input type="checkbox" name="disable_comments" id="disable_comments" value="1" <?php checked(get_option('hithto_disable_comments', 0), 1); ?>>
+                            <?php esc_html_e( 'Disable comments site-wide', 'hi-theme-toolkit' ); ?>
+                        </label>
+                    </p>
+                    <p class="description">
+                        <?php esc_html_e( 'Closes and hides comments on all content, and removes the Comments page and admin bar link.', 'hi-theme-toolkit' ); ?>
+                    </p>
+                    <p class="submit">
+                        <input type="submit" name="submit" class="button-primary" value="Save Changes">
+                    </p>
+                </form>
+            </div>
+
             <div class="admin-footer">
                 <h2>Admin footer</h2>
                 <form method="post">
@@ -655,15 +702,43 @@ class MainService
 
             <hr />
 
+            <div class="allow-svg-upload">
+                <h2>SVG uploads</h2>
+                <form method="post">
+                    <?php wp_nonce_field('allow_svg_upload_action', 'allow_svg_upload_nonce'); ?>
+                    <p>
+                        <label for="allow_svg_upload">
+                            <input type="checkbox" name="allow_svg_upload" id="allow_svg_upload" value="1" <?php checked(get_option('hithto_allow_svg_upload', 0), 1); ?>>
+                            <?php esc_html_e( 'Allow SVG files in the media library', 'hi-theme-toolkit' ); ?>
+                        </label>
+                    </p>
+                    <p class="description">
+                        <?php esc_html_e( 'SVG files can contain scripts: only enable this if the people allowed to upload files are trusted.', 'hi-theme-toolkit' ); ?>
+                    </p>
+                    <p class="submit">
+                        <input type="submit" name="submit" class="button-primary" value="Save Changes">
+                    </p>
+                </form>
+            </div>
+
             <div class="file_size">
                 <h2>File size</h2>
                 <form method="post" action="">
                     <?php wp_nonce_field('file_size_action', 'file_size_nonce'); ?>
                     <p>
+                        <label for="limit_upload_size">
+                            <input type="checkbox" name="limit_upload_size" id="limit_upload_size" value="1" <?php checked(get_option('hithto_limit_upload_size', 0), 1); ?>>
+                            <?php esc_html_e( 'Limit the maximum upload size', 'hi-theme-toolkit' ); ?>
+                        </label>
+                    </p>
+                    <p>
                         <label for="file_size">
                             <?php esc_html_e( 'Maximum file size (in MB):', 'hi-theme-toolkit' ); ?>
-                            <input type="number" id="file_size" name="file_size" min="1" max="300" step="1" value="<?php echo esc_attr(get_option('hithto_file_size', 1) / (1024 * 1024)); ?>" required>
+                            <input type="number" id="file_size" name="file_size" min="1" max="100" step="1" value="<?php echo esc_attr(get_option('hithto_file_size', 5 * 1024 * 1024) / (1024 * 1024)); ?>" required>
                         </label>
+                    </p>
+                    <p class="description">
+                        <?php esc_html_e( 'When unchecked, the upload limit of the server is used.', 'hi-theme-toolkit' ); ?>
                     </p>
                     <p class="submit">
                         <input type="submit" name="submit" class="button-primary" value="Save Changes">
