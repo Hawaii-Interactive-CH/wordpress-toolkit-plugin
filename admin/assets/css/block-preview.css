@@ -1,0 +1,15 @@
+/**
+ * Block Preview
+ *
+ * Loaded inside the block editor canvas.
+ * ACF block previews render the real block markup: their links and form
+ * fields are disabled so a click selects the block instead of following them.
+ */
+.acf-block-preview a,
+.acf-block-preview button,
+.acf-block-preview input,
+.acf-block-preview select,
+.acf-block-preview textarea,
+.acf-block-preview iframe {
+    pointer-events: none;
+}

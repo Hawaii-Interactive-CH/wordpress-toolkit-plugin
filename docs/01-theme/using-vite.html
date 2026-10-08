@@ -14,6 +14,9 @@
 <h2 id="usage">Usage</h2>
 <h3 id="1-adding-files">1. Adding files</h3>
 <p>Add files to the theme's <code>src</code> folder. They will be automatically compiled and minified.</p>
+<h4 id="block-editor-styles">Block editor styles</h4>
+<p>The toolkit loads the build of <code>src/scss/blocks.scss</code> inside the block editor canvas, so blocks and patterns look like the front-end. Use another entry with <code>\Toolkit\utils\AssetService::set_block_editor_entry('src/scss/editor.scss');</code> if needed. Themes without Vite can use a <code>public/css/blocks.css</code> file instead.</p>
+<p>In the editor, links and form fields of the ACF block previews are disabled: a click selects the block instead of following the link.</p>
 <h3 id="2-using-aliases">2. Using aliases</h3>
 <p>Aliases are configured in <code>vite.config.js</code> and simplify file imports. Instead of writing:</p>
 <pre><code class="language-javascript">import { myFunction } from '../../../utils/&lt;file&gt;';</code></pre>
@@ -53,7 +56,10 @@
 </ul>
 </li>
 <li><a href="#usage">Usage</a><ul>
-<li><a href="#1-adding-files">1. Adding files</a></li>
+<li><a href="#1-adding-files">1. Adding files</a><ul>
+<li><a href="#block-editor-styles">Block editor styles</a></li>
+</ul>
+</li>
 <li><a href="#2-using-aliases">2. Using aliases</a></li>
 <li><a href="#3-installed-plugins">3. Installed plugins</a><ul>
 <li><a href="#3-1-vue-js">3.1. Vue.js</a></li>

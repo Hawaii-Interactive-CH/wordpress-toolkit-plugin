@@ -1,0 +1,10 @@
+/**
+ * Pattern Lock
+ *
+ * Loaded with pattern-lock.js for users who can't edit the theme options.
+ * The layout of the patterns is locked, so the "Edit pattern" button of the
+ * block inspector is useless: hide it to only keep the "Content" panel.
+ */
+.block-editor-block-inspector-edit-contents {
+    display: none;
+}

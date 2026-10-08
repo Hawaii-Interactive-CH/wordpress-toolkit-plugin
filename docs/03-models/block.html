@@ -1,7 +1,7 @@
 <div class='grid grid-cols-5-1'><div class='content'><h1 id="custom-block">Custom Block</h1>
 <h2 id="creating-a-custom-block">Creating a Custom Block</h2>
 <p>To create a <code>Block</code>, add a file in the theme's <code>models/custom</code> folder and create its partial in the <code>partials/blocks</code> folder with the same name as the <code>TYPE</code>.</p>
-<p>You can generate one via the <code>Toolkit &gt; Models</code> tab in the WordPress admin by clicking the <code>Block</code> tab, or by copying and modifying the following code:</p>
+<p>Copy and modify the following code, then enable the block in <code>Toolkit &gt; Models</code>:</p>
 <pre><code class="language-php">&lt;?php
 
 namespace Toolkit\models\custom;
@@ -28,10 +28,29 @@ class BlockDemo extends Block
   }
 }</code></pre>
 <h2 id="usage">Usage</h2>
-<p><code>Blocks</code> are content elements that can be added to <code>Posts</code> and <code>Pages</code> from the WordPress editor. They behave like <code>Gutenberg Blocks</code> and can be added, edited, and removed from the <code>Post</code> or <code>Page</code> content.</p></div><div class='toc'><div class='fix'><ul>
+<p><code>Blocks</code> are content elements that can be added to <code>Posts</code> and <code>Pages</code> from the WordPress editor. They behave like <code>Gutenberg Blocks</code> and can be added, edited, and removed from the <code>Post</code> or <code>Page</code> content.</p>
+<h2 id="inserter-preview">Inserter Preview</h2>
+<p>Without example data, the block inserter shows an empty preview of the block. Add <code>example</code> to <code>settings()</code> to render it with sample field values (keyed by field name):</p>
+<pre><code class="language-php">public static function settings()
+{
+  return array(
+    'title' =&gt; 'Demo',
+    // ...
+    'example' =&gt; array(
+      'attributes' =&gt; array(
+        'mode' =&gt; 'preview',
+        'data' =&gt; array(
+          'title' =&gt; 'Join us',
+          'text' =&gt; 'Lorem ipsum dolor sit amet.',
+        ),
+      ),
+    ),
+  );
+}</code></pre></div><div class='toc'><div class='fix'><ul>
 <li><a href="#custom-block">Custom Block</a><ul>
 <li><a href="#creating-a-custom-block">Creating a Custom Block</a></li>
 <li><a href="#usage">Usage</a></li>
+<li><a href="#inserter-preview">Inserter Preview</a></li>
 </ul>
 </li>
 </ul></div></div></div>
