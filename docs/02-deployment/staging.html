@@ -1,0 +1,39 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="how-to-build-the-theme-for-staging-and-deploy-to-a-test-server">How to Build the Theme for Staging and Deploy to a Test Server</h1>
+<h2 id="introduction">Introduction</h2>
+<p>When deploying to a test server where the site is in a subfolder, you need to build the theme in staging mode to specify the correct asset paths.</p>
+<p>Example: <code>http://my-site.local/my-subfolder/</code></p>
+<h2 id="configuration">Configuration</h2>
+<h3 id="1-make-sure-the-theme-name-or-subfolder-is-set-in-the-env-file-at-the-project-root">1. Make sure the theme name or subfolder is set in the <code>.env</code> file at the project root</h3>
+<pre><code class="language-bash"># .env
+APP_NAME=my-theme</code></pre>
+<h3 id="2-run-the-build-command">2. Run the build command</h3>
+<pre><code class="language-bash">npm run staging</code></pre>
+<h2 id="deployment">Deployment</h2>
+<ul>
+<li>
+<ol>
+<li>Copy the <code>toolkit</code> folder to the test server in the <code>wp-content/themes</code> directory.</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>Make sure there is no <code>.dev</code> file at the theme root.</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>Activate the theme in the WordPress admin.</li>
+</ol>
+</li>
+</ul></div><div class='toc'><div class='fix'><ul>
+<li><a href="#how-to-build-the-theme-for-staging-and-deploy-to-a-test-server">How to Build the Theme for Staging and Deploy to a Test Server</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#configuration">Configuration</a><ul>
+<li><a href="#1-make-sure-the-theme-name-or-subfolder-is-set-in-the-env-file-at-the-project-root">1. Make sure the theme name or subfolder is set in the .env file at the project root</a></li>
+<li><a href="#2-run-the-build-command">2. Run the build command</a></li>
+</ul>
+</li>
+<li><a href="#deployment">Deployment</a></li>
+</ul>
+</li>
+</ul></div></div></div>

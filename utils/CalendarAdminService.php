@@ -17,7 +17,7 @@ class CalendarAdminService {
 	}
 
 	public static function enqueue_scripts( $hook ) {
-		if ( 'toolkit-calendar_page_toolkit-calendar-settings' !== $hook ) {
+		if ( ! str_ends_with( (string) $hook, '_page_' . self::MENU_SLUG . '-google-calendar' ) ) {
 			return;
 		}
 
@@ -27,7 +27,9 @@ class CalendarAdminService {
 			return;
 		}
 
-		wp_enqueue_script( 'toolkit-calendar-test', false, [ 'jquery' ], HITHTO_VERSION, true );
+		// Script without a file: it must be registered before WordPress can enqueue it
+		wp_register_script( 'toolkit-calendar-test', false, [ 'jquery' ], HITHTO_VERSION, true );
+		wp_enqueue_script( 'toolkit-calendar-test' );
 		wp_localize_script(
 			'toolkit-calendar-test',
 			'toolkitCalendarTest',

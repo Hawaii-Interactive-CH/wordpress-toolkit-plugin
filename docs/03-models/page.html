@@ -1,0 +1,23 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="page">Page</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <code>Page</code> model is a base model for pages. It is used to retrieve information about a page.</p>
+<p>It is generally used for static pages by adding constants with the page IDs.</p>
+<p>The file is located in the theme's <code>models</code> folder.</p>
+<pre><code class="language-php">const HOME = 1;
+const ABOUT = 2;
+const CONTACT = 3;</code></pre>
+<p>Simply use the <code>Page</code> model to access these constants.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Page;
+
+$page = new Page(Page::HOME);
+
+?&gt;</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#page">Page</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+</ul>
+</li>
+</ul></div></div></div>

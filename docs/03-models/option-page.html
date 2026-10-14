@@ -1,0 +1,39 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="option-page">Option Page</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <code>OptionPage</code> model is a base model for options pages. It is used to retrieve information from an options page. It is typically used for theme options pages.</p>
+<p>This type of page requires the ACF Pro extension and must be linked in the WordPress admin under <code>ACF &gt; Add &gt; Settings &gt; Click on Rule and choose "option page" &gt; Select the option page</code>.</p>
+<h2 id="usage">Usage</h2>
+<h3 id="acf">acf()</h3>
+<p>To retrieve information from the options page, use the <code>acf()</code> method.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Config;
+
+?&gt;
+
+&lt;?php echo Config::acf(&lt;field_name&gt;); ?&gt;</code></pre>
+<h3 id="have-rows">have_rows()</h3>
+<p>Returns <code>true</code> if there are rows in the repeater with <code>&lt;field_name&gt;</code> as the key.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Config;
+
+?&gt;
+
+&lt;?php if(Config::have_rows(&lt;field_name&gt;)) { ?&gt;
+  &lt;!-- Code --&gt;
+&lt;?php } ?&gt;</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#option-page">Option Page</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#acf">acf()</a></li>
+<li><a href="#have-rows">have_rows()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

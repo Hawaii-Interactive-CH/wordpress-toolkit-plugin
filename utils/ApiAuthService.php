@@ -64,7 +64,7 @@ class ApiAuthService
 
     public static function enqueue_styles($hook)
     {
-        if ('wordpress-toolkit-plugin_page_api-authentication' !== $hook) {
+        if (!str_ends_with((string) $hook, '_page_api-authentication')) {
             return;
         }
         $css = '

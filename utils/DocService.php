@@ -7,8 +7,6 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-use Hithto\Vendor\Parsedown\ParsedownToc;
-
 class DocService {
 
     public static function register() {
@@ -17,7 +15,7 @@ class DocService {
     }
 
     public static function enqueue_scripts( $hook ) {
-        if ( 'wordpress-toolkit-plugin_page_toolkit-docs' !== $hook ) {
+        if ( ! str_ends_with( (string) $hook, '_page_toolkit-docs' ) ) {
             return;
         }
 
@@ -77,8 +75,8 @@ class DocService {
             // Table of contents is built on each request, never written to disk
             echo wp_kses( self::generate_index($base_dir), self::index_allowed_html() );
         } else {
-            $raw_content = file_get_contents($file_path);
-            echo wp_kses_post( self::parse_markdown( $raw_content ) );
+            // Doc pages are stored as HTML (content + page table of contents)
+            echo wp_kses_post( file_get_contents($file_path) );
         }
         echo '</div>';
 
@@ -104,17 +102,6 @@ class DocService {
             'svg'  => ['height' => true, 'width' => true, 'xmlns' => true, 'viewbox' => true],
             'path' => ['d' => true],
         ];
-    }
-
-    private static function parse_markdown($markdown) {
-        // Bundled library, namespaced under Hithto\Vendor (not covered by the Toolkit\ autoloader)
-        require_once HITHTO_DIR . 'utils/parsedown/Parsedown.php';
-        require_once HITHTO_DIR . 'utils/parsedown/ParsedownToc.php';
-
-        $Parsedown = new ParsedownToc();
-        $body = $Parsedown->body($markdown);
-        $toc  = $Parsedown->contentsList();
-        return "<div class='grid grid-cols-5-1'><div class='content'>" . $body . "</div><div class='toc'><div class='fix'>" . $toc . "</div></div></div>";
     }
 
     /**

@@ -1,0 +1,210 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="categories-and-tags">Categories and Tags</h1>
+<h2 id="creating-a-category-for-a-custom-post-type">Creating a Category for a Custom Post Type</h2>
+<p>To create a category for a Custom Post Type, add a file in the theme's <code>models/custom</code> folder.</p>
+<p><code>Tag</code> and <code>Category</code> are taxonomies and work the same way.</p>
+<p>You can generate one when creating a <code>model</code> via the <code>Toolkit &gt; Models</code> tab in the WordPress admin, or by copying and modifying the following code:</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit\models\custom;
+
+use Toolkit\models\Taxonomy;
+use Toolkit\models\custom\Demo;
+
+class DemoCategory extends Taxonomy
+{
+  const TYPE = 'demo_category';
+  public static function register()
+  {
+    register_taxonomy(self::TYPE, Demo::TYPE, array(
+      'hierarchical' =&gt; true,
+      'show_admin_column' =&gt; true,
+      'publicly_queryable' =&gt; false,
+      'show_in_rest' =&gt; true,
+      'labels' =&gt;
+      array(
+        'name' =&gt; 'Categories',
+        'singular_name' =&gt; 'Category',
+        'search_items' =&gt; 'Search categories',
+        'all_items' =&gt; 'All categories',
+        'parent_item' =&gt; 'Parent category',
+        'parent_item_colon' =&gt; 'Parent category:',
+        'edit_item' =&gt; 'Edit category',
+        'update_item' =&gt; 'Update category',
+        'add_new_item' =&gt; 'Add new category',
+        'new_item_name' =&gt; 'New category',
+        'menu_name' =&gt; 'Categories',
+      ),
+    ));
+  }
+}</code></pre>
+<h2 id="usage">Usage</h2>
+<h3 id="all">all()</h3>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php DemoCategory::all(function (DemoCategory $category) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $category-&gt;link() ?&gt;"&gt;
+        &lt;?= $category-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="all-by-type">all_by_type()</h3>
+<p>The <code>all_by_type</code> method retrieves all categories of a specific type.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php DemoCategory::all_by_type('demo', function (DemoCategory $category) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $category-&gt;link() ?&gt;"&gt;
+        &lt;?= $category-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;
+</code></pre>
+<h3 id="current">current()</h3>
+<p>The <code>current</code> method retrieves the current category in a WordPress loop.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+?&gt;
+
+&lt;?php DemoCategory::current(function (DemoCategory $category) { ?&gt;
+  &lt;h1&gt;&lt;?= $category-&gt;title() ?&gt;&lt;/h1&gt;
+&lt;?php }); ?&gt;</code></pre>
+<h3 id="id">id()</h3>
+<p>Returns the category ID.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_id(1);
+
+?&gt;
+
+&lt;p&gt;&lt;?= $category-&gt;id() ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="slug">slug()</h3>
+<p>Returns the category slug.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_id(1);
+
+?&gt;
+
+&lt;p&gt;&lt;?= $category-&gt;slug() ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="title">title()</h3>
+<p>Returns the category title.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_id(1);
+
+?&gt;
+
+&lt;p&gt;&lt;?= $category-&gt;title() ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="link">link()</h3>
+<p>Returns the link to the category.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_id(1);
+
+?&gt;
+
+&lt;a href="&lt;?= $category-&gt;link() ?&gt;"&gt;Link to category&lt;/a&gt;</code></pre>
+<h3 id="find-by-id">find_by_id()</h3>
+<p>Finds a category by its ID.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_id(1);
+
+?&gt;</code></pre>
+<h3 id="find-by-slug">find_by_slug()</h3>
+<p>Finds a category by its slug.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_slug('slug_of_category');
+
+?&gt;</code></pre>
+<h3 id="acf">acf()</h3>
+<p>Returns the value of an ACF field.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_id(1);
+
+?&gt;
+
+&lt;p&gt;&lt;?= $category-&gt;acf('field_name') ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="jsonserialize">jsonSerialize()</h3>
+<p>Returns an associative array containing the model data as JSON.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\custom\DemoCategory;
+
+$category = DemoCategory::find_by_id(1);
+
+?&gt;
+
+&lt;?= json_encode($category) ?&gt;</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#categories-and-tags">Categories and Tags</a><ul>
+<li><a href="#creating-a-category-for-a-custom-post-type">Creating a Category for a Custom Post Type</a></li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#all">all()</a></li>
+<li><a href="#all-by-type">all_by_type()</a></li>
+<li><a href="#current">current()</a></li>
+<li><a href="#id">id()</a></li>
+<li><a href="#slug">slug()</a></li>
+<li><a href="#title">title()</a></li>
+<li><a href="#link">link()</a></li>
+<li><a href="#find-by-id">find_by_id()</a></li>
+<li><a href="#find-by-slug">find_by_slug()</a></li>
+<li><a href="#acf">acf()</a></li>
+<li><a href="#jsonserialize">jsonSerialize()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

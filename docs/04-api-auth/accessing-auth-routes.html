@@ -1,0 +1,91 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="authentication-guide-for-accessing-secured-api-routes">Authentication Guide for Accessing Secured API Routes</h1>
+<h2 id="introduction">Introduction</h2>
+<p>To access secured API routes, a client must follow an authentication process that involves obtaining a transient token using a master token. Here is how to proceed:</p>
+<h2 id="authentication-steps">Authentication Steps</h2>
+<h3 id="1-obtain-a-master-token">1. Obtain a Master Token</h3>
+<p>The client must first obtain a master token from the site administrator. This token is required to generate a transient token used for secured API requests.</p>
+<h3 id="2-make-a-request-to-the-auth-route">2. Make a Request to the <code>/auth</code> Route</h3>
+<p>With the master token in hand, the client must send a POST request to the <code>/auth</code> route. This request must include the master token in the <code>Authorization</code> header.</p>
+<p><strong>Request Example:</strong></p>
+<ul>
+<li><strong>URL</strong>: <code>https://your-site.com/wp-json/api/v1/auth</code></li>
+<li><strong>Method</strong>: POST</li>
+<li><strong>Header</strong>: Authorization: Bearer YOUR_MASTER_TOKEN</li>
+</ul>
+<p><strong>cURL Example:</strong></p>
+<pre><code class="language-sh">curl -X POST https://your-site.com/wp-json/api/v1/auth \
+-H "Authorization: Bearer YOUR_MASTER_TOKEN"</code></pre>
+<h3 id="3-receiving-the-transient-token">3. Receiving the Transient Token</h3>
+<p>If the request is successful, the response will contain a transient token. This token must be used for all subsequent requests to secured API routes.</p>
+<p><strong>Response Example:</strong></p>
+<pre><code class="language-json">{
+  "transient_token": "GENERATED_TRANSIENT_TOKEN"
+}</code></pre>
+<h3 id="4-using-the-transient-token-for-api-requests">4. Using the Transient Token for API Requests</h3>
+<p>To access other API routes, the client must include the transient token in the request headers.</p>
+<p><strong>Request Example:</strong></p>
+<ul>
+<li><strong>URL</strong>: <a href="https://your-site.com/wp-json/api/v1/auth/test">https://your-site.com/wp-json/api/v1/auth/test</a></li>
+<li><strong>Method</strong>: POST</li>
+<li><strong>Header</strong>: Authorization: Bearer YOUR_TRANSIENT_TOKEN</li>
+</ul>
+<p><strong>cURL Example:</strong></p>
+<pre><code class="language-sh">curl -X POST https://your-site.com/wp-json/api/v1/auth/test \
+-H "Authorization: Bearer YOUR_TRANSIENT_TOKEN"</code></pre>
+<h3 id="5-how-to-define-a-secured-api-route">5. How to Define a Secured API Route</h3>
+<p>To define a secured API route, use the <code>register_rest_route</code> function. Make sure to include a transient token check in the route definition to ensure only authenticated clients can access it.</p>
+<p><strong>Route definition example:</strong></p>
+<pre><code class="language-php">register_rest_route($namespace, '/test', array(
+    'methods' =&gt; 'GET',
+    'permission_callback' =&gt; array($authController, 'verify_transient_token'),
+    'callback' =&gt; function() {
+        return "test";
+    },
+));</code></pre>
+<p><strong>In this example:</strong></p>
+<ul>
+<li><strong>permission_callback</strong>: Calls the <code>verify_transient_token</code> method on the <code>$authController</code> object. This method validates the transient token provided by the client in the request header.</li>
+<li><strong>callback</strong>: Defines the function to execute if the token check passes. In this example, it simply returns "test".</li>
+</ul>
+<h2 id="error-cases">Error Cases</h2>
+<h3 id="invalid-or-missing-master-token">Invalid or Missing Master Token</h3>
+<p>If the master token is invalid or missing, the request to <code>/auth</code> will fail with a 403 error.</p>
+<p><strong>Response Example:</strong></p>
+<pre><code class="language-json">{
+  "code": "invalid_master_token",
+  "message": "Invalid or missing master token",
+  "data": {
+    "status": 403
+  }
+}</code></pre>
+<h3 id="invalid-or-expired-transient-token">Invalid or Expired Transient Token</h3>
+<p>If the transient token is invalid or has expired, the request to a secured route will fail with a 403 error.</p>
+<p><strong>Response Example:</strong></p>
+<pre><code class="language-json">{
+  "code": "invalid_transient_token",
+  "message": "Token expired or invalid, please provide master token to generate a new transient token",
+  "data": {
+    "status": 403
+  }
+}</code></pre>
+<h3 id="conclusion">Conclusion</h3>
+<p>By following these steps, a client can authenticate and access secured API routes using transient tokens generated from a master token. Make sure to handle tokens correctly and renew transient tokens before they expire to maintain continuous access to secured APIs.</p></div><div class='toc'><div class='fix'><ul>
+<li><a href="#authentication-guide-for-accessing-secured-api-routes">Authentication Guide for Accessing Secured API Routes</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#authentication-steps">Authentication Steps</a><ul>
+<li><a href="#1-obtain-a-master-token">1. Obtain a Master Token</a></li>
+<li><a href="#2-make-a-request-to-the-auth-route">2. Make a Request to the /auth Route</a></li>
+<li><a href="#3-receiving-the-transient-token">3. Receiving the Transient Token</a></li>
+<li><a href="#4-using-the-transient-token-for-api-requests">4. Using the Transient Token for API Requests</a></li>
+<li><a href="#5-how-to-define-a-secured-api-route">5. How to Define a Secured API Route</a></li>
+</ul>
+</li>
+<li><a href="#error-cases">Error Cases</a><ul>
+<li><a href="#invalid-or-missing-master-token">Invalid or Missing Master Token</a></li>
+<li><a href="#invalid-or-expired-transient-token">Invalid or Expired Transient Token</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

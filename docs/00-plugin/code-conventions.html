@@ -1,0 +1,225 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="code-conventions">Code Conventions</h1>
+<p>This project follows the <a href="https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/">WordPress PHP Coding Standards</a>. The key rules are summarised below.</p>
+<hr />
+<h2 id="indentation">Indentation</h2>
+<p>Use <strong>tabs</strong>, not spaces.</p>
+<pre><code class="language-php">// correct
+public function id() {
+    return $this-&gt;_data['id'];
+}
+
+// incorrect
+public function id() {
+    return $this-&gt;_data['id'];
+}</code></pre>
+<hr />
+<h2 id="brace-style">Brace Style</h2>
+<p>Opening braces go on the <strong>same line</strong> as the declaration (K&amp;R style).</p>
+<pre><code class="language-php">// correct
+class Demo extends CustomPostType {
+}
+
+public function register() {
+}
+
+// incorrect
+class Demo extends CustomPostType
+{
+}</code></pre>
+<hr />
+<h2 id="spacing">Spacing</h2>
+<h3 id="inside-parentheses">Inside parentheses</h3>
+<p>Always add a space inside parentheses for control structures and function calls.</p>
+<pre><code class="language-php">// correct
+if ( $x ) {
+}
+function_exists( 'acf_register_block_type' );
+in_array( $value, $array, true );
+
+// incorrect
+if ($x) {
+}
+function_exists("acf_register_block_type");</code></pre>
+<h3 id="after">After <code>!</code></h3>
+<p>Always add a space after the <code>!</code> operator.</p>
+<pre><code class="language-php">// correct
+if ( ! $id ) {
+}
+if ( ! function_exists( 'get_field' ) ) {
+}
+
+// incorrect
+if (!$id) {
+}</code></pre>
+<h3 id="around-operators">Around operators</h3>
+<pre><code class="language-php">// correct
+$x = 1;
+$result = $a + $b;
+
+// incorrect
+$x=1;
+$result=$a+$b;</code></pre>
+<hr />
+<h2 id="quotes">Quotes</h2>
+<p>Use <strong>single quotes</strong> for plain strings. Use double quotes only when the string contains a variable or special character that requires it.</p>
+<pre><code class="language-php">// correct
+$type = 'post';
+trigger_error( 'ACF is not installed.', E_USER_WARNING );
+
+// incorrect
+$type = "post";
+trigger_error( "ACF is not installed.", E_USER_WARNING );</code></pre>
+<hr />
+<h2 id="comparisons">Comparisons</h2>
+<p>Always use <strong>strict comparisons</strong> (<code>===</code> / <code>!==</code>).</p>
+<pre><code class="language-php">// correct
+if ( 'object' === gettype( $data ) ) {
+}
+if ( false !== strpos( $str, 'foo' ) ) {
+}
+
+// incorrect
+if ( gettype( $data ) == 'object' ) {
+}</code></pre>
+<p>Use <strong>Yoda conditions</strong> (constant on the left) for equality checks.</p>
+<pre><code class="language-php">// correct
+if ( 'post' === $type ) {
+}
+
+// incorrect
+if ( $type === 'post' ) {
+}</code></pre>
+<hr />
+<h2 id="arrays">Arrays</h2>
+<p>Use the short <code>[]</code> syntax. Align <code>=&gt;</code> operators when declaring multi-key arrays.</p>
+<pre><code class="language-php">// correct
+$args = [
+    'post_type'      =&gt; 'demo',
+    'posts_per_page' =&gt; 10,
+    'order'          =&gt; 'DESC',
+];
+
+// incorrect
+$args = array(
+    'post_type' =&gt; 'demo',
+    'posts_per_page' =&gt; 10,
+);</code></pre>
+<hr />
+<h2 id="functions">Functions</h2>
+<p>Prefer <code>implode()</code> over its alias <code>join()</code>.</p>
+<pre><code class="language-php">// correct
+implode( ', ', $items );
+
+// incorrect
+join( ', ', $items );</code></pre>
+<p>Use the third parameter of <code>in_array()</code> for strict type checking.</p>
+<pre><code class="language-php">// correct
+in_array( $value, $array, true );
+
+// incorrect
+in_array( $value, $array );</code></pre>
+<hr />
+<h2 id="docblocks">Docblocks</h2>
+<p>All public and protected methods must have a docblock with <code>@param</code> and <code>@return</code> tags.</p>
+<pre><code class="language-php">/**
+ * Get an ACF field value by key.
+ *
+ * @param string $key The ACF field key.
+ * @return mixed
+ */
+public function acf( string $key ) {
+    // ...
+}</code></pre>
+<p>Private methods and one-liner helpers may omit the docblock only when the method name and signature are self-explanatory.</p>
+<hr />
+<h2 id="naming">Naming</h2>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Convention</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Classes</td>
+<td><code>PascalCase</code></td>
+<td><code>CustomPostType</code>, <code>BlockHero</code></td>
+</tr>
+<tr>
+<td>Methods &amp; functions</td>
+<td><code>snake_case</code></td>
+<td><code>find_by_id()</code>, <code>acf_media()</code></td>
+</tr>
+<tr>
+<td>Variables</td>
+<td><code>snake_case</code></td>
+<td><code>$post_id</code>, <code>$render_callback</code></td>
+</tr>
+<tr>
+<td>Constants</td>
+<td><code>UPPER_SNAKE_CASE</code></td>
+<td><code>TYPE</code>, <code>HITHTO_VERSION</code></td>
+</tr>
+<tr>
+<td>Hooks</td>
+<td><code>snake_case</code> with prefix</td>
+<td><code>toolkit_register_block</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="namespaces">Namespaces</h2>
+<p>All classes must declare a namespace matching their folder path under <code>Toolkit</code>.</p>
+<pre><code class="language-php">// Plugin utility → utils/
+namespace Toolkit\utils;
+
+// Theme custom model → models/custom/
+namespace Toolkit\models\custom;</code></pre>
+<p>See <a href="admin.php?page=toolkit-docs&amp;file=00-plugin%2Fnamespace.html">Namespace</a> for the full namespace reference.</p>
+<hr />
+<h2 id="escaping-output">Escaping Output</h2>
+<p>Always escape output at the point of rendering, using the most specific function available.</p>
+<pre><code class="language-php">echo esc_html( $title );
+echo esc_url( $link );
+echo esc_attr( $class );
+echo wp_kses_post( $content );</code></pre>
+<p>Never echo raw user data or unverified external values.</p>
+<hr />
+<h2 id="sanitising-input">Sanitising Input</h2>
+<p>Sanitise all data coming from <code>$_GET</code>, <code>$_POST</code>, or the REST API before using it.</p>
+<pre><code class="language-php">$slug = sanitize_text_field( $_POST['slug'] ?? '' );
+$id   = absint( $_GET['id'] ?? 0 );</code></pre>
+<hr />
+<h2 id="internationalisation">Internationalisation</h2>
+<p>All user-facing strings must be wrapped in a translation function with the plugin text domain.</p>
+<pre><code class="language-php">// correct
+__( 'Add new item', 'hi-theme-toolkit' );
+esc_html__( 'Category', 'hi-theme-toolkit' );
+
+// incorrect
+__( 'Add new item' );
+'Add new item';</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#code-conventions">Code Conventions</a><ul>
+<li><a href="#indentation">Indentation</a></li>
+<li><a href="#brace-style">Brace Style</a></li>
+<li><a href="#spacing">Spacing</a><ul>
+<li><a href="#inside-parentheses">Inside parentheses</a></li>
+<li><a href="#after">After !</a></li>
+<li><a href="#around-operators">Around operators</a></li>
+</ul>
+</li>
+<li><a href="#quotes">Quotes</a></li>
+<li><a href="#comparisons">Comparisons</a></li>
+<li><a href="#arrays">Arrays</a></li>
+<li><a href="#functions">Functions</a></li>
+<li><a href="#docblocks">Docblocks</a></li>
+<li><a href="#naming">Naming</a></li>
+<li><a href="#namespaces">Namespaces</a></li>
+<li><a href="#escaping-output">Escaping Output</a></li>
+<li><a href="#sanitising-input">Sanitising Input</a></li>
+<li><a href="#internationalisation">Internationalisation</a></li>
+</ul>
+</li>
+</ul></div></div></div>

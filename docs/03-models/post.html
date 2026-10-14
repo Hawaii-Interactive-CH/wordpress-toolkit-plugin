@@ -1,0 +1,76 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="post">Post</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <code>Post</code> model is a base model for blog posts. It is used to retrieve information about a post.</p>
+<p>It has the same structure as the <code>Page</code> model but with methods specific to posts.</p>
+<h2 id="usage">Usage</h2>
+<h3 id="categories">categories()</h3>
+<p>To get the post's categories, use the <code>categories()</code> method.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Post;
+
+$model = new Post(&lt;post_id&gt;);
+?&gt;
+
+&lt;ul&gt;
+    &lt;?php foreach ($model-&gt;categories() as $category): ?&gt;
+        &lt;li id="category-&lt;?= $category-&gt;id() ?&gt;" &gt;&lt;?= $category-&gt;title() ?&gt;&lt;/li&gt;
+    &lt;?php endforeach; ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="categories-name">categories_name()</h3>
+<p>To get the post's category names separated by <code>,</code>, use the <code>categories_name()</code> method.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Post;
+
+$model = new Post(&lt;post_id&gt;);
+
+?&gt;
+
+&lt;p&gt;&lt;?php echo $model-&gt;categories_name() ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="tags">tags()</h3>
+<p>To get the post's tags, use the <code>tags()</code> method.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Post;
+
+$model = new Post(&lt;post_id&gt;);
+
+?&gt;
+
+&lt;ul&gt;
+    &lt;?php foreach ($model-&gt;tags() as $tag): ?&gt;
+        &lt;li id="tag-&lt;?= $tag-&gt;id() ?&gt;" &gt;&lt;?= $tag-&gt;title() ?&gt;&lt;/li&gt;
+    &lt;?php endforeach; ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="tags-name">tags_name()</h3>
+<p>To get the post's tag names separated by <code>,</code>, use the <code>tags_name()</code> method.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Post;
+
+$model = new Post(&lt;post_id&gt;);
+
+?&gt;
+
+&lt;p&gt;&lt;?php echo $model-&gt;tags_name() ?&gt;&lt;/p&gt;</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#post">Post</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#categories">categories()</a></li>
+<li><a href="#categories-name">categories_name()</a></li>
+<li><a href="#tags">tags()</a></li>
+<li><a href="#tags-name">tags_name()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

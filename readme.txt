@@ -64,8 +64,6 @@ No data is sent to any external service by default. External connections are opt
 
 This plugin includes the following third-party libraries:
 
-* **Parsedown** — Markdown parser by Emanuil Rusev. Licensed under the MIT License. [Source](https://github.com/erusev/parsedown). Bundled under the plugin's own `Hithto\Vendor\Parsedown` namespace.
-* **ParsedownToc** — Table of contents extension for Parsedown by KEINOS. Licensed under the MIT License. [Source](https://github.com/KEINOS/parsedown-extension_table-of-contents). Bundled under the plugin's own `Hithto\Vendor\Parsedown` namespace.
 * **Highlight.js** v11.12.0 — Syntax highlighter by Josh Goebel and contributors, used in the admin Docs page to highlight code blocks. Licensed under the BSD 3-Clause License. [Source](https://github.com/highlightjs/highlight.js). Bundled locally in `admin/assets/`, no external request is made.
 
 == Screenshots ==

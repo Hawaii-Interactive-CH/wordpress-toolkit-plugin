@@ -1,0 +1,162 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="media-taxonomy">Media Taxonomy</h1>
+<p>The Media Taxonomy feature allows you to categorize and organize your media library files using a hierarchical taxonomy system similar to post categories.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Categorize media files with a hierarchical taxonomy system</li>
+<li>Filter media in the WordPress media library by category</li>
+<li>Bulk add/remove media items to/from categories</li>
+<li>Template functions for displaying media by category</li>
+<li>REST API support for integration with the block editor</li>
+</ul>
+<h2 id="admin-interface">Admin Interface</h2>
+<h3 id="adding-categories-to-media-items">Adding Categories to Media Items</h3>
+<p>You can assign categories to media items in several ways:</p>
+<ol>
+<li><strong>When uploading files</strong>: Categories can be selected in the upload form.</li>
+<li><strong>In the media library</strong>: Edit a media item and select categories from the dropdown.</li>
+<li><strong>Bulk actions</strong>: Select multiple media items in the list view and use the bulk actions dropdown to add or remove categories.</li>
+</ol>
+<h3 id="managing-media-categories">Managing Media Categories</h3>
+<p>To manage your media categories:</p>
+<ol>
+<li>Go to Media &gt; Media Categories in the WordPress admin.</li>
+<li>Add, edit, or delete categories just like post categories.</li>
+</ol>
+<h2 id="template-functions">Template Functions</h2>
+<p>The plugin provides several helper functions to work with media categories in your themes:</p>
+<h3 id="get-media-by-category">Get Media by Category</h3>
+<pre><code class="language-php">// Get all media items in a specific category
+$media_items = get_media_by_category($term_id, 'id');
+
+// Get media items by category slug
+$media_items = get_media_by_category('featured-images', 'slug');
+
+// With additional arguments
+$media_items = get_media_by_category($term_id, 'id', [
+    'posts_per_page' =&gt; 10,
+    'orderby' =&gt; 'date',
+    'order' =&gt; 'DESC'
+]);
+
+// Loop through the results
+foreach ($media_items as $media_item) {
+    echo wp_get_attachment_image($media_item-&gt;ID, 'thumbnail');
+}</code></pre>
+<h3 id="get-all-media-categories">Get All Media Categories</h3>
+<pre><code class="language-php">// Get all media categories
+$categories = get_media_categories();
+
+// With additional arguments
+$categories = get_media_categories([
+    'orderby' =&gt; 'name',
+    'order' =&gt; 'ASC',
+    'hide_empty' =&gt; true
+]);
+
+// Loop through the categories
+foreach ($categories as $category) {
+    echo '&lt;h3&gt;' . $category-&gt;name . '&lt;/h3&gt;';
+
+    // Get media for this category
+    $media_items = get_media_by_category($category-&gt;term_id);
+
+    // Display the media
+    foreach ($media_items as $media_item) {
+        echo wp_get_attachment_image($media_item-&gt;ID, 'thumbnail');
+    }
+}</code></pre>
+<h3 id="get-categories-for-a-media-item">Get Categories for a Media Item</h3>
+<pre><code class="language-php">// Get all categories for a specific media item
+$categories = get_media_item_categories($attachment_id);
+
+// Output the category names
+foreach ($categories as $category) {
+    echo $category-&gt;name . ', ';
+}</code></pre>
+<h3 id="check-if-media-is-in-a-category">Check if Media is in a Category</h3>
+<pre><code class="language-php">// Check if a media item is in a specific category
+if (media_in_category($attachment_id, $category_id)) {
+    echo 'This media item is in the category';
+}
+
+// Check by slug
+if (media_in_category($attachment_id, 'featured-images', 'slug')) {
+    echo 'This media item is a featured image';
+}</code></pre>
+<h3 id="display-a-gallery-from-a-category">Display a Gallery from a Category</h3>
+<pre><code class="language-php">// Display a gallery of images from a category
+echo media_category_gallery($category_id);
+
+// With custom settings
+echo media_category_gallery('gallery-images', 'slug', [], [
+    'size' =&gt; 'medium',
+    'columns' =&gt; 4,
+    'link' =&gt; 'file',
+    'class' =&gt; 'my-custom-gallery'
+]);</code></pre>
+<h2 id="advanced-usage">Advanced Usage</h2>
+<h3 id="direct-access-to-classes">Direct Access to Classes</h3>
+<p>You can also directly use the classes:</p>
+<pre><code class="language-php">use Toolkit\models\MediaTaxonomy;
+use Toolkit\utils\MediaTaxonomyHelper;
+
+// Using the model directly
+$attachments = MediaTaxonomy::get_attachments_by_term($term_id);
+
+// Using the helper class
+$gallery_html = MediaTaxonomyHelper::media_category_gallery($term_id);</code></pre>
+<h3 id="adding-media-to-categories-programmatically">Adding Media to Categories Programmatically</h3>
+<pre><code class="language-php">// Using the helper function (added in the global namespace)
+MediaTaxonomyHelper::add_media_to_category($attachment_id, $term_id);
+
+// Add to multiple categories
+MediaTaxonomyHelper::add_media_to_category($attachment_id, [$term_id_1, $term_id_2]);
+
+// Replace existing categories instead of appending
+MediaTaxonomyHelper::add_media_to_category($attachment_id, $term_id, false);</code></pre>
+<h3 id="removing-media-from-categories-programmatically">Removing Media from Categories Programmatically</h3>
+<pre><code class="language-php">// Remove from a category
+MediaTaxonomyHelper::remove_media_from_category($attachment_id, $term_id);
+
+// Remove from multiple categories
+MediaTaxonomyHelper::remove_media_from_category($attachment_id, [$term_id_1, $term_id_2]);</code></pre>
+<h2 id="rest-api-support">REST API Support</h2>
+<p>The Media Categories taxonomy supports the WordPress REST API, making it compatible with the block editor and other applications that use the REST API.</p>
+<p>Example endpoint: <code>/wp-json/wp/v2/media-categories</code></p>
+<h2 id="filters-and-hooks">Filters and Hooks</h2>
+<p>The implementation respects WordPress core filters and hooks for taxonomies, so you can use standard WordPress filters to modify the behavior.</p>
+<p>For example:</p>
+<pre><code class="language-php">// Modify the registration arguments for the media category taxonomy
+add_filter('register_taxonomy_args', function($args, $taxonomy, $object_type) {
+    if ($taxonomy === 'media_category') {
+        // Modify args here
+        $args['label'] = 'Media Tags';
+    }
+    return $args;
+}, 10, 3);</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#media-taxonomy">Media Taxonomy</a><ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#admin-interface">Admin Interface</a><ul>
+<li><a href="#adding-categories-to-media-items">Adding Categories to Media Items</a></li>
+<li><a href="#managing-media-categories">Managing Media Categories</a></li>
+</ul>
+</li>
+<li><a href="#template-functions">Template Functions</a><ul>
+<li><a href="#get-media-by-category">Get Media by Category</a></li>
+<li><a href="#get-all-media-categories">Get All Media Categories</a></li>
+<li><a href="#get-categories-for-a-media-item">Get Categories for a Media Item</a></li>
+<li><a href="#check-if-media-is-in-a-category">Check if Media is in a Category</a></li>
+<li><a href="#display-a-gallery-from-a-category">Display a Gallery from a Category</a></li>
+</ul>
+</li>
+<li><a href="#advanced-usage">Advanced Usage</a><ul>
+<li><a href="#direct-access-to-classes">Direct Access to Classes</a></li>
+<li><a href="#adding-media-to-categories-programmatically">Adding Media to Categories Programmatically</a></li>
+<li><a href="#removing-media-from-categories-programmatically">Removing Media from Categories Programmatically</a></li>
+</ul>
+</li>
+<li><a href="#rest-api-support">REST API Support</a></li>
+<li><a href="#filters-and-hooks">Filters and Hooks</a></li>
+</ul>
+</li>
+</ul></div></div></div>

@@ -1,0 +1,37 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="custom-block">Custom Block</h1>
+<h2 id="creating-a-custom-block">Creating a Custom Block</h2>
+<p>To create a <code>Block</code>, add a file in the theme's <code>models/custom</code> folder and create its partial in the <code>partials/blocks</code> folder with the same name as the <code>TYPE</code>.</p>
+<p>You can generate one via the <code>Toolkit &gt; Models</code> tab in the WordPress admin by clicking the <code>Block</code> tab, or by copying and modifying the following code:</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit\models\custom;
+
+use Toolkit\models\Block;
+
+class BlockDemo extends Block
+{
+  const TYPE = 'block-demo';
+
+  public static function settings()
+  {
+    return array(
+      'title' =&gt; 'Demo',
+      'mode' =&gt; 'auto',
+      'description' =&gt; 'Demo',
+      'icon' =&gt; 'block-default',
+      'keywords' =&gt;
+      array(
+        0 =&gt; 'section',
+        1 =&gt; 'hi-block',
+      ),
+    );
+  }
+}</code></pre>
+<h2 id="usage">Usage</h2>
+<p><code>Blocks</code> are content elements that can be added to <code>Posts</code> and <code>Pages</code> from the WordPress editor. They behave like <code>Gutenberg Blocks</code> and can be added, edited, and removed from the <code>Post</code> or <code>Page</code> content.</p></div><div class='toc'><div class='fix'><ul>
+<li><a href="#custom-block">Custom Block</a><ul>
+<li><a href="#creating-a-custom-block">Creating a Custom Block</a></li>
+<li><a href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul></div></div></div>

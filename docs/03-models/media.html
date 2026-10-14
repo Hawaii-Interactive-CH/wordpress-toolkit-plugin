@@ -1,0 +1,201 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="media">Media</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <code>AbstractMedia</code> model is the base class for WordPress attachments (images, SVGs, etc.). It provides methods to retrieve the optimised URL of an image, generate <code>srcset</code> attributes, render a full <code>&lt;picture&gt;</code> element, and insert an SVG inline.</p>
+<p>To use it, create a class in <code>models/custom/</code> that extends <code>AbstractMedia</code>:</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit\models\custom;
+
+use Toolkit\models\AbstractMedia;
+
+class Media extends AbstractMedia {}</code></pre>
+<hr />
+<h2 id="available-methods">Available Methods</h2>
+<h3 id="src">src()</h3>
+<p>Returns the optimised URL of an image for a given size. Priority: WebP → PNG/JPG → original. If the requested size does not exist, returns the original image URL.</p>
+<pre><code class="language-php">$media = new Media($attachment_id);
+
+// URL of the WebP version generated for the "image-xl" size
+echo $media-&gt;src('image-xl');
+
+// URL of the original image
+echo $media-&gt;src('full');</code></pre>
+<p>Example in a template:</p>
+<pre><code class="language-php">&lt;img
+    src="&lt;?= $media-&gt;src('image-xl') ?&gt;"
+    alt="&lt;?= $media-&gt;alt() ?&gt;"&gt;</code></pre>
+<hr />
+<h3 id="srcset">srcset()</h3>
+<p>Builds the <code>srcset</code> attribute value from an associative array <code>[size name =&gt; width descriptor]</code>. Only already-generated sizes are included.</p>
+<pre><code class="language-php">$media = new Media($attachment_id);
+
+echo $media-&gt;srcset([
+    'image-s'  =&gt; '640w',
+    'image-m'  =&gt; '960w',
+    'image-l'  =&gt; '1280w',
+    'image-xl' =&gt; '1920w',
+]);
+
+// → "https://…/image-640x….webp 640w, https://…/image-960x….webp 960w, …"</code></pre>
+<p>Example in a template:</p>
+<pre><code class="language-php">&lt;img
+    src="&lt;?= $media-&gt;src('image-xl') ?&gt;"
+    srcset="&lt;?= $media-&gt;srcset(['image-s' =&gt; '640w', 'image-l' =&gt; '1280w', 'image-xl' =&gt; '1920w']) ?&gt;"
+    sizes="100vw"
+    alt="&lt;?= $media-&gt;alt() ?&gt;"&gt;</code></pre>
+<hr />
+<h3 id="picture">picture()</h3>
+<p>Generates a full <code>&lt;picture&gt;</code> element with <code>&lt;source&gt;</code> elements and a fallback <code>&lt;img&gt;</code>. Each entry in the <code>$sources</code> array corresponds to a <code>&lt;source&gt;</code>. Supports retina variants (2x) and media queries.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$sources</code></td>
+<td><code>array</code></td>
+<td>Array of source definitions (see below)</td>
+</tr>
+<tr>
+<td><code>$class</code></td>
+<td><code>string</code></td>
+<td>Optional CSS class added to the <code>&lt;img&gt;</code> element</td>
+</tr>
+<tr>
+<td><code>$lazy</code></td>
+<td><code>bool</code></td>
+<td>Adds <code>loading="lazy"</code> to the <code>&lt;img&gt;</code>. Default: <code>true</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each entry in <code>$sources</code> is an associative array:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>size</code></td>
+<td><code>string</code></td>
+<td><strong>Required.</strong> Registered size name (e.g. <code>'image-xl'</code>)</td>
+</tr>
+<tr>
+<td><code>media</code></td>
+<td><code>string</code></td>
+<td>Optional. CSS media query (e.g. <code>'(min-width: 1280px)'</code>)</td>
+</tr>
+<tr>
+<td><code>size2x</code></td>
+<td><code>string</code></td>
+<td>Optional. Size name for the retina 2x variant</td>
+</tr>
+</tbody>
+</table>
+<p>The last resolved <code>&lt;source&gt;</code> is also used as the <code>src</code> of the fallback <code>&lt;img&gt;</code>.</p>
+<pre><code class="language-php">$media = new Media($attachment_id);
+
+// Simple example: one source with retina
+echo $media-&gt;picture([
+    ['size' =&gt; 'image-xl', 'size2x' =&gt; 'image-xl-2x'],
+]);</code></pre>
+<pre><code class="language-html">&lt;!-- Output --&gt;
+&lt;picture&gt;
+    &lt;source srcset="https://…/image-xl.webp 1x, https://…/image-xl-2x.webp 2x"&gt;
+    &lt;img src="https://…/image-xl.webp" alt="…" loading="lazy"&gt;
+&lt;/picture&gt;</code></pre>
+<p>Example with multiple breakpoints:</p>
+<pre><code class="language-php">echo $media-&gt;picture([
+    ['size' =&gt; 'image-s',  'media' =&gt; '(max-width: 640px)',  'size2x' =&gt; 'image-s-2x'],
+    ['size' =&gt; 'image-m',  'media' =&gt; '(max-width: 1280px)', 'size2x' =&gt; 'image-m-2x'],
+    ['size' =&gt; 'image-xl', 'size2x' =&gt; 'image-xl-2x'],
+], 'hero__image');</code></pre>
+<pre><code class="language-html">&lt;!-- Output --&gt;
+&lt;picture&gt;
+    &lt;source media="(max-width: 640px)"  srcset="https://…/image-s.webp 1x, https://…/image-s-2x.webp 2x"&gt;
+    &lt;source media="(max-width: 1280px)" srcset="https://…/image-m.webp 1x, https://…/image-m-2x.webp 2x"&gt;
+    &lt;source srcset="https://…/image-xl.webp 1x, https://…/image-xl-2x.webp 2x"&gt;
+    &lt;img src="https://…/image-xl.webp" alt="…" class="hero__image" loading="lazy"&gt;
+&lt;/picture&gt;</code></pre>
+<hr />
+<h3 id="inline-svg">inline_svg()</h3>
+<p>Returns the raw SVG file content for direct inline insertion in HTML. Useful for controlling icons or illustrations via CSS/JS. Only works for attachments with the <code>.svg</code> extension.</p>
+<p>The <code>&lt;?xml ?&gt;</code> declaration and DOCTYPE are automatically stripped.</p>
+<pre><code class="language-php">$icon = new Media($svg_attachment_id);
+
+echo $icon-&gt;inline_svg();
+
+// → &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"&gt;…&lt;/svg&gt;</code></pre>
+<p>Example in a template:</p>
+<pre><code class="language-php">&lt;button class="btn"&gt;
+    &lt;?= $icon-&gt;inline_svg() ?&gt;
+    Download
+&lt;/button&gt;</code></pre>
+<hr />
+<h3 id="alt">alt()</h3>
+<p>Returns the alternative text defined in the WordPress media library.</p>
+<pre><code class="language-php">echo $media-&gt;alt();
+// → "Team presentation photo"</code></pre>
+<hr />
+<h3 id="caption">caption()</h3>
+<p>Returns the caption defined in the WordPress media library.</p>
+<pre><code class="language-php">echo $media-&gt;caption();
+// → "Photo taken at the 2024 annual event"</code></pre>
+<hr />
+<h2 id="full-example">Full Example</h2>
+<pre><code class="language-php">&lt;?php
+// In functions.php or a theme file
+
+use Toolkit\models\custom\Media;
+
+// From an ACF field (returns an ID)
+$attachment_id = get_field('hero_image');
+
+if ($attachment_id) :
+    $media = new Media($attachment_id);
+?&gt;
+
+&lt;figure class="hero"&gt;
+    &lt;?= $media-&gt;picture([
+        ['size' =&gt; 'image-s',  'media' =&gt; '(max-width: 640px)',  'size2x' =&gt; 'image-s-2x'],
+        ['size' =&gt; 'image-m',  'media' =&gt; '(max-width: 1280px)', 'size2x' =&gt; 'image-m-2x'],
+        ['size' =&gt; 'image-xl', 'size2x' =&gt; 'image-xl-2x'],
+    ], 'hero__img') ?&gt;
+
+    &lt;?php if ($media-&gt;caption()) : ?&gt;
+        &lt;figcaption&gt;&lt;?= $media-&gt;caption() ?&gt;&lt;/figcaption&gt;
+    &lt;?php endif ?&gt;
+&lt;/figure&gt;
+
+&lt;?php endif ?&gt;</code></pre>
+<hr />
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Image sizes must be registered via <code>Size::add()</code> in <code>functions.php</code>. The original image is returned if a size has not yet been generated (background processing via cron).</li>
+<li><code>picture()</code> and <code>srcset()</code> silently omit sizes that have not yet been generated.</li>
+<li><code>inline_svg()</code> reads the file directly from disk. Do not use with SVGs from untrusted sources.</li>
+</ul></div><div class='toc'><div class='fix'><ul>
+<li><a href="#media">Media</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#available-methods">Available Methods</a><ul>
+<li><a href="#src">src()</a></li>
+<li><a href="#srcset">srcset()</a></li>
+<li><a href="#picture">picture()</a></li>
+<li><a href="#inline-svg">inline_svg()</a></li>
+<li><a href="#alt">alt()</a></li>
+<li><a href="#caption">caption()</a></li>
+</ul>
+</li>
+<li><a href="#full-example">Full Example</a></li>
+<li><a href="#notes">Notes</a></li>
+</ul>
+</li>
+</ul></div></div></div>

@@ -77,7 +77,6 @@ $toolkit_to_register = [
 	'\\Toolkit\\utils\\ModelService',
 	'\\Toolkit\\utils\\DocService',
 	'\\Toolkit\\utils\\ApiAuthService',
-	'\\Toolkit\\utils\\MenuService',
 	'\\Toolkit\\utils\\AssetService',
 	// Models
 	'\\Toolkit\\models\\MediaTaxonomy',

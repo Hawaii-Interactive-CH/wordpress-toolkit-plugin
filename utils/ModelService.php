@@ -133,7 +133,12 @@ class ModelService
     {
         $options = get_option("toolkit_enabled_models", []);
 
-        foreach ($options as $model => $enabled) {
+        foreach ((array) $options as $model => $enabled) {
+            // Model names are PHP class names: anything else (e.g. "../") is never used to build a file path
+            if (!is_string($model) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $model)) {
+                continue;
+            }
+
             if ($enabled) {
                 // Define the file path based on the model name
                 $file_path =

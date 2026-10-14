@@ -1,0 +1,68 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="vite-and-wordpress">Vite and WordPress</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Vite is a fast build tool for modern project development. It is based on ESBuild technology and compiles JavaScript, CSS, and other static files.</p>
+<p>Make sure to copy the <code>.env.example</code> file to <code>.env</code> and configure it according to the project's needs.</p>
+<h2 id="configuration">Configuration</h2>
+<h3 id="1-install-dependencies">1. Install dependencies</h3>
+<pre><code class="language-bash">npm install</code></pre>
+<h3 id="2-start-the-development-server">2. Start the development server</h3>
+<pre><code class="language-bash">npm run watch</code></pre>
+<h3 id="3-build-the-theme-for-production">3. Build the theme for production</h3>
+<pre><code class="language-bash">npm run production</code></pre>
+<h3 id="4-build-the-theme-for-staging">4. Build the theme for staging</h3>
+<pre><code class="language-bash">npm run staging</code></pre>
+<h2 id="usage">Usage</h2>
+<h3 id="1-adding-files">1. Adding files</h3>
+<p>Add files to the theme's <code>src</code> folder. They will be automatically compiled and minified.</p>
+<h3 id="2-using-aliases">2. Using aliases</h3>
+<p>Aliases are configured in <code>vite.config.js</code> and simplify file imports. Instead of writing:</p>
+<pre><code class="language-javascript">import { myFunction } from '../../../utils/&lt;file&gt;';</code></pre>
+<p>You can write:</p>
+<pre><code class="language-javascript">import { myFunction } from '@utils/&lt;file&gt;';</code></pre>
+<p>To add an alias, edit <code>vite.config.js</code>:</p>
+<pre><code class="language-javascript">export default defineConfig({
+  // ...
+  resolve: {
+    alias: {
+      '@utils': path.resolve(__dirname, 'src/utils'),
+    },
+  },
+  // ...
+});</code></pre>
+<h3 id="3-installed-plugins">3. Installed plugins</h3>
+<h4 id="3-1-vue-js">3.1. Vue.js</h4>
+<p>The theme is configured to use Vue.js. You can add <code>.vue</code> files in <code>src/javascript/vue</code> and use them in JavaScript files.</p>
+<p>The Vue entry point is <code>src/javascript/vue/main.js</code>.</p>
+<h4 id="3-2-react">3.2. React</h4>
+<p>The theme is configured to use React. You can add <code>.jsx</code> files in <code>src/javascript/react</code> and use them in JavaScript files.</p>
+<p>The React entry point is <code>src/javascript/react/main.jsx</code>.</p>
+<h4 id="dynamic-import">Dynamic import</h4>
+<p>For both Vue.js and React, you can use dynamic imports to load components on demand in their respective entry files.</p>
+<p>This loads components only when needed. Simply add them to the <code>componentImports</code> object.</p>
+<p>Example:</p>
+<pre><code class="language-javascript">const componentImports = {
+  "id-of-component": () =&gt; import("./path/to/component.ext")
+};</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#vite-and-wordpress">Vite and WordPress</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#configuration">Configuration</a><ul>
+<li><a href="#1-install-dependencies">1. Install dependencies</a></li>
+<li><a href="#2-start-the-development-server">2. Start the development server</a></li>
+<li><a href="#3-build-the-theme-for-production">3. Build the theme for production</a></li>
+<li><a href="#4-build-the-theme-for-staging">4. Build the theme for staging</a></li>
+</ul>
+</li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#1-adding-files">1. Adding files</a></li>
+<li><a href="#2-using-aliases">2. Using aliases</a></li>
+<li><a href="#3-installed-plugins">3. Installed plugins</a><ul>
+<li><a href="#3-1-vue-js">3.1. Vue.js</a></li>
+<li><a href="#3-2-react">3.2. React</a></li>
+<li><a href="#dynamic-import">Dynamic import</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

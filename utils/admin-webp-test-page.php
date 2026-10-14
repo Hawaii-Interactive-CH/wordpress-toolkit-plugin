@@ -21,7 +21,7 @@ class WebPTestPage
 
     public static function enqueue_scripts($hook)
     {
-        if ('tools_page_webp-optimization-test' !== $hook) {
+        if (!str_ends_with((string) $hook, '_page_webp-optimization-test')) {
             return;
         }
         wp_enqueue_style('hithto-webp-test-page', HITHTO_URL . 'admin/assets/css/webp-test-page.css', [], HITHTO_VERSION);

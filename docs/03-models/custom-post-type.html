@@ -1,0 +1,183 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="custom-post-type">Custom Post Type</h1>
+<h2 id="creating-a-custom-post-type">Creating a Custom Post Type</h2>
+<p>To create a <code>Custom Post Type</code>, add a file in the theme's <code>models/custom</code> folder, or generate one via <code>Toolkit &gt; Models</code> in the admin.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit\models\custom;
+
+use Toolkit\models\CustomPostType;
+
+class Demo extends CustomPostType implements \JsonSerializable
+{
+  const TYPE = 'demo';
+  const SLUG = 'demos';
+
+  public static function type_settings()
+  {
+    return array(
+      'menu_position' =&gt; 2,
+      'label' =&gt; 'Demos',
+      'labels' =&gt;
+      array(
+        'name' =&gt; 'Demos',
+        'singular_name' =&gt; 'Demo',
+        'menu_name' =&gt; 'Demos',
+        'all_items' =&gt; 'All demos',
+        'add_new' =&gt; 'Add new',
+        'add_new_item' =&gt; 'Add new demo',
+        'edit_item' =&gt; 'Edit demo',
+        'new_item' =&gt; 'New demo',
+        'view_item' =&gt; 'View demo',
+        'view_items' =&gt; 'View demos',
+        'search_items' =&gt; 'Search demo',
+      ),
+      'description' =&gt; '',
+      'public' =&gt; true,
+      'publicly_queryable' =&gt; true,
+      'show_ui' =&gt; true,
+      'show_in_rest' =&gt; true,
+      'show_in_nav_menus' =&gt; true,
+      'rest_base' =&gt; '',
+      'has_archive' =&gt; true,
+      'show_in_menu' =&gt; true,
+      'exclude_from_search' =&gt; false,
+      'capability_type' =&gt; 'post',
+      'map_meta_cap' =&gt; true,
+      'hierarchical' =&gt; false,
+      'rewrite' =&gt;
+      array(
+        'slug' =&gt; 'demos',
+        'with_front' =&gt; false,
+      ),
+      'query_var' =&gt; true,
+      'menu_icon' =&gt; 'dashicons-icon-default',
+      'supports' =&gt;
+      array(
+        0 =&gt; 'title',
+        1 =&gt; 'editor',
+        2 =&gt; 'thumbnail',
+        3 =&gt; 'excerpt',
+      ),
+    );
+  }
+
+  public function jsonSerialize(): mixed
+  {
+    return [
+      "id" =&gt; $this-&gt;id(),
+      "title" =&gt; $this-&gt;title(),
+      "slug" =&gt; $this-&gt;slug(),
+      "link" =&gt; $this-&gt;link(),
+      "excerpt" =&gt; $this-&gt;excerpt(),
+      "content" =&gt; $this-&gt;content(),
+      "date" =&gt; $this-&gt;date(),
+    ];
+  }
+}</code></pre>
+<hr />
+<h2 id="admin-list-columns">Admin List Columns</h2>
+<h3 id="adding-columns-add-columns">Adding columns — <code>add_columns()</code></h3>
+<p>Inserts custom columns immediately after the <strong>Title</strong> column. Idempotent: calling <code>add_columns()</code> multiple times for the same type only registers the hooks once.</p>
+<h4 id="column-options">Column options</h4>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>label</code></td>
+<td><code>string</code></td>
+<td>Column header label</td>
+</tr>
+<tr>
+<td><code>render</code></td>
+<td><code>callable</code></td>
+<td>Receives the model instance, must output (echo) the content</td>
+</tr>
+<tr>
+<td><code>format</code></td>
+<td><code>string</code></td>
+<td><em>(optional)</em> Date shortcut — replaces <code>render</code> with <code>$post-&gt;date($format)</code></td>
+</tr>
+<tr>
+<td><code>sortable</code></td>
+<td><code>bool\|string\|array</code></td>
+<td><em>(optional)</em> Makes the column sortable</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>format</code> and <code>render</code> are mutually exclusive. If <code>format</code> is set, <code>render</code> is ignored.</p>
+</blockquote>
+<h4 id="sortable-values"><code>sortable</code> values</h4>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>true</code></td>
+<td>Sort by meta_key = column slug (alphabetical)</td>
+</tr>
+<tr>
+<td><code>'my_key'</code></td>
+<td>Sort by the specified meta_key (alphabetical)</td>
+</tr>
+<tr>
+<td><code>['key' =&gt; 'my_key', 'numeric' =&gt; true]</code></td>
+<td>Numeric sort by the specified meta_key</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example">Example</h4>
+<pre><code class="language-php">// In functions.php or the theme initialisation
+Demo::add_columns([
+    'illustration' =&gt; [
+        'label'  =&gt; __('Illustration', 'theme'),
+        'render' =&gt; fn($post) =&gt; $post-&gt;thumbnail(
+            fn($img) =&gt; '&lt;img src="' . esc_url($img-&gt;src('thumbnail')) . '" width="60"&gt;'
+        ),
+    ],
+    'category' =&gt; [
+        'label'    =&gt; __('Category', 'theme'),
+        'render'   =&gt; fn($post) =&gt; esc_html(
+            implode(', ', $post-&gt;terms(DemoCategory::class, fn($t) =&gt; $t-&gt;name()))
+        ),
+        'sortable' =&gt; true,
+    ],
+    'price' =&gt; [
+        'label'    =&gt; __('Price', 'theme'),
+        'render'   =&gt; fn($post) =&gt; esc_html($post-&gt;acf('price')) . ' CHF',
+        'sortable' =&gt; ['key' =&gt; 'price', 'numeric' =&gt; true],
+    ],
+    'publish_date' =&gt; [
+        'label'  =&gt; __('Date', 'theme'),
+        'format' =&gt; 'd.m.Y',
+    ],
+]);</code></pre>
+<h3 id="removing-columns-remove-columns">Removing columns — <code>remove_columns()</code></h3>
+<p>Removes one or more columns by their slug.</p>
+<pre><code class="language-php">Demo::remove_columns(['title', 'date']);</code></pre>
+<p>Common slugs: <code>cb</code> (checkbox), <code>title</code>, <code>author</code>, <code>date</code>, <code>comments</code>.</p></div><div class='toc'><div class='fix'><ul>
+<li><a href="#custom-post-type">Custom Post Type</a><ul>
+<li><a href="#creating-a-custom-post-type">Creating a Custom Post Type</a></li>
+<li><a href="#admin-list-columns">Admin List Columns</a><ul>
+<li><a href="#adding-columns-add-columns">Adding columns — add_columns()</a><ul>
+<li><a href="#column-options">Column options</a></li>
+<li><a href="#sortable-values">sortable values</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</li>
+<li><a href="#removing-columns-remove-columns">Removing columns — remove_columns()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

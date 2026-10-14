@@ -1,0 +1,110 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="api-authentication-with-transients-in-wordpress">API Authentication with Transients in WordPress</h1>
+<p>This document explains how the API authentication interface built with the <code>ApiAuthService</code> class works and how to use it.</p>
+<h2 id="introduction">Introduction</h2>
+<p>The API authentication interface manages authentication tokens to secure access to your WordPress API endpoints. Key features include:</p>
+<ul>
+<li>Generating and storing an encryption key.</li>
+<li>Generating a master token.</li>
+<li>Managing the lifetime of transient tokens.</li>
+<li>Adding and removing IP addresses and domains from a whitelist.</li>
+<li>Cleaning up expired transient tokens.</li>
+</ul>
+<h2 id="features">Features</h2>
+<h3 id="generating-the-encryption-key">Generating the Encryption Key</h3>
+<p>This feature generates a unique encryption key and automatically adds it to the <code>wp-config.php</code> file.</p>
+<ol>
+<li>Go to the <code>API Authentication</code> admin page.</li>
+<li>Click the <strong>Generate Encryption Key</strong> button.</li>
+<li>If an encryption key is already defined, the button will be disabled and a message will inform you.</li>
+</ol>
+<h3 id="generating-the-master-token">Generating the Master Token</h3>
+<p>The master token is required to generate transient tokens.</p>
+<ol>
+<li>Go to the <code>API Authentication</code> admin page.</li>
+<li>Click the <strong>Generate Master Token</strong> button.</li>
+<li>If the encryption key is not defined, the button will be disabled. Generate the encryption key first.</li>
+</ol>
+<h3 id="configuring-transient-token-lifetime">Configuring Transient Token Lifetime</h3>
+<p>You can set the lifetime of transient tokens in minutes.</p>
+<ol>
+<li>Go to the <code>API Authentication</code> admin page.</li>
+<li>Enter the desired lifetime (in minutes) in the <strong>Expiry Time (in minutes)</strong> field.</li>
+<li>Click <strong>Save Expiry Time</strong> to save the changes.</li>
+</ol>
+<h3 id="managing-the-ip-domain-whitelist">Managing the IP/Domain Whitelist</h3>
+<p>This section allows adding or removing IP addresses or domains authorised to access the API.</p>
+<ol>
+<li>
+<p><strong>Adding an IP/Domain:</strong></p>
+<ul>
+<li>Go to the <code>API Authentication</code> admin page.</li>
+<li>Enter the IP address or domain in the <strong>IP/Domain</strong> field.</li>
+<li>Click <strong>Add to Whitelist</strong>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Removing an IP/Domain:</strong></p>
+<ul>
+<li>Go to the <code>API Authentication</code> admin page.</li>
+<li>In the <strong>Current Settings</strong> section, find the IP or domain you want to remove.</li>
+<li>Click the <strong>Remove</strong> button next to it.</li>
+</ul>
+</li>
+</ol>
+<h2 id="cleaning-up-expired-transient-tokens">Cleaning Up Expired Transient Tokens</h2>
+<p>A cron job is configured to automatically clean up expired transient tokens every hour. This task removes transients whose expiry date has passed.</p>
+<h2 id="admin-interface">Admin Interface</h2>
+<p>The <code>API Authentication</code> admin page provides a UI for managing the features described above. Here is an overview of the available sections:</p>
+<ol>
+<li>
+<p><strong>Generate Encryption Key</strong></p>
+<ul>
+<li>Generate a unique encryption key.</li>
+<li>The button is disabled if a key is already defined.</li>
+</ul>
+</li>
+<li>
+<p><strong>Generate Master Token</strong></p>
+<ul>
+<li>Generate a master token.</li>
+<li>The button is disabled if the encryption key is not defined.</li>
+</ul>
+</li>
+<li>
+<p><strong>Set Transient Token Expiry</strong></p>
+<ul>
+<li>Set the lifetime of transient tokens in minutes.</li>
+<li>An input field for the lifetime and a button to save changes.</li>
+</ul>
+</li>
+<li>
+<p><strong>Whitelist IP/Domain</strong></p>
+<ul>
+<li>Add IP addresses or domains to the whitelist.</li>
+<li>An input field for the IP or domain and a button to add to the whitelist.</li>
+</ul>
+</li>
+<li>
+<p><strong>Current Settings</strong></p>
+<ul>
+<li>Display current whitelisted IP addresses and domains.</li>
+<li>A button to remove each IP or domain from the whitelist.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<p>For any questions or further assistance, consult your project developer or the official WordPress documentation.</p></div><div class='toc'><div class='fix'><ul>
+<li><a href="#api-authentication-with-transients-in-wordpress">API Authentication with Transients in WordPress</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#features">Features</a><ul>
+<li><a href="#generating-the-encryption-key">Generating the Encryption Key</a></li>
+<li><a href="#generating-the-master-token">Generating the Master Token</a></li>
+<li><a href="#configuring-transient-token-lifetime">Configuring Transient Token Lifetime</a></li>
+<li><a href="#managing-the-ip-domain-whitelist">Managing the IP/Domain Whitelist</a></li>
+</ul>
+</li>
+<li><a href="#cleaning-up-expired-transient-tokens">Cleaning Up Expired Transient Tokens</a></li>
+<li><a href="#admin-interface">Admin Interface</a></li>
+</ul>
+</li>
+</ul></div></div></div>

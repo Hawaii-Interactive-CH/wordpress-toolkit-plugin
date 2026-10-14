@@ -1,0 +1,39 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="photo-gallery">Photo Gallery</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <code>Gallery</code> model is a base model for photo galleries. It is used to retrieve information about a photo gallery.</p>
+<h2 id="usage">Usage</h2>
+<h3 id="pictures">pictures()</h3>
+<p>To get the gallery photos, use the <code>pictures()</code> method.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\Gallery;
+use Toolkit\models\Media;
+
+// Image IDs (an array of ACF IDs also works)
+$images_ids = [1, 2, 3];
+
+$gallery = new Gallery($images_ids);
+
+?&gt;
+
+&lt;?php $gallery-&gt;pictures(function(Media $media) { ?&gt;
+  &lt;img
+    alt="&lt;?= $media-&gt;alt() ?&gt;"
+    src="&lt;?= $media-&gt;src("image-xl") ?&gt;"
+    srcset="&lt;?= $media-&gt;src("image-s") ?&gt; 400w, 
+            &lt;?= $media-&gt;src("image-m") ?&gt; 860w,
+            &lt;?= $media-&gt;src("image-l") ?&gt; 1280w, 
+            &lt;?= $media-&gt;src("image-xl") ?&gt; 1920w"
+    sizes="100vw"&gt;
+&lt;?php }); ?&gt;</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#photo-gallery">Photo Gallery</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#pictures">pictures()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

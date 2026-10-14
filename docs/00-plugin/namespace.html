@@ -1,0 +1,72 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="namespace-system-between-the-plugin-and-the-theme">Namespace System Between the Plugin and the Theme</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The namespace system allows defining file paths for classes, functions, and constants. This helps organize code and makes it more readable.</p>
+<p>To access plugin classes from the theme, you must use the same namespace: <code>Toolkit</code>.</p>
+<p>By default, files are first loaded from the plugin, then from the theme if the file exists there.</p>
+<p>This allows overriding plugin classes in the theme.</p>
+<h2 id="configuration">Configuration</h2>
+<h3 id="1-add-the-namespace-at-the-top-of-the-file">1. Add the namespace at the top of the file</h3>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+class Post {
+    // ...
+}</code></pre>
+<h3 id="2-use-the-class-in-the-theme">2. Use the class in the theme</h3>
+<pre><code class="language-php">namespace Toolkit;
+
+use Toolkit\Post;
+
+$post = new Post();</code></pre>
+<p>Note that the namespace is the same as the plugin's. In general, it is recommended to name namespaces according to the folder structure of the plugin or theme.</p>
+<p>Example:</p>
+<p>If a file is located in the <code>inc</code> folder of the plugin, the namespace will be <code>Toolkit\Inc</code>.</p>
+<h2 id="base-structure">Base Structure</h2>
+<p>Here is the base structure of the plugin and theme:</p>
+<h3 id="utils">Utils</h3>
+<pre><code class="language-md">- Toolkit\utils\AssetService
+- Toolkit\utils\DocService
+- Toolkit\utils\GravityForm
+- Toolkit\utils\MainService
+- Toolkit\utils\ModelService
+- Toolkit\utils\Navigation
+- Toolkit\utils\ShareLinks
+- Toolkit\utils\Size
+- Toolkit\utils\Slugify
+- Toolkit\utils\Upscale
+- Toolkit\utils\WPML</code></pre>
+<h3 id="models">Models</h3>
+<p>Models are classes used to manage custom post types and custom taxonomies.</p>
+<p>To override them in the theme, modify them in the theme's <code>models</code> folder. The Abstract classes in the plugin's <code>models</code> folder (e.g. <code>AbstractPost</code>, ...) define default methods that can be overridden in the theme (e.g. <code>Post</code>, ...) if needed.</p>
+<p>For custom post types specific to the theme, it is recommended to place them in the theme's <code>models/custom</code> folder or use the plugin's built-in generator.</p>
+<p>The default models are:</p>
+<pre><code class="language-md">- Toolkit\models\AbstractCategory
+- Toolkit\models\AbstractFile
+- Toolkit\models\AbstractGallery
+- Toolkit\models\AbstractMedia
+- Toolkit\models\AbstractPage
+- Toolkit\models\AbstractPost
+- Toolkit\models\AbstractSearch
+- Toolkit\models\AbstractTag
+- Toolkit\models\Block
+- Toolkit\models\CustomPostType
+- Toolkit\models\OptionPage
+- Toolkit\models\PostType
+- Toolkit\models\QueryBuilder
+- Toolkit\models\Taxonomy</code></pre></div><div class='toc'><div class='fix'><ul>
+<li><a href="#namespace-system-between-the-plugin-and-the-theme">Namespace System Between the Plugin and the Theme</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#configuration">Configuration</a><ul>
+<li><a href="#1-add-the-namespace-at-the-top-of-the-file">1. Add the namespace at the top of the file</a></li>
+<li><a href="#2-use-the-class-in-the-theme">2. Use the class in the theme</a></li>
+</ul>
+</li>
+<li><a href="#base-structure">Base Structure</a><ul>
+<li><a href="#utils">Utils</a></li>
+<li><a href="#models">Models</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

@@ -1,0 +1,425 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="querybuilder">QueryBuilder</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <code>QueryBuilder</code> model is a base model for queries. It is used to retrieve posts with a fluent, chainable API.</p>
+<h2 id="usage">Usage</h2>
+<h3 id="from">from()</h3>
+<p>The <code>from</code> method retrieves all records of a given type. It takes the post type name and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="where">where()</h3>
+<p>The <code>where</code> method filters results by a condition. It takes a key, a value, and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;where('post_type', 'post', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="paginate">paginate()</h3>
+<p>The <code>paginate</code> method paginates the results. It takes the number of results per page and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;paginate(5, function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="search">search()</h3>
+<p>The <code>search</code> method searches posts by a keyword. It takes a search string and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;search('lorem', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="where-ids">where_ids()</h3>
+<p>The <code>where_ids</code> method retrieves posts by a list of IDs. It takes an array of IDs and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;where_ids([1, 2, 3], function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="order">order()</h3>
+<p>The <code>order</code> method sorts results. It takes a key, a sort direction, and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;order('post_date', 'DESC', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="meta-order">meta_order()</h3>
+<p>The <code>meta_order</code> method sorts results by a meta field. It takes a meta key, a sort direction, and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;meta_order('meta_key', 'DESC', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="meta-query-relation">meta_query_relation()</h3>
+<p>The <code>meta_query_relation</code> method sets the relation between meta queries (<code>AND</code> or <code>OR</code>).</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;meta_query_relation('AND')-&gt;where('post_type', 'post', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="add-meta-query">add_meta_query()</h3>
+<p>The <code>add_meta_query</code> method adds a meta query. It takes a key, a value, a comparison operator, and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;add_meta_query('meta_key', 'meta_value', '!=', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="tax-query-relation">tax_query_relation()</h3>
+<p>The <code>tax_query_relation</code> method sets the relation between taxonomy queries (<code>AND</code> or <code>OR</code>).</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;tax_query_relation('AND')-&gt;where('post_type', 'post', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="add-tax-query">add_tax_query()</h3>
+<p>The <code>add_tax_query</code> method adds a taxonomy query. It takes a taxonomy, a term, a comparison operator, and an optional callback.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;add_tax_query('taxonomy', 'term', '!=', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="after">after()</h3>
+<p>The <code>after</code> method retrieves posts published after a given date.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;after('2020-01-01', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="before">before()</h3>
+<p>The <code>before</code> method retrieves posts published before a given date.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;before('2020-01-01', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="add-date-filter">add_date_filter()</h3>
+<p>The <code>add_date_filter</code> method adds a date filter by key and value.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;add_date_filter('post_date', '2020-01-01', function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="find-all">find_all()</h3>
+<p>The <code>find_all</code> method returns all matching posts as an array.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php foreach (QueryBuilder::from('posts')-&gt;find_all() as $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php } ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="find-one">find_one()</h3>
+<p>The <code>find_one</code> method returns the first matching post.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+
+$post = QueryBuilder::from('posts')-&gt;find_one();
+
+?&gt;
+
+&lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+  &lt;?= $post-&gt;title() ?&gt;
+&lt;/a&gt;</code></pre>
+<h3 id="limit">limit()</h3>
+<p>The <code>limit</code> method limits the number of results.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+use Toolkit\models\Post;
+
+?&gt;
+
+&lt;ul&gt;
+  &lt;?php QueryBuilder::from('posts')-&gt;limit(5, function (Post $post) { ?&gt;
+    &lt;li&gt;
+      &lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+        &lt;?= $post-&gt;title() ?&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;?php }); ?&gt;
+&lt;/ul&gt;</code></pre>
+<h3 id="find-by-id">find_by_id()</h3>
+<p>The <code>find_by_id</code> method retrieves a single post by its ID.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+
+$post = QueryBuilder::from('posts')-&gt;find_by_id(1);
+
+?&gt;
+
+&lt;a href="&lt;?= $post-&gt;link() ?&gt;"&gt;
+  &lt;?= $post-&gt;title() ?&gt;
+&lt;/a&gt;</code></pre>
+<h3 id="count-all">count_all()</h3>
+<p>The <code>count_all</code> method counts all matching posts.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+
+$count = QueryBuilder::from('posts')-&gt;count_all();
+
+?&gt;
+
+&lt;p&gt;&lt;?= $count ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="count-displayed">count_displayed()</h3>
+<p>The <code>count_displayed</code> method counts all posts matching the current query parameters.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+
+$count = QueryBuilder::from('posts')-&gt;where('post_type', 'post')-&gt;count_displayed();
+
+?&gt;
+
+&lt;p&gt;&lt;?= $count ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="page-number">page_number()</h3>
+<p>The <code>page_number</code> method returns the current page number.</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit;
+
+use Toolkit\models\QueryBuilder;
+
+$page_number = QueryBuilder::from('posts')-&gt;page_number();
+
+?&gt;
+
+&lt;p&gt;&lt;?= $page_number ?&gt;&lt;/p&gt;</code></pre>
+<h3 id="pagination">pagination()</h3>
+<p>The <code>pagination</code> method returns the pagination HTML.</p></div><div class='toc'><div class='fix'><ul>
+<li><a href="#querybuilder">QueryBuilder</a><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#from">from()</a></li>
+<li><a href="#where">where()</a></li>
+<li><a href="#paginate">paginate()</a></li>
+<li><a href="#search">search()</a></li>
+<li><a href="#where-ids">where_ids()</a></li>
+<li><a href="#order">order()</a></li>
+<li><a href="#meta-order">meta_order()</a></li>
+<li><a href="#meta-query-relation">meta_query_relation()</a></li>
+<li><a href="#add-meta-query">add_meta_query()</a></li>
+<li><a href="#tax-query-relation">tax_query_relation()</a></li>
+<li><a href="#add-tax-query">add_tax_query()</a></li>
+<li><a href="#after">after()</a></li>
+<li><a href="#before">before()</a></li>
+<li><a href="#add-date-filter">add_date_filter()</a></li>
+<li><a href="#find-all">find_all()</a></li>
+<li><a href="#find-one">find_one()</a></li>
+<li><a href="#limit">limit()</a></li>
+<li><a href="#find-by-id">find_by_id()</a></li>
+<li><a href="#count-all">count_all()</a></li>
+<li><a href="#count-displayed">count_displayed()</a></li>
+<li><a href="#page-number">page_number()</a></li>
+<li><a href="#pagination">pagination()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div></div>

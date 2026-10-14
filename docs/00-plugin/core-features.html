@@ -1,0 +1,90 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="plugin-usage">Plugin Usage</h1>
+<p>This plugin loads the core features of a WordPress theme.</p>
+<ul>
+<li>[x] Maintenance mode activation</li>
+<li>[x] Custom post type (CPT) creation and activation/deactivation</li>
+<li>[x] Gutenberg block creation</li>
+<li>[x] WordPress menu management (hidden in the admin menu)</li>
+<li>[ ] Cookie banner (TODO)</li>
+<li>[ ] More default CPTs (e.g. FAQ, Team, ...) (TODO)</li>
+</ul>
+<h2 id="available-constants">Available Constants</h2>
+<pre><code class="language-php">// Plugin version
+define( 'HITHTO_VERSION', '3.0.0' );
+
+// Absolute path to the plugin
+define( 'HITHTO_DIR', plugin_dir_path(__FILE__) );
+
+// Plugin URL
+define( 'HITHTO_URL', plugin_dir_url(__FILE__) );
+
+// Absolute path to the theme
+define( 'HITHTO_THEME_PATH', get_template_directory() );
+
+// Theme URL
+define( 'HITHTO_THEME_URL', get_template_directory_uri() );
+
+// Absolute path to the theme's view files
+define( 'HITHTO_THEME_VIEWS_PATH', get_template_directory() . '/templates' );</code></pre>
+<blockquote>
+<p><strong>Deprecated names:</strong> the former <code>WP_TOOLKIT_*</code> constants (<code>WP_TOOLKIT_DIR</code>, <code>WP_TOOLKIT_URL</code>, …) are still defined as aliases of the <code>HITHTO_*</code> ones for existing themes, but will be removed in a future major version. Use the <code>HITHTO_*</code> names in new code.</p>
+</blockquote>
+<h2 id="customizing-the-login-page-mainservice-customize-login">Customizing the Login Page — <code>MainService::customize_login()</code></h2>
+<p>Allows replacing the logo, background color, and button color on the <code>/wp-login.php</code> page.</p>
+<h3 id="options">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>logo</code></td>
+<td><code>string</code></td>
+<td>URL of the logo image (replaces the WordPress logo)</td>
+</tr>
+<tr>
+<td><code>background</code></td>
+<td><code>string</code></td>
+<td>CSS background color (e.g. <code>'#f5f5f5'</code>)</td>
+</tr>
+<tr>
+<td><code>button_color</code></td>
+<td><code>string</code></td>
+<td>CSS color for the Submit button</td>
+</tr>
+<tr>
+<td><code>button_hover</code></td>
+<td><code>string</code></td>
+<td><em>(optional)</em> CSS hover color — defaults to <code>button_color</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">Example</h3>
+<pre><code class="language-php">use Toolkit\utils\MainService;
+
+MainService::customize_login([
+    'logo'         =&gt; get_template_directory_uri() . '/assets/images/logo.svg',
+    'background'   =&gt; '#f5f5f5',
+    'button_color' =&gt; '#e63946',
+    'button_hover' =&gt; '#c1121f',
+]);</code></pre>
+<p>Call this from the theme's <code>functions.php</code> file or inside an <code>init</code> hook.</p>
+<hr />
+<h2 id="intelephense-vscode">Intelephense (VSCode)</h2>
+<p>For Intelephense to work correctly, you need to declare your username in the theme's <code>autoload.js</code> file.</p>
+<p>This script loads the theme's classes and functions into Intelephense.</p></div><div class='toc'><div class='fix'><ul>
+<li><a href="#plugin-usage">Plugin Usage</a><ul>
+<li><a href="#available-constants">Available Constants</a></li>
+<li><a href="#customizing-the-login-page-mainservice-customize-login">Customizing the Login Page — MainService::customize_login()</a><ul>
+<li><a href="#options">Options</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</li>
+<li><a href="#intelephense-vscode">Intelephense (VSCode)</a></li>
+</ul>
+</li>
+</ul></div></div></div>
