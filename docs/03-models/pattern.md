@@ -36,63 +36,90 @@ Then enable it in `Toolkit > Models`.
 
 ## Pattern Content
 
-The partial `partials/patterns/pattern-demo.php` contains the block markup of the pattern. The easiest way to get it is to compose the layout in the editor, then use `Copy all blocks` (or the code editor) and paste the result in the partial.
+The partial `partials/patterns/pattern-demo.php` is written in plain HTML, with the theme classes. The toolkit converts it into blocks when the pattern is registered.
 
 ```php
-<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group">
-  <!-- wp:heading -->
-  <h2 class="wp-block-heading"><?php esc_html_e( 'Title', 'hi-theme-toolkit' ); ?></h2>
-  <!-- /wp:heading -->
+<section class="section-demo" data-name="Demo section">
 
-  <!-- wp:paragraph -->
-  <p>Lorem ipsum dolor sit amet.</p>
-  <!-- /wp:paragraph -->
-</div>
-<!-- /wp:group -->
+    <h2 class="green" data-name="Section title" data-placeholder="Enter the section title…"></h2>
+
+    <p class="bigger">Lorem ipsum dolor sit amet.</p>
+
+    <ul>
+        <li>First point</li>
+        <li>Second point</li>
+    </ul>
+
+    <div data-acf="block-demo" data-name="Banner" data-field-titre="Welcome"></div>
+
+</section>
 ```
 
-The partial is a PHP file, so translation functions and constants such as `HITHTO_THEME_URL` can be used.
+The partial is a PHP file, so translation functions and constants such as `HITHTO_THEME_URL` can be used. Plain texts are enough for the editor labels (`data-name`, `data-placeholder`); use `__()` only if the editors of a site work in another language.
 
-ACF blocks can be used in a pattern too:
+### Elements
 
-```html
-<!-- wp:acf/block-demo {"name":"acf/block-demo","data":{"title":"Demo"},"mode":"preview"} /-->
+| HTML | Block |
+|---|---|
+| `h1` to `h6` | Heading |
+| `p` | Paragraph |
+| `ul`, `ol` with `li` | List |
+| `img` | Image |
+| `div`, `section`, `header`, `footer`, `article`, `aside`, `main` | Group (the tag is kept) |
+| any element with `data-acf` | ACF block |
+| any other tag | Custom HTML |
+
+`class` is kept as the block additional CSS class and `id` as its anchor. Other attributes are removed.
+
+### Data attributes
+
+| Attribute | Use |
+|---|---|
+| `data-name` | Name of the element in the `Content` panel and the list view |
+| `data-placeholder` | Text displayed in an empty heading or paragraph, in the editor only |
+| `data-acf` | `TYPE` of the ACF block |
+| `data-field-{name}` | Initial value of the ACF field `{name}` |
+| `data-locked` | Element that non-administrators can't edit (see `Locked Elements`) |
+
+### Rules
+
+- The pattern has a **single root element** (a `section` or a `div` holding the other elements), so the layout lock works.
+- A text written directly inside a `section` or a `div` is ignored: put it in a `p`.
+- A `li` only contains text and inline tags (`strong`, `em`, `a`, `br`, `span`): no `p` and no nested list, or the block is invalid.
+- ACF field names are lowercase with underscores (`data-field-titre_bouton`): the HTML parser turns attribute names to lowercase.
+- A value starting with `[` or `{` is read as JSON (for a `link` field for example). Always write it with `esc_attr( wp_json_encode( ... ) )`, which handles quotes and apostrophes:
+
+```php
+<div data-acf="block-demo" data-field-lien="<?php echo esc_attr( wp_json_encode( [ 'url' => '#', 'title' => "Voir l'agenda", 'target' => '' ] ) ); ?>"></div>
 ```
+
+- Only simple fields can get an initial value. Repeater, group, flexible content, image, file and relational fields can't be filled from the pattern (an image ID is not the same from one site to another): they are empty when the pattern is inserted, and the user fills them in the editor. For an image, plan a default image in the block partial.
+- The Custom HTML block (any other tag) can't be edited by non-administrators in a locked pattern, and its content is filtered when a user without the `unfiltered_html` capability saves the page (authors, or editors on a multisite): `svg`, `iframe`, `script` and some attributes are removed. For an icon, use an ACF block.
+
+### Block markup
+
+A partial that already contains block markup (`<!-- wp:`) is kept as is. You can compose a layout in the editor, use `Copy all blocks` and paste the result in the partial.
 
 ## Naming the Elements
 
-By default, the `Content` panel and the list view show the block type (`Paragraph`, `Image`...). Give each element a name with `metadata.name` to show what it is used for:
+By default, the `Content` panel and the list view show the block type (`Paragraph`, `Image`...). Give each element a name with `data-name` to show what it is used for:
 
-```php
-<!-- wp:heading {"metadata":{"name":"<?php esc_attr_e( 'Section title', 'theme' ); ?>"}} -->
-<h2 class="wp-block-heading"><?php esc_html_e( 'Title', 'theme' ); ?></h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph {"metadata":{"name":"<?php esc_attr_e( 'Introduction', 'theme' ); ?>"}} -->
-<p>Lorem ipsum dolor sit amet.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:acf/block-demo {"name":"acf/block-demo","metadata":{"name":"<?php esc_attr_e( 'Banner', 'theme' ); ?>"},"mode":"preview"} /-->
+```html
+<h2 data-name="Section title"></h2>
+<p data-name="Introduction">Lorem ipsum dolor sit amet.</p>
+<div data-acf="block-demo" data-name="Banner"></div>
 ```
 
 ## Placeholders
 
-Instead of a sample text, a `placeholder` tells the user what to write. It is only displayed in the editor while the element is empty:
+Instead of a sample text, a placeholder tells the user what to write. It is only displayed in the editor while the heading or paragraph is empty:
 
-```php
-<!-- wp:heading {"placeholder":"<?php esc_attr_e( 'Event title…', 'theme' ); ?>"} -->
-<h2 class="wp-block-heading"></h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph {"placeholder":"<?php esc_attr_e( 'Write a short introduction…', 'theme' ); ?>"} -->
-<p></p>
-<!-- /wp:paragraph -->
+```html
+<h2 data-placeholder="Event title…"></h2>
+<p data-placeholder="Write a short introduction…"></p>
 ```
 
 If the user leaves an element empty, its empty tag (`<p></p>`) is still printed on the front-end: hide it in the theme styles if needed (`p:empty { display: none; }`).
-
-Text values inside the block comments are JSON: escape them with `esc_attr_e()` and avoid double quotes in translations.
 
 ## Settings
 
@@ -119,7 +146,7 @@ public static function settings()
 }
 ```
 
-ACF blocks inside a pattern are previewed with the data set in the pattern markup (`data`). To give an ACF block a filled preview in the block inserter, see `example` in the Block documentation.
+ACF blocks inside a pattern are previewed with the values set with `data-field-{name}`. To give an ACF block a filled preview in the block inserter, see `example` in the Block documentation.
 
 ## Starter Patterns
 
@@ -191,6 +218,22 @@ Once inserted in a page, these users can still edit texts, images and links, and
 The pattern must have a single root block (a group for example): WordPress only keeps the pattern name on the inserted blocks in this case, and the lock relies on it.
 
 The lock is applied in the editor only, nothing is saved in the post content.
+
+## Locked Elements
+
+By default, the texts, images and links of a locked pattern stay editable. Add `data-locked` to an element to freeze it too, for example an imposed section title:
+
+```html
+<section class="section-demo">
+    <h2 data-locked>Our next events</h2>
+    <p data-placeholder="Write a short introduction…"></p>
+</section>
+```
+
+For non-administrators, a locked element is still displayed but can't be selected or edited, and it is not listed in the `Content` panel. Inside a locked group, every element is locked.
+
+- It only works when `Only administrators can edit the layout of patterns` is checked. Administrators are never affected.
+- Don't put `data-locked` on the root element: the whole pattern would be frozen, and the user could not select it to move or remove it.
 
 ## Only Toolkit Patterns
 
