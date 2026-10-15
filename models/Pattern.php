@@ -38,6 +38,7 @@ abstract class Pattern
 
 	/**
 	 * Render the pattern template and return its markup.
+	 * Plain HTML is converted into blocks, block markup is kept as is.
 	 *
 	 * @param string $file The pattern template path.
 	 * @return string
@@ -45,6 +46,12 @@ abstract class Pattern
 	protected static function content( string $file ): string {
 		ob_start();
 		include $file;
-		return ob_get_clean();
+		$html = ob_get_clean();
+
+		if ( false === strpos( $html, '<!-- wp:' ) ) {
+			$html = \Toolkit\utils\PatternConverter::convert( $html );
+		}
+
+		return $html;
 	}
 }

@@ -56,12 +56,22 @@
     }
 
     /**
-     * Lock the inner blocks of a pattern: content blocks stay editable, the others are disabled.
+     * Check if a block is marked as locked in the pattern (data-locked).
      */
-    function lockInnerBlocks(blocks, modes) {
+    function isLocked(block) {
+        var metadata = block.attributes && block.attributes.metadata;
+        return !!(metadata && metadata.hithtoLocked);
+    }
+
+    /**
+     * Lock the inner blocks of a pattern: content blocks stay editable, the others are disabled.
+     * Locked blocks (data-locked) and their inner blocks are disabled.
+     */
+    function lockInnerBlocks(blocks, modes, parentLocked) {
         blocks.forEach(function(block) {
-            modes[block.clientId] = isContentBlock(block.name) ? 'contentOnly' : 'disabled';
-            lockInnerBlocks(block.innerBlocks, modes);
+            var locked = parentLocked || isLocked(block);
+            modes[block.clientId] = !locked && isContentBlock(block.name) ? 'contentOnly' : 'disabled';
+            lockInnerBlocks(block.innerBlocks, modes, locked);
         });
     }
 
@@ -71,9 +81,10 @@
     function collectModes(blocks, modes) {
         blocks.forEach(function(block) {
             if (isToolkitPattern(block)) {
-                // The pattern itself can still be moved or removed
-                modes[block.clientId] = 'contentOnly';
-                lockInnerBlocks(block.innerBlocks, modes);
+                // The pattern itself can still be moved or removed, unless it is locked
+                var locked = isLocked(block);
+                modes[block.clientId] = locked ? 'disabled' : 'contentOnly';
+                lockInnerBlocks(block.innerBlocks, modes, locked);
             } else {
                 collectModes(block.innerBlocks, modes);
             }
