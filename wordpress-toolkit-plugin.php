@@ -10,7 +10,6 @@
  * @wordpress-plugin
  * Plugin Name: HI Theme Toolkit
  * Description: A developer toolkit for building WordPress themes — provides base models, ACF block registration, custom post types, taxonomies, REST API helpers, and utility services.
- * Plugin URI: https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin
  * Version: 3.0.0
  * Requires at least: 6.8
  * Requires PHP: 8.0

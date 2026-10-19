@@ -18,7 +18,7 @@ WordPress Toolkit is a professional development framework for building complex W
 
 ### Services
 
-- **MainService** — Maintenance mode, cookie consent banner, SVG upload support, emoji removal, comment system toggle, WordPress version hiding, login page customization, custom admin branding.
+- **MainService** — Coming-soon mode, cookie consent banner, SVG upload support, emoji removal, comment system toggle, WordPress version hiding, login page customization, custom admin branding.
 - **AssetService** — CSS/JS registration and enqueuing with Vite dev server and production manifest support.
 - **ModelService** — Auto-scans `/models/custom/` and registers enabled post types via an admin toggle UI.
 - **CalendarService** — Google Calendar synchronization: fetch, create, update, and clean up events on a configurable cron schedule.
