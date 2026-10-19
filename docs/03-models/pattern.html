@@ -1,0 +1,247 @@
+<div class='grid grid-cols-5-1'><div class='content'><h1 id="custom-pattern">Custom Pattern</h1>
+<h2 id="creating-a-custom-pattern">Creating a Custom Pattern</h2>
+<p>To create a <code>Pattern</code>, add a file in the theme's <code>models/custom</code> folder and create its partial in the <code>partials/patterns</code> folder with the same name as the <code>TYPE</code>.</p>
+<p>Copy and modify the following code:</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Toolkit\models\custom;
+
+use Toolkit\models\Pattern;
+
+class PatternDemo extends Pattern
+{
+  const TYPE = 'pattern-demo';
+
+  public static function settings()
+  {
+    return array(
+      'title' =&gt; 'Demo',
+      'description' =&gt; 'Demo',
+      'keywords' =&gt;
+      array(
+        0 =&gt; 'section',
+        1 =&gt; 'hi-pattern',
+      ),
+    );
+  }
+}</code></pre>
+<p>Then enable it in <code>Toolkit &gt; Models</code>.</p>
+<h2 id="pattern-content">Pattern Content</h2>
+<p>The partial <code>partials/patterns/pattern-demo.php</code> is written in plain HTML, with the theme classes. The toolkit converts it into blocks when the pattern is registered.</p>
+<pre><code class="language-php">&lt;section class="section-demo" data-name="Demo section"&gt;
+
+    &lt;h2 class="green" data-name="Section title" data-placeholder="Enter the section title…"&gt;&lt;/h2&gt;
+
+    &lt;p class="bigger"&gt;Lorem ipsum dolor sit amet.&lt;/p&gt;
+
+    &lt;ul&gt;
+        &lt;li&gt;First point&lt;/li&gt;
+        &lt;li&gt;Second point&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;div data-acf="block-demo" data-name="Banner" data-field-titre="Welcome"&gt;&lt;/div&gt;
+
+&lt;/section&gt;</code></pre>
+<p>The partial is a PHP file, so translation functions and constants such as <code>HITHTO_THEME_URL</code> can be used. Plain texts are enough for the editor labels (<code>data-name</code>, <code>data-placeholder</code>); use <code>__()</code> only if the editors of a site work in another language.</p>
+<h3 id="elements">Elements</h3>
+<table>
+<thead>
+<tr>
+<th>HTML</th>
+<th>Block</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>h1</code> to <code>h6</code></td>
+<td>Heading</td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>Paragraph</td>
+</tr>
+<tr>
+<td><code>ul</code>, <code>ol</code> with <code>li</code></td>
+<td>List</td>
+</tr>
+<tr>
+<td><code>img</code></td>
+<td>Image</td>
+</tr>
+<tr>
+<td><code>div</code>, <code>section</code>, <code>header</code>, <code>footer</code>, <code>article</code>, <code>aside</code>, <code>main</code></td>
+<td>Group (the tag is kept)</td>
+</tr>
+<tr>
+<td>any element with <code>data-acf</code></td>
+<td>ACF block</td>
+</tr>
+<tr>
+<td>any other tag</td>
+<td>Custom HTML</td>
+</tr>
+</tbody>
+</table>
+<p><code>class</code> is kept as the block additional CSS class and <code>id</code> as its anchor. Other attributes are removed.</p>
+<h3 id="data-attributes">Data attributes</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data-name</code></td>
+<td>Name of the element in the <code>Content</code> panel and the list view</td>
+</tr>
+<tr>
+<td><code>data-placeholder</code></td>
+<td>Text displayed in an empty heading or paragraph, in the editor only</td>
+</tr>
+<tr>
+<td><code>data-acf</code></td>
+<td><code>TYPE</code> of the ACF block</td>
+</tr>
+<tr>
+<td><code>data-field-{name}</code></td>
+<td>Initial value of the ACF field <code>{name}</code></td>
+</tr>
+<tr>
+<td><code>data-locked</code></td>
+<td>Element that non-administrators can't edit (see <code>Locked Elements</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rules">Rules</h3>
+<ul>
+<li>The pattern has a <strong>single root element</strong> (a <code>section</code> or a <code>div</code> holding the other elements), so the layout lock works.</li>
+<li>A text written directly inside a <code>section</code> or a <code>div</code> is ignored: put it in a <code>p</code>.</li>
+<li>A <code>li</code> only contains text and inline tags (<code>strong</code>, <code>em</code>, <code>a</code>, <code>br</code>, <code>span</code>): no <code>p</code> and no nested list, or the block is invalid.</li>
+<li>ACF field names are lowercase with underscores (<code>data-field-titre_bouton</code>): the HTML parser turns attribute names to lowercase.</li>
+<li>A value starting with <code>[</code> or <code>{</code> is read as JSON (for a <code>link</code> field for example). Always write it with <code>esc_attr( wp_json_encode( ... ) )</code>, which handles quotes and apostrophes:</li>
+</ul>
+<pre><code class="language-php">&lt;div data-acf="block-demo" data-field-lien="&lt;?php echo esc_attr( wp_json_encode( [ 'url' =&gt; '#', 'title' =&gt; "Voir l'agenda", 'target' =&gt; '' ] ) ); ?&gt;"&gt;&lt;/div&gt;</code></pre>
+<ul>
+<li>Only simple fields can get an initial value. Repeater, group, flexible content, image, file and relational fields can't be filled from the pattern (an image ID is not the same from one site to another): they are empty when the pattern is inserted, and the user fills them in the editor. For an image, plan a default image in the block partial.</li>
+<li>The Custom HTML block (any other tag) can't be edited by non-administrators in a locked pattern, and its content is filtered when a user without the <code>unfiltered_html</code> capability saves the page (authors, or editors on a multisite): <code>svg</code>, <code>iframe</code>, <code>script</code> and some attributes are removed. For an icon, use an ACF block.</li>
+</ul>
+<h3 id="block-markup">Block markup</h3>
+<p>A partial that already contains block markup (<code>&lt;!-- wp:</code>) is kept as is. You can compose a layout in the editor, use <code>Copy all blocks</code> and paste the result in the partial.</p>
+<h2 id="naming-the-elements">Naming the Elements</h2>
+<p>By default, the <code>Content</code> panel and the list view show the block type (<code>Paragraph</code>, <code>Image</code>...). Give each element a name with <code>data-name</code> to show what it is used for:</p>
+<pre><code class="language-html">&lt;h2 data-name="Section title"&gt;&lt;/h2&gt;
+&lt;p data-name="Introduction"&gt;Lorem ipsum dolor sit amet.&lt;/p&gt;
+&lt;div data-acf="block-demo" data-name="Banner"&gt;&lt;/div&gt;</code></pre>
+<h2 id="placeholders">Placeholders</h2>
+<p>Instead of a sample text, a placeholder tells the user what to write. It is only displayed in the editor while the heading or paragraph is empty:</p>
+<pre><code class="language-html">&lt;h2 data-placeholder="Event title…"&gt;&lt;/h2&gt;
+&lt;p data-placeholder="Write a short introduction…"&gt;&lt;/p&gt;</code></pre>
+<p>If the user leaves an element empty, its empty tag (<code>&lt;p&gt;&lt;/p&gt;</code>) is still printed on the front-end: hide it in the theme styles if needed (<code>p:empty { display: none; }</code>).</p>
+<h2 id="settings">Settings</h2>
+<p><code>settings()</code> accepts the arguments of <a href="https://developer.wordpress.org/reference/functions/register_block_pattern/">register_block_pattern</a> (<code>title</code>, <code>description</code>, <code>categories</code>, <code>keywords</code>, <code>blockTypes</code>, <code>viewportWidth</code>, <code>inserter</code>...). The <code>content</code> is generated from the partial.</p>
+<p>The pattern is registered as <code>hithto/{TYPE}</code>.</p>
+<h2 id="inserter-preview">Inserter Preview</h2>
+<p>The inserter shows a preview of each pattern, rendered with the theme block styles.</p>
+<ul>
+<li><code>viewportWidth</code> sets the width (in pixels) used to render the preview, so a full-width pattern looks like on a desktop screen.</li>
+<li><code>description</code> and <code>keywords</code> are used by the inserter search.</li>
+</ul>
+<pre><code class="language-php">public static function settings()
+{
+  return array(
+    'title' =&gt; 'Demo',
+    'description' =&gt; 'A section with a title, a text and a banner.',
+    'keywords' =&gt; array( 'section', 'banner' ),
+    'viewportWidth' =&gt; 1400,
+  );
+}</code></pre>
+<p>ACF blocks inside a pattern are previewed with the values set with <code>data-field-{name}</code>. To give an ACF block a filled preview in the block inserter, see <code>example</code> in the Block documentation.</p>
+<h2 id="starter-patterns">Starter Patterns</h2>
+<p>When a new page is created, WordPress opens a modal to choose a pattern as a starting point. To add a pattern to this modal, set <code>blockTypes</code> to <code>core/post-content</code> and list the post types in <code>postTypes</code>:</p>
+<pre><code class="language-php">public static function settings()
+{
+  return array(
+    'title' =&gt; 'Demo',
+    'blockTypes' =&gt; array( 'core/post-content' ),
+    'postTypes' =&gt; array( 'page', 'event' ),
+  );
+}</code></pre>
+<p>The modal is only displayed when the content is empty, and users can disable it in the editor preferences (<code>Show starter patterns</code>).</p>
+<h2 id="template-patterns">Template Patterns</h2>
+<p>A pattern can be added by default to every new post of a post type, through the <code>template</code> argument of its <code>type_settings()</code>:</p>
+<pre><code class="language-php">class Event extends CustomPostType
+{
+  const TYPE = 'event';
+
+  public static function type_settings()
+  {
+    return array(
+      // ...
+      'template' =&gt; array(
+        array( 'core/pattern', array( 'slug' =&gt; 'hithto/pattern-demo' ) ),
+      ),
+    );
+  }
+}</code></pre>
+<p>The template only applies to new posts. Both models must be enabled in <code>Toolkit &gt; Models</code>.</p>
+<p>If the pattern sets <code>postTypes</code>, it must include the post type (here <code>event</code>), otherwise the pattern is not loaded in the editor and the template stays empty.</p>
+<h2 id="hide-pattern">Hide Pattern</h2>
+<p>To keep a pattern out of the inserter, set <code>inserter</code> to <code>false</code>. It can still be used in a template, which is useful for patterns only meant to be added by default to a post type.</p>
+<pre><code class="language-php">class PatternDemo extends Pattern
+{
+  const TYPE = 'pattern-demo';
+
+  public static function settings()
+  {
+    return array(
+      'title' =&gt; 'Demo',
+      'inserter' =&gt; false,
+    );
+  }
+}</code></pre>
+<h2 id="locking-the-layout">Locking the Layout</h2>
+<p>In the <code>Patterns</code> section of the <code>Toolkit</code> page, check <code>Only administrators can edit the layout of patterns</code> to lock the toolkit patterns (<code>hithto/*</code>) for users who can't edit the theme options (editors, authors...).</p>
+<p>Once inserted in a page, these users can still edit texts, images and links, and move or remove the pattern, but they can't change its styles (colors, font sizes, spacing...) or add, remove and reorder the blocks inside it. This also applies in the <code>Edit pattern</code> mode. The <code>Edit pattern</code> button of the block settings sidebar is hidden, so the sidebar only shows the <code>Content</code> panel. Administrators are not affected.</p>
+<p>The pattern must have a single root block (a group for example): WordPress only keeps the pattern name on the inserted blocks in this case, and the lock relies on it.</p>
+<p>The lock is applied in the editor only, nothing is saved in the post content.</p>
+<h2 id="locked-elements">Locked Elements</h2>
+<p>By default, the texts, images and links of a locked pattern stay editable. Add <code>data-locked</code> to an element to freeze it too, for example an imposed section title:</p>
+<pre><code class="language-html">&lt;section class="section-demo"&gt;
+    &lt;h2 data-locked&gt;Our next events&lt;/h2&gt;
+    &lt;p data-placeholder="Write a short introduction…"&gt;&lt;/p&gt;
+&lt;/section&gt;</code></pre>
+<p>For non-administrators, a locked element is still displayed but can't be selected or edited, and it is not listed in the <code>Content</code> panel. Inside a locked group, every element is locked.</p>
+<ul>
+<li>It only works when <code>Only administrators can edit the layout of patterns</code> is checked. Administrators are never affected.</li>
+<li>Don't put <code>data-locked</code> on the root element: the whole pattern would be frozen, and the user could not select it to move or remove it.</li>
+</ul>
+<h2 id="only-toolkit-patterns">Only Toolkit Patterns</h2>
+<p>In the <code>Patterns</code> section of the <code>Toolkit</code> page, check <code>Only show toolkit patterns in the editor</code> to hide every pattern that is not a toolkit pattern (<code>hithto/*</code>): patterns from WordPress, from the wordpress.org directory, from the theme <code>patterns</code> folder and from other plugins.</p>
+<p>Patterns created by users in the editor (<code>My patterns</code>) are not affected.</p>
+<h2 id="category">Category</h2>
+<p>When <code>categories</code> is not set, the pattern is added to the toolkit category (<code>hithto</code>). Its name, displayed in the editor, can be changed in the <code>Patterns</code> section of the <code>Toolkit</code> page (default: <code>Hawaii</code>).</p></div><div class='toc'><div class='fix'><ul>
+<li><a href="#custom-pattern">Custom Pattern</a><ul>
+<li><a href="#creating-a-custom-pattern">Creating a Custom Pattern</a></li>
+<li><a href="#pattern-content">Pattern Content</a><ul>
+<li><a href="#elements">Elements</a></li>
+<li><a href="#data-attributes">Data attributes</a></li>
+<li><a href="#rules">Rules</a></li>
+<li><a href="#block-markup">Block markup</a></li>
+</ul>
+</li>
+<li><a href="#naming-the-elements">Naming the Elements</a></li>
+<li><a href="#placeholders">Placeholders</a></li>
+<li><a href="#settings">Settings</a></li>
+<li><a href="#inserter-preview">Inserter Preview</a></li>
+<li><a href="#starter-patterns">Starter Patterns</a></li>
+<li><a href="#template-patterns">Template Patterns</a></li>
+<li><a href="#hide-pattern">Hide Pattern</a></li>
+<li><a href="#locking-the-layout">Locking the Layout</a></li>
+<li><a href="#locked-elements">Locked Elements</a></li>
+<li><a href="#only-toolkit-patterns">Only Toolkit Patterns</a></li>
+<li><a href="#category">Category</a></li>
+</ul>
+</li>
+</ul></div></div></div>
