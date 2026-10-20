@@ -352,7 +352,7 @@ add_action( 'after_setup_theme', function () {
 
 ### WordPress Requirements
 
-Requires at least: 6.4
+Requires at least: 6.8
 Requires PHP: 8.0
 
 ### Getting Started
@@ -363,36 +363,115 @@ To start a new theme using this toolkit, use the official boilerplate:
 
 ### Installation
 
-Download the [wordpress-toolkit-plugin](https://github.com/Hawaii-Interactive-CH/wordpress-toolkit-plugin) as a zip and install it via the WordPress admin.
+The plugin is available on the WordPress.org Plugin Directory as [HI Theme Toolkit](https://wordpress.org/plugins/hi-theme-toolkit/).
+
+- **WordPress admin**: go to **Plugins → Add New**, search for "HI Theme Toolkit", then install and activate it.
+- **WP-CLI**:
+
+```bash
+wp plugin install hi-theme-toolkit --activate
+```
+
+- **Composer** (via [WPackagist](https://wpackagist.org)):
+
+```bash
+composer require wpackagist-plugin/hi-theme-toolkit
+```
+
+Updates are then delivered through the standard WordPress update system.
 
 
 ### Publishing a new version
 
-1. Update the version number in `wordpress-toolkit-plugin.php` (header and constant):
+The plugin is distributed through the WordPress.org Plugin Directory (`hi-theme-toolkit`). Sites using it receive updates from WordPress.org, so a release is only available once it has been committed to SVN.
+
+#### Prerequisites
+
+- Subversion installed: `brew install subversion`
+- Commit access to `https://plugins.svn.wordpress.org/hi-theme-toolkit`
+- An SVN password, generated from your WordPress.org profile (**Edit Profile → Account & Security**). Your WordPress.org account password does not work for SVN.
+
+#### 1. Bump the version
+
+The version must be identical in three places, otherwise the deploy script stops:
 
 ```php
+// wordpress-toolkit-plugin.php
  * Version: 3.x.x
 if ( ! defined( 'HITHTO_VERSION' ) ) define( 'HITHTO_VERSION', '3.x.x' );
 ```
 
-2. Commit and push the changes:
-
-```bash
-git add wordpress-toolkit-plugin.php
-git commit -m "update version to 2.x.x"
-git push origin main
+```text
+// readme.txt
+Stable tag: 3.x.x
 ```
 
-3. Create a tag and a GitHub Release:
+Follow semantic versioning: patch (`3.0.1`) for fixes, minor (`3.1.0`) for new backward-compatible features, major (`4.0.0`) for breaking changes.
 
-```bash
-git tag v2.x.x
-git push origin v2.x.x
+#### 2. Update `readme.txt`
+
+- Add an entry at the top of `== Changelog ==`:
+
+```text
+= 3.x.x =
+* Fix: ...
+* Feat: ...
 ```
 
-Then on GitHub, go to **Releases → Draft a new release**, select the tag `v2.x.x` and publish.
+- Optionally add an entry to `== Upgrade Notice ==`. It is displayed in wp-admin next to the update button, so use it for breaking changes or security fixes.
+- Update `Tested up to:` if you tested against a newer WordPress version.
 
-The plugin will automatically detect the new release on sites using it and prompt for an update.
+#### 3. Commit and tag on GitHub
+
+```bash
+git add .
+git commit -m "RELEASE : 3.x.x"
+git tag v3.x.x
+git push origin main --tags
+```
+
+#### 4. Deploy to WordPress.org
+
+```bash
+npm run deploy-svn -- <wordpress-org-username>
+```
+
+The script (`bin/deploy-svn.sh`):
+
+1. Checks that the version, `HITHTO_VERSION` and `Stable tag` match, and that the tag does not already exist in SVN.
+2. Checks out or updates the SVN working copy in `../hi-theme-toolkit-svn` (override with `SVN_DIR=/path`).
+3. Syncs the plugin into `trunk/`, excluding development files (`.git`, `bin`, `docs`, `screenshots`, `package.json`, ...).
+4. Copies `screenshots/screenshotNN.png`, `banner-*` and `icon-*` into `assets/`.
+5. Creates `tags/3.x.x` from `trunk/`.
+6. Shows `svn status` and asks for confirmation before running `svn commit`.
+
+Answering anything other than `y` leaves the changes in the local SVN working copy without publishing them.
+
+#### 5. Verify
+
+- After a few minutes (up to ~15), check that https://wordpress.org/plugins/hi-theme-toolkit/ shows the new version.
+- Sites check for updates about every 12 hours. To force it, use **Dashboard → Updates → Check again**, or run `wp plugin update hi-theme-toolkit`.
+
+#### Rules
+
+- Never modify a published tag. Fix it in a new version instead.
+- To roll back, set `Stable tag` back to the previous version and commit. Sites that already updated are not downgraded, so publish a fix version quickly.
+- **Readme-only changes** (for example `Tested up to`) do not need a new version. Edit `readme.txt` in both `trunk/` and the current `tags/3.x.x/` in the SVN working copy, then run `svn commit`.
+- `register_activation_hook` does not run on updates. If a release needs a data migration, compare a stored version option with `HITHTO_VERSION` on `plugins_loaded`.
+
+#### Assets
+
+Banner and icon sources are in `screenshots/banner.svg` and `screenshots/icon.svg`. Regenerate the PNG files with:
+
+```bash
+cd screenshots
+rsvg-convert -w 256 -h 256 icon.svg -o icon-256x256.png
+rsvg-convert -w 128 -h 128 icon.svg -o icon-128x128.png
+rsvg-convert -w 772 -h 250 banner.svg -o banner-772x250.png
+rsvg-convert -w 1544 -h 500 banner.svg -o banner-1544x500.png
+```
+
+Screenshot captions come from the `== Screenshots ==` section of `readme.txt`, in the same order as the numbered files.
 
 ## Documentation
 
