@@ -72,8 +72,8 @@ fi
 
 cd "$SVN_DIR"
 
-svn status | grep -E '^\?' | cut -c9- | while IFS= read -r path; do svn add --parents "$path" >/dev/null; done
-svn status | grep -E '^!' | cut -c9- | while IFS= read -r path; do svn delete "$path" >/dev/null; done
+{ svn status | grep -E '^\?' || true; } | cut -c9- | while IFS= read -r path; do svn add --parents "$path" >/dev/null; done
+{ svn status | grep -E '^!' || true; } | cut -c9- | while IFS= read -r path; do svn delete "$path" >/dev/null; done
 
 for file in assets/*; do
 	[ -e "$file" ] || continue
