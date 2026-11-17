@@ -217,6 +217,45 @@ class PatternDemo extends Pattern
 <li>It only works when <code>Only administrators can edit the layout of patterns</code> is checked. Administrators are never affected.</li>
 <li>Don't put <code>data-locked</code> on the root element: the whole pattern would be frozen, and the user could not select it to move or remove it.</li>
 </ul>
+<h2 id="updating-existing-patterns">Updating Existing Patterns</h2>
+<p>When a pattern is inserted, WordPress copies its blocks into the page: changing the partial afterwards only affects new insertions. To apply the new version of a partial to the patterns already inserted, click <code>Resync existing patterns</code> in the <code>Patterns</code> section of the <code>Toolkit</code> page (administrators only), check the patterns to update, then <code>Preview changes</code> and <code>Resync now</code>.</p>
+<p>The layout comes from the partial (blocks, order, tags, classes, ids, <code>data-name</code>, <code>data-placeholder</code>, <code>data-locked</code>), the content is kept from the page:</p>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>Kept from the page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heading, paragraph</td>
+<td>The text (with its bold, italic and links)</td>
+</tr>
+<tr>
+<td>List</td>
+<td>Every item</td>
+</tr>
+<tr>
+<td>ACF block</td>
+<td>The field values, the default values of the partial are used for the new fields</td>
+</tr>
+<tr>
+<td>Image and other content blocks</td>
+<td>The whole block, only its classes, id and name come from the partial</td>
+</tr>
+<tr>
+<td>Group, custom HTML</td>
+<td>Nothing, they come from the partial</td>
+</tr>
+</tbody>
+</table>
+<p>The blocks of the page are matched with the blocks of the partial by their <code>data-name</code>, then in order among the blocks of the same type. Give a <code>data-name</code> to the editable elements, so their content follows them when the partial is reordered.</p>
+<ul>
+<li>A pattern holding content that has no place in the new version (a block added in the page, or removed from the partial) is left as is and listed in the preview. Empty headings and paragraphs are not considered as content.</li>
+<li>Each updated content gets a revision (if its post type supports revisions), to roll back if needed.</li>
+<li>Only patterns with a single root block can be resynced, like the lock.</li>
+</ul>
 <h2 id="only-toolkit-patterns">Only Toolkit Patterns</h2>
 <p>In the <code>Patterns</code> section of the <code>Toolkit</code> page, check <code>Only show toolkit patterns in the editor</code> to hide every pattern that is not a toolkit pattern (<code>hithto/*</code>): patterns from WordPress, from the wordpress.org directory, from the theme <code>patterns</code> folder and from other plugins.</p>
 <p>Patterns created by users in the editor (<code>My patterns</code>) are not affected.</p>
@@ -240,6 +279,7 @@ class PatternDemo extends Pattern
 <li><a href="#hide-pattern">Hide Pattern</a></li>
 <li><a href="#locking-the-layout">Locking the Layout</a></li>
 <li><a href="#locked-elements">Locked Elements</a></li>
+<li><a href="#updating-existing-patterns">Updating Existing Patterns</a></li>
 <li><a href="#only-toolkit-patterns">Only Toolkit Patterns</a></li>
 <li><a href="#category">Category</a></li>
 </ul>

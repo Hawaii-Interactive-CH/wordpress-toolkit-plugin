@@ -77,6 +77,7 @@ $toolkit_to_register = [
 	'\\Toolkit\\utils\\DocService',
 	'\\Toolkit\\utils\\ApiAuthService',
 	'\\Toolkit\\utils\\AssetService',
+	'\\Toolkit\\utils\\PatternSyncService',
 	// Models
 	'\\Toolkit\\models\\MediaTaxonomy',
 ];

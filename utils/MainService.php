@@ -778,8 +778,48 @@ class MainService
                     </table>
                     <p class="submit">
                         <input type="submit" name="submit" class="button-primary" value="Save Changes">
+                        <?php if (current_user_can('manage_options')) : ?>
+                            <button type="button" class="button" id="hithto-pattern-sync-toggle" aria-expanded="false" aria-controls="hithto-pattern-sync"><?php esc_html_e( 'Resync existing patterns', 'hi-theme-toolkit' ); ?></button>
+                        <?php endif; ?>
                     </p>
                 </form>
+
+                <?php if (current_user_can('manage_options')) : ?>
+                    <?php $sync_patterns = \Toolkit\utils\PatternSyncService::patterns(); ?>
+                    <div id="hithto-pattern-sync" hidden>
+                        <h3><?php esc_html_e( 'Resync existing patterns', 'hi-theme-toolkit' ); ?></h3>
+                        <p class="description">
+                            <?php esc_html_e( 'Updates the patterns already inserted in the content with the current version of their partial. The layout comes from the partial, the texts, images, lists and ACF fields are kept. A pattern holding content that has no place in the new version is left as is. Each updated content gets a revision.', 'hi-theme-toolkit' ); ?>
+                        </p>
+                        <?php if ($sync_patterns) : ?>
+                            <fieldset id="hithto-pattern-sync-list">
+                                <legend class="screen-reader-text"><?php esc_html_e( 'Patterns to resync', 'hi-theme-toolkit' ); ?></legend>
+                                <?php foreach ($sync_patterns as $name => $pattern) : ?>
+                                    <?php $count = \Toolkit\utils\PatternSyncService::usage_count($name); ?>
+                                    <p>
+                                        <label>
+                                            <input type="checkbox" value="<?php echo esc_attr($name); ?>" <?php checked($count > 0); disabled($count, 0); ?>>
+                                            <?php echo esc_html($pattern['title']); ?>
+                                            <code><?php echo esc_html($name); ?></code>
+                                            <?php
+                                            /* translators: %d: number of contents */
+                                            echo esc_html(sprintf(_n('%d content', '%d contents', $count, 'hi-theme-toolkit'), $count));
+                                            ?>
+                                        </label>
+                                    </p>
+                                <?php endforeach; ?>
+                            </fieldset>
+                            <p>
+                                <button type="button" class="button" id="hithto-pattern-sync-preview"><?php esc_html_e( 'Preview changes', 'hi-theme-toolkit' ); ?></button>
+                                <button type="button" class="button button-primary" id="hithto-pattern-sync-apply" hidden><?php esc_html_e( 'Resync now', 'hi-theme-toolkit' ); ?></button>
+                                <span class="spinner" id="hithto-pattern-sync-spinner" style="float:none"></span>
+                            </p>
+                            <div id="hithto-pattern-sync-report" aria-live="polite"></div>
+                        <?php else : ?>
+                            <p><?php esc_html_e( 'No toolkit pattern is enabled.', 'hi-theme-toolkit' ); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <hr />
